@@ -1,0 +1,54 @@
+version: "1"
+# x-variables:
+#   dat_auth: &dat_auth auth
+#   dat_backend: &dat_backend dat-backend
+#   dat_admin: &dat_admin admin
+services:
+  core-cs:
+    container_name: nis_backend_core
+    image: nis-backend
+    build:
+      context: .
+      args:
+        - APP=core
+        - PORT=${BASE_PORT}
+    restart: unless-stopped
+    ports:
+      - ${BASE_PORT}:${BASE_PORT}
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    command: >
+      sh -c "pnpx prisma generate && pnpm run start:${ENV}"
+  auth-cs:
+    container_name: nis_backend_auth
+    image: nis-backend
+    build:
+      context: .
+      args:
+        - APP=auth
+        - PORT=${AUTH_PORT}
+    restart: unless-stopped
+    ports:
+      - ${AUTH_PORT}:${AUTH_PORT}
+    env_file:
+      - .env
+    volumes:
+      - .:/app # in dev (for real-time updates)
+    command: >
+      sh -c "pnpx prisma generate && pnpm run start:${ENV} auth"
+  # dat-admin-cs:
+  #   container_name: *dat_admin
+  #   build:
+  #     context: .
+  #     args:
+  #       - APP=admin
+  #       - PORT=${DAT_ADMIN_PORT}
+  #   restart: unless-stopped
+  #   ports:
+  #     - ${DAT_ADMIN_PORT}:${DAT_ADMIN_PORT}
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - .:/app

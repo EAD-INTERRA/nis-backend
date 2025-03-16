@@ -1,0 +1,399 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Resource {
+  RESOURCE_A
+  RESOURCE_B
+}
+
+enum PermissionLevel {
+  READ
+  READ_VIEW
+}
+
+enum NotificationType {
+  OUTGOING
+  INCOMING
+}
+
+enum Gender {
+  Male
+  Female
+}
+
+enum MaritalStatus {
+  Single
+  Married
+  Widowed
+  Divorced
+}
+
+model User {
+  // id  String @id @unique @default(uuid())
+  id    String @unique @default(uuid())
+  email String @unique
+
+  password      String
+  password_salt String @default("")
+
+  details UserDetail? @relation()
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  activation_token        String?
+  activation_token_sentAt DateTime? @default(now())
+
+  password_reset_token        String?
+  password_reset_token_sentAt DateTime? @default(now())
+
+  login_token        Int?      @unique
+  login_token_sentAt DateTime?
+
+  last_login DateTime?
+
+  refresh_token_hash       String?
+  refresh_token_expires_at DateTime?
+
+  @@index([email])
+  @@map("user")
+}
+
+model UserDetail {
+  id   String @id @default(uuid())
+  name String
+
+  user_id String @unique
+  user    User?  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  role_id String?
+  role    Role?   @relation("RoleToUser", fields: [role_id], references: [id])
+
+  roles_created Role[] @relation("CreatorToRole")
+  roles_updated Role[] @relation("RoleToUpdater")
+
+  notification_channels_created  NotificationChannel[]  @relation()
+  notification_providers_created NotificationProvider[] @relation()
+
+  phone   String? @unique
+  gender  Gender?
+  address String?
+
+  is_active      Boolean @default(false)
+  is_super_admin Boolean @default(false)
+
+  creator_id    String? // Foreign key for creator
+  creator       UserDetail?  @relation("CreatorToUser", fields: [creator_id], references: [user_id])
+  users_created UserDetail[] @relation("CreatorToUser")
+
+  updater_id    String?
+  updater       UserDetail?  @relation("UpdaterToUser", fields: [updater_id], references: [user_id])
+  users_updated UserDetail[] @relation("UpdaterToUser")
+
+  actions Audit[] @relation()
+
+  @@index([phone, user_id])
+  @@map("user_detail")
+}
+
+model Role {
+  id          String       @id @default(uuid())
+  name        String
+  permissions Permission[] @relation()
+  users       UserDetail[] @relation("RoleToUser")
+
+  created_by String?
+  creator    UserDetail? @relation("CreatorToRole", fields: [created_by], references: [user_id])
+  created_at DateTime?   @default(now())
+
+  updated_by String?
+  updater    UserDetail? @relation("RoleToUpdater", fields: [updated_by], references: [user_id])
+  updated_at DateTime?   @updatedAt
+
+  @@index([name])
+  @@map("role")
+}
+
+model Permission {
+  id       String          @id @default(uuid())
+  resource Resource
+  level    PermissionLevel
+  roles    Role[]          @relation()
+
+  @@index([resource, level])
+  @@map("permission")
+}
+
+model NotificationChannel {
+  id         String            @id @default(uuid())
+  name       String            @unique
+  logs       NotificationLog[] @relation()
+  created_by String?
+  creator    UserDetail?       @relation(fields: [created_by], references: [user_id])
+  created_at DateTime?         @default(now())
+  receivedAt DateTime?         @default(now())
+
+  @@index([name])
+  @@map("notification_channel")
+}
+
+model NotificationProvider {
+  id         String            @id @default(uuid())
+  name       String            @unique
+  logs       NotificationLog[] @relation()
+  created_by String?
+  creator    UserDetail?       @relation(fields: [created_by], references: [user_id])
+  created_at DateTime?         @default(now())
+  receivedAt DateTime?         @default(now())
+
+  @@index([name])
+  @@map("notification_provider")
+}
+
+model NotificationLog {
+  id            String                @id @default(uuid())
+  channel_id    String?
+  channel       NotificationChannel?  @relation(fields: [channel_id], references: [id])
+  provider_id   String?
+  provider      NotificationProvider? @relation(fields: [provider_id], references: [id])
+  type          NotificationType
+  status_code   Int?
+  content       String
+  reference_no  String?
+  // patientId    Int?
+  phone_numbers String[]
+  emails        String[]
+  user_id       Int?
+  sent_at       DateTime?             @default(now())
+  received_at   DateTime?             @default(now())
+
+  @@index([channel_id, provider_id])
+  @@map("notification_log")
+}
+
+model Audit {
+  id          String      @id @default(uuid())
+  user_id     String?
+  user        UserDetail? @relation(fields: [user_id], references: [user_id])
+  ip          String?
+  action      String?
+  path        String?
+  description String?
+  date        DateTime    @default(now())
+
+  @@index([user_id, ip])
+  @@map("audit")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  // user_id     Int
+  // user        user_detail? @relation(fields: [user_id], references: [user_id])
+  fields      Json?
+  ip          String?
+  action      String?
+  description String?
+  date        DateTime @default(now())
+
+  @@index([ip])
+  @@map("project")
+}
+
+// NIS
+
+model PortOfEntry {
+  id          String              @id @default(uuid())
+  name        String
+  travel_info TravelInformation[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([name])
+  @@map("port_of_entry")
+}
+
+model Country {
+  id          String              @id @default(uuid())
+  name        String              @unique
+  code        String?             @unique
+  travel_info TravelInformation[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([name])
+  @@map("country")
+}
+
+model State {
+  id              String          @id @default(uuid())
+  name            String          @unique
+  contact_details ContactDetail[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([name])
+  @@map("state")
+}
+
+model Nationality {
+  id             String         @id @default(uuid())
+  name           String
+  external_id    String         @unique
+  visa_types     VisaType[]
+  passport_types PassportType[]
+  description    String?
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @default(now())
+  applicants     Applicant[]
+
+  @@index([name])
+  @@map("nationality")
+}
+
+model VisaType {
+  id            String            @id @default(uuid())
+  name          String            @unique
+  requirements  VisaRequirement[]
+  nationalities Nationality[]
+  applicants    Applicant[]
+  fee           Int               @default(0)
+  validity      Int               @default(0)
+  max_stay      Int               @default(0)
+  description   String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@index([name])
+  @@map("visa_type")
+}
+
+model VisaRequirement {
+  id                   String               @id @default(uuid())
+  name                 String               @unique
+  // type        String?
+  visa_types           VisaType[]
+  description          String?
+  supporting_documents SupportingDocument[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@index([id, name])
+  @@map("visa_requirement")
+}
+
+model PassportType {
+  id            String        @id @default(uuid())
+  name          String        @unique
+  nationalities Nationality[]
+  applicants    Applicant[]
+  description   String?
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @default(now())
+
+  @@index([id, name])
+  @@map("passport_type")
+}
+
+model Applicant {
+  id                   String               @id @default(uuid())
+  title                String
+  surname              String
+  first_name           String
+  middle_name          String?
+  date_of_birth        DateTime
+  place_of_birth       String
+  nationality_id       String
+  nationality          Nationality          @relation(fields: [nationality_id], references: [id])
+  visa_type_id         String?
+  visa_type            VisaType?            @relation(fields: [visa_type_id], references: [id])
+  passport_type_id     String?
+  passport_type        PassportType?        @relation(fields: [passport_type_id], references: [id])
+  gender               Gender
+  marital_status       MaritalStatus
+  passport_no          String
+  passport_expiry_date DateTime
+  travel_information   TravelInformation[]
+  contact_detail       ContactDetail[]
+  supporting_documents SupportingDocument[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@index([passport_no])
+  @@map("applicant")
+}
+
+model TravelInformation {
+  id                      String      @id @default(uuid())
+  applicant_id            String?
+  applicant               Applicant?  @relation(fields: [applicant_id], references: [id])
+  purpose                 String
+  airline                 String
+  flight_no               String
+  country_of_departure_id String
+  country_of_departure    Country     @relation(fields: [country_of_departure_id], references: [id])
+  date_of_departure       DateTime
+  date_of_arrival         DateTime
+  port_id                 String
+  port_of_entry           PortOfEntry @relation(fields: [port_id], references: [id])
+  duration_of_stay        Int
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @default(now())
+
+  @@index([applicant_id, country_of_departure_id, port_id])
+  @@map("travel_info")
+}
+
+model ContactDetail {
+  id            String     @id @default(uuid())
+  applicant_id  String?
+  applicant     Applicant? @relation(fields: [applicant_id], references: [id])
+  contact_name  String
+  contact_phone String
+  contact_email String
+  address       String
+  city          String
+  postal_code   String
+
+  state_id String
+  state    State  @relation(fields: [state_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([applicant_id, state_id])
+  @@map("contact_detail")
+}
+
+model SupportingDocument {
+  id                  String          @id @default(uuid())
+  name                String
+  url                 String
+  visa_requirement    VisaRequirement @relation(fields: [visa_requirement_id], references: [id])
+  visa_requirement_id String
+  applicant           Applicant       @relation(fields: [applicant_id], references: [id])
+  applicant_id        String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@index([visa_requirement_id, applicant_id])
+  @@map("supporting_document")
+}

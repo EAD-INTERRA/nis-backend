@@ -1,0 +1,161 @@
+import { Controller, Post, Get, Body, UploadedFile, UseInterceptors, Param } from '@nestjs/common';
+import { CreateOrUpdateApplicantDto, CreateOrUpdatePortOfEntryDto, CreateOrUpdateCountryDto, CreateOrUpdateStateDto, CreateOrUpdateNationalityDto, CreateOrUpdateVisaTypeDto, CreateOrUpdateVisaRequirementDto, CreateOrUpdatePassportTypeDto, CreateOrUpdateTravelInformationDto, CreateOrUpdateContactDetailDto, CreateOrUpdateSupportingDocumentDto } from '@app/e-visa/dtos/e-visa.dto';
+import { EVisaService } from '@app/e-visa';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { mapErrorCodeToHttpResponse } from '@app/utils/response';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+@Controller({
+    path: 'e-visa',
+    version: '1'
+})
+@ApiTags('e-visa')
+export class EVisaController {
+  constructor(private readonly eVisaService: EVisaService) {}
+
+  @Post('applicants')
+  async saveBioData(@Body() createOrUpdateApplicantDto: CreateOrUpdateApplicantDto) {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.saveBioData(createOrUpdateApplicantDto));
+  }
+
+  @Get('applicants')
+  async getApplicants() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getApplicants());
+  }
+
+  @Get('applicants/:applicant_id')
+  async getApplicantById(@Param('applicant_id') applicant_id: string) {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getApplicantById(applicant_id));
+  }
+
+  @Post('port-of-entry')
+  async savePortOfEntry(@Body() createOrUpdatePortOfEntryDto: CreateOrUpdatePortOfEntryDto) {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.savePortOfEntry(createOrUpdatePortOfEntryDto));
+  }
+
+  @Get('port-of-entry')
+  async getPortOfEntries() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getPortOfEntries());
+  }
+
+//   @Post('country')
+//   async saveCountry(@Body() createOrUpdateCountryDto: CreateOrUpdateCountryDto) {
+//     return mapErrorCodeToHttpResponse(await this.eVisaService.saveCountry(createOrUpdateCountryDto));
+//   }
+
+  @Get('countries')
+  async getCountries() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getCountries());
+  }
+
+//   @Post('state')
+//   async saveState(@Body() createOrUpdateStateDto: CreateOrUpdateStateDto) {
+//     return mapErrorCodeToHttpResponse(await this.eVisaService.saveState(createOrUpdateStateDto));
+//   }
+
+  @Get('states')
+  async getStates() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getStates());
+  }
+
+//   @Post('nationality')
+//   async saveNationality(@Body() createOrUpdateNationalityDto: CreateOrUpdateNationalityDto) {
+//     return mapErrorCodeToHttpResponse(await this.eVisaService.saveNationality(createOrUpdateNationalityDto));
+//   }
+
+  @Get('nationalities')
+  async getNationalities() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getNationalities());
+  }
+
+  @Post('visa-types')
+  async saveVisaType(@Body() createOrUpdateVisaTypeDto: CreateOrUpdateVisaTypeDto) {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.saveVisaType(createOrUpdateVisaTypeDto));
+  }
+
+  @Get('visa-types')
+  async getVisaTypes() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypes());
+  }
+
+  @Post('visa-requirements')
+  async saveVisaRequirement(@Body() createOrUpdateVisaRequirementDto: CreateOrUpdateVisaRequirementDto) {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.saveVisaRequirement(createOrUpdateVisaRequirementDto));
+  }
+
+  @Get('visa-requirements')
+  async getVisaRequirements() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaRequirements());
+  }
+
+  @Post('passport-types')
+  async savePassportType(@Body() createOrUpdatePassportTypeDto: CreateOrUpdatePassportTypeDto) {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.savePassportType(createOrUpdatePassportTypeDto));
+  }
+
+  @Get('passport-types')
+  async getPassportTypes() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getPassportTypes());
+  }
+
+  @Post('travel-information')
+  async saveTravelInformation(@Body() createOrUpdateTravelInformationDto: CreateOrUpdateTravelInformationDto) {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.saveTravelInformation(createOrUpdateTravelInformationDto));
+  }
+
+  @Get('travel-information')
+  async getTravelInformation() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getTravelInformation());
+  }
+
+  @Post('contact-details')
+  async saveContactDetail(@Body() createOrUpdateContactDetailDto: CreateOrUpdateContactDetailDto) {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.saveContactDetail(createOrUpdateContactDetailDto));
+  }
+
+  @Get('contact-details')
+  async getContactDetails() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getContactDetails());
+  }
+
+//   @Post('supporting-document')
+//   async saveSupportingDocument(@Body() createOrUpdateSupportingDocumentDto: CreateOrUpdateSupportingDocumentDto) {
+//     return mapErrorCodeToHttpResponse(await this.eVisaService.saveSupportingDocument(createOrUpdateSupportingDocumentDto));
+//   }
+@Post('supporting-documents')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+        name: {
+          type: 'string',
+        },
+        visa_requirement_id: {
+          type: 'string',
+        },
+        applicant_id: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  async saveSupportingDocument(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createOrUpdateSupportingDocumentDto: CreateOrUpdateSupportingDocumentDto,
+  ) {
+    const fileUrl = `uploads/${file.filename}`; // Adjust the URL based on your file storage strategy
+    createOrUpdateSupportingDocumentDto.url = fileUrl;
+    return mapErrorCodeToHttpResponse(await this.eVisaService.saveSupportingDocument(createOrUpdateSupportingDocumentDto));
+  }
+
+  @Get('supporting-documents')
+  async getSupportingDocuments() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getSupportingDocuments());
+  }
+}
