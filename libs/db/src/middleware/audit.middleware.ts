@@ -29,11 +29,11 @@ export function auditLogger(req: Request & { user: any }, res: Response, next: N
     const originalSend = res.send;
 
     // Override the send method to capture the response body
-    res.send = function (body) {
-        console.log('Response Body: ', body);
-        res.send = originalSend; // Restore the original send method
-        return res.send(body); // Send the response
-    };
+    // res.send = function (body) {
+    //     console.log('Response Body: ', body);
+    //     res.send = originalSend; // Restore the original send method
+    //     return res.send(body); // Send the response
+    // };
 
     // Log the response status code instead of calling res.json()
     res.on('finish', async () => {

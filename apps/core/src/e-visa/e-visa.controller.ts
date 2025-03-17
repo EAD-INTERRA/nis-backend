@@ -140,14 +140,14 @@ export class EVisaController {
     return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypes());
   }
   
-  @Get('visa-types/:id')
-  async getVisaTypeById(@Param('id') id: string) {
-    return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypeByIdOrKey(id));
-  }
+  // @Get('visa-types/:id')
+  // async getVisaTypeById(@Param('id') id: string) {
+  //   return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypeById(id));
+  // }
 
   @Get('visa-types/:key')
   async getVisaTypeByKey(@Param('key') key: string) {
-    return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypeByIdOrKey( null, key));
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypeByKey(key));
   }
 
   @Post('visa-requirements')
