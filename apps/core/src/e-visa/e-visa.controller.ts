@@ -146,7 +146,7 @@ export class EVisaController {
   }
 
   @Get('visa-types/:key')
-  async getVisaTypeByKey(@Param('id') key: string) {
+  async getVisaTypeByKey(@Param('key') key: string) {
     return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypeByIdOrKey( null, key));
   }
 

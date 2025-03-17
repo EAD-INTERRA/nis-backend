@@ -11,7 +11,7 @@ export class EVisaService {
     ) { }
 
     async saveBioData(createOrUpdateApplicantDto: CreateOrUpdateApplicantDto): Promise<ServiceResponse> {
-        try {
+        // try {
             const { id, visa_type_key, visa_type_id, ...data } = createOrUpdateApplicantDto;
 
             let visa_type: VisaType;
@@ -40,10 +40,10 @@ export class EVisaService {
                 }
             });
             return success(applicant, "Applicant bio data saved successfully");
-        } catch (e) {
-            console.error(e);
-            exception({ message: e, customMessage: "Failed to save applicant bio data" });
-        }
+        // } catch (e) {
+        //     console.error(e);
+        //     exception({ message: e, customMessage: "Failed to save applicant bio data" });
+        // }
     }
 
     async getApplicants(): Promise<ServiceResponse> {

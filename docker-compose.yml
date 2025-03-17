@@ -20,7 +20,7 @@ services:
     # volumes:
     #   - .:/app
     command: >
-      sh -c "pnpx prisma migrate dev --name initial && pnpm run start:${ENV}"
+      sh -c "pnpx prisma generate && pnpm run start:${ENV}"
   auth-cs:
     container_name: nis_backend_auth
     image: eadinterra/nis-backend
@@ -37,7 +37,7 @@ services:
     # volumes:
     #   - .:/app # in dev (for real-time updates)
     command: >
-      sh -c "pnpx prisma migrate dev --name initial && pnpm run start:${ENV} auth"
+      sh -c "pnpx prisma generate  && pnpm run start:${ENV} auth"
   # dat-admin-cs:
   #   container_name: *dat_admin
   #   build:
