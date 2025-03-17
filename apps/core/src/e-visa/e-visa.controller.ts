@@ -14,7 +14,69 @@ export class EVisaController {
   constructor(private readonly eVisaService: EVisaService) {}
 
   @Post('applicants')
-  async saveBioData(@Body() createOrUpdateApplicantDto: CreateOrUpdateApplicantDto) {
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+        title: {
+          type: 'string',
+        },
+        surname: {
+          type: 'string',
+        },
+        first_name: {
+          type: 'string',
+        },
+        middle_name: {
+          type: 'string',
+        },
+        date_of_birth: {
+          type: 'string',
+          format: 'date',
+        },
+        place_of_birth: {
+          type: 'string',
+        },
+        nationality_id: {
+          type: 'string',
+        },
+        passport_type_id: {
+          type: 'string',
+        },
+        visa_type_id: {
+          type: 'string',
+        },
+        visa_type_key: {
+          type: 'string',
+        },
+        gender: {
+          type: 'string',
+        },
+        marital_status: {
+          type: 'string',
+        },
+        passport_no: {
+          type: 'string',
+        },
+        passport_expiry_date: {
+          type: 'string',
+          format: 'date',
+        },
+      },
+    },
+  })
+  async saveBioData(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createOrUpdateApplicantDto: CreateOrUpdateApplicantDto,
+  ) {
+    const fileUrl = `uploads/${file.filename}`; // Adjust the URL based on your file storage strategy
+    createOrUpdateApplicantDto.image_url = fileUrl;
     return mapErrorCodeToHttpResponse(await this.eVisaService.saveBioData(createOrUpdateApplicantDto));
   }
 
@@ -76,6 +138,16 @@ export class EVisaController {
   @Get('visa-types')
   async getVisaTypes() {
     return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypes());
+  }
+  
+  @Get('visa-types/:id')
+  async getVisaTypeById(@Param('id') id: string) {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypeByIdOrKey(id));
+  }
+
+  @Get('visa-types/:key')
+  async getVisaTypeByKey(@Param('id') key: string) {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypeByIdOrKey( null, key));
   }
 
   @Post('visa-requirements')

@@ -215,7 +215,7 @@ model Project {
 
 model PortOfEntry {
   id          String              @id @default(uuid())
-  name        String
+  name        String              @unique
   travel_info TravelInformation[]
 
   created_at DateTime @default(now())
@@ -268,6 +268,7 @@ model Nationality {
 model VisaType {
   id            String            @id @default(uuid())
   name          String            @unique
+  key           String?           @unique
   requirements  VisaRequirement[]
   nationalities Nationality[]
   applicants    Applicant[]
@@ -286,8 +287,11 @@ model VisaType {
 model VisaRequirement {
   id                   String               @id @default(uuid())
   name                 String               @unique
-  // type        String?
-  visa_types           VisaType[]
+  field                String?
+  label                String?
+  required             Boolean              @default(false)
+  // visa_type_id         String?
+  visa_types           VisaType[] //           @relation(fields: [visa_type_id], references: [id])
   description          String?
   supporting_documents SupportingDocument[]
 
@@ -329,6 +333,7 @@ model Applicant {
   marital_status       MaritalStatus
   passport_no          String
   passport_expiry_date DateTime
+  image_url            String?
   travel_information   TravelInformation[]
   contact_detail       ContactDetail[]
   supporting_documents SupportingDocument[]

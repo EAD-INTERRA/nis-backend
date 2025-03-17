@@ -1,13 +1,102 @@
 export const VISA_TYPES = [
-    { name: "Tourism" },
-    { name: "Business" },
+    { key: "F3B", name: "Transit Visa" },
+    { key: "F4A", name: "Business (Single Entry)" },
+    { key: "F4B", name: "Business (Multiple Entry)" },
+    { key: "F4C", name: "Business (Frequent Travelers)" },
+    { key: "F5A", name: "Tourism Visa" },
+    { key: "F6A", name: "Visiting Visa (Single Entry)" },
+    { key: "F7E", name: "Sports Visa" },
+    { key: "F7F", name: "Creative Arts Visa" },
+    { key: "F7G", name: "Study Tour Visa" },
+    { key: "F7H", name: "Academic Exchange Visa" },
+    { key: "F71", name: "International Cultural Exchange Visa" },
+    { key: "F7K", name: "Emergency/Relief Work Visa" },
+    { key: "F9A", name: "Returning Nigerians by Birth" },
 ];
 
 export const PASSPORT_TYPES = [
     { name: "Standard" },
+    { name: "Official" },
     { name: "Diplomatic" },
 ];
 
+export const TITLES = [
+    { name: "Mr" },
+    { name: "Mrs" },
+    { name: "Miss" },
+];
+
+
+export const PORTS_OF_ENTRY = [
+    { name: "Nnamdi Azikiwe International Airport, Abuja" },
+    { name: "Mallam Aminu Kano Airport, Kano" },
+    { name: "Murtala Mohammed Airport, Lagos" },
+    { name: "Margret Ekpo Airport, Calabar" },
+    { name: "Port Harcourt International Airport, Rivers" },
+    { name: "Akanu Ibiam International Airport, Enugu" },
+];
+
+export const COMMON_UPLOADS = [
+    { field: "passport", label: "Passport Copy (Valid for at least 6 months)", required: true },
+    { field: "return_ticket", label: "Return Ticket", required: true },
+    { field: "hotel_reservation", label: "Hotel Reservation or Host Address in Nigeria", required: true },
+    { field: "bank_statement", label: "Evidence of Sufficient Funds (Bank Statement)", required: true },
+];
+
+export const VISA_SPECIFIC_UPLOADS_MAP = {
+    F3B: [
+        { field: "onward_ticket", label: "Onward Ticket", required: true },
+        { field: "visa_final_destination", label: "Visa to Final Destination (if applicable)", required: false },
+        { field: "birth_certificate", label: "Birth Certificate (For Minors)", required: false },
+        { field: "parental_consent", label: "Parental Consent Letter (For Minors)", required: false },
+    ],
+    F4A: [
+        { field: "cac_certificate", label: "CAC Certificate", required: true },
+        { field: "invitation_letter", label: "Invitation Letter (On Company Letterhead)", required: true },
+    ],
+    F4B: [
+        { field: "cac_certificate", label: "CAC Certificate", required: true },
+        { field: "invitation_letter", label: "Invitation Letter (On Company Letterhead)", required: true },
+    ],
+    F4C: [
+        { field: "cac_certificate", label: "CAC Certificate", required: true },
+        { field: "invitation_letter", label: "Invitation Letter (On Company Letterhead)", required: true },
+        { field: "investment_confirmation", label: "Investment Confirmation Letter (from NIPC)", required: true },
+    ],
+    F5A: [
+        { field: "bank_statement_180", label: "180-Day Bank Statement", required: true },
+    ],
+    F6A: [
+        { field: "invitation_letter", label: "Invitation Letter from Nigerian Host", required: true },
+        { field: "host_passport", label: "Copy of Nigerian Passport/Residency Permit of Host", required: true },
+    ],
+    F7E: [
+        { field: "invitation_letter", label: "Invitation Letter from Tournament Organizer", required: true },
+        { field: "athlete_credentials", label: "Athlete’s Credentials", required: true },
+        { field: "sports_commission_letter", label: "Letter from Federal/State Sports Commission", required: true },
+    ],
+    F7F: [
+        { field: "invitation_letter", label: "Invitation Letter from Event Organizer", required: true },
+        { field: "cultural_endorsement", label: "Federal/State Arts or Cultural Endorsement", required: true },
+    ],
+    F7G: [
+        { field: "academic_credentials", label: "Academic Credentials", required: true },
+        { field: "invitation_letter", label: "Invitation Letter from Nigerian Institution", required: true },
+    ],
+    F7H: [
+        { field: "academic_credentials", label: "Academic Credentials", required: true },
+        { field: "invitation_letter", label: "Invitation Letter from Nigerian Institution", required: true },
+        { field: "acceptance_letter", label: "Acceptance Letter from Home Institution (or MOU)", required: true },
+    ],
+    F71: [
+        { field: "govt_letter", label: "Letter from Relevant Government Agency", required: true },
+        { field: "cultural_mou", label: "Cultural Exchange MoU", required: true },
+    ],
+    F7K: [
+        { field: "govt_letter", label: "Letter from Relevant Government Agency", required: true },
+        { field: "ngo_employment", label: "Employment/Affiliation Letter from NGO", required: true },
+    ],
+};
 
 export const STATES_IN_NIGERIA = [
     { name: "Abia" },

@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { COUNTRIES, NATIONALITIES, PASSPORT_TYPES, STATES_IN_NIGERIA, VISA_TYPES } from "../data/nationality";
+import { COMMON_UPLOADS, COUNTRIES, NATIONALITIES, PASSPORT_TYPES, PORTS_OF_ENTRY, STATES_IN_NIGERIA, VISA_SPECIFIC_UPLOADS_MAP, VISA_TYPES } from "../data/nationality";
 
 const providers = ["COURE", "AFRICASTALKING", "SENDGRID"]
 const channels = ["SMS", "EMAIL"]
@@ -78,6 +78,30 @@ export async function seedCountries(db: PrismaClient = new PrismaClient()) {
     }
 }
 
+export async function seedPortsOfEntry(db: PrismaClient = new PrismaClient()) {
+    const prisma = db;
+
+    for (const port of PORTS_OF_ENTRY) {
+        try {
+            const result = await prisma.portOfEntry.upsert({
+                create: {
+                    name: port.name,
+                },
+                where: {
+                    name: port.name,
+                },
+                update: {},
+            });
+
+            if (result) {
+                console.log(`${port.name} created successfully`);
+            }
+        } catch (error) {
+            console.error('Error creating port of entry:', error);
+        }
+    }
+}
+
 export async function seedVisaTypes(db: PrismaClient = new PrismaClient()) {
     const prisma = db;
 
@@ -86,9 +110,10 @@ export async function seedVisaTypes(db: PrismaClient = new PrismaClient()) {
             const result = await prisma.visaType.upsert({
                 create: {
                     name: visaType.name,
+                    key: visaType.key,
                 },
                 where: {
-                    name: visaType.name,
+                    key: visaType.key,
                 },
                 update: {},
             });
@@ -126,6 +151,87 @@ export async function seedPassportTypes(db: PrismaClient = new PrismaClient()) {
     }
 }
 
+
+export async function seedVisaRequirements(db: PrismaClient = new PrismaClient()) {
+    const prisma = db;
+  
+    for (const visaType of VISA_TYPES) {
+      // Seed common uploads for all visa types
+      for (const upload of COMMON_UPLOADS) {
+        try {
+          const existingRequirement = await prisma.visaRequirement.findUnique({
+            where: { name: upload.field },
+          });
+  
+          if (existingRequirement) {
+            await prisma.visaRequirement.update({
+              where: { id: existingRequirement.id },
+              data: {
+                visa_types: {
+                  connect: { key: visaType.key },
+                },
+              },
+            });
+          } else {
+            await prisma.visaRequirement.create({
+              data: {
+                name: upload.field,
+                field: upload.field,
+                label: upload.label,
+                required: upload.required,
+                visa_types: {
+                  connect: { key: visaType.key },
+                },
+              },
+            });
+          }
+  
+          console.log(`${upload.field} for ${visaType.name} processed successfully`);
+        } catch (error) {
+          console.error(`Error processing ${upload.field} for ${visaType.name}:`, error);
+        }
+      }
+  
+      // Seed visa-specific uploads
+      const specificUploads = VISA_SPECIFIC_UPLOADS_MAP[visaType.key];
+      if (specificUploads) {
+        for (const upload of specificUploads) {
+          try {
+            const existingRequirement = await prisma.visaRequirement.findUnique({
+              where: { name: upload.field },
+            });
+  
+            if (existingRequirement) {
+              await prisma.visaRequirement.update({
+                where: { id: existingRequirement.id },
+                data: {
+                  visa_types: {
+                    connect: { key: visaType.key },
+                  },
+                },
+              });
+            } else {
+              await prisma.visaRequirement.create({
+                data: {
+                  name: upload.field,
+                  field: upload.field,
+                  label: upload.label,
+                  required: upload.required,
+                  visa_types: {
+                    connect: { key: visaType.key },
+                  },
+                },
+              });
+            }
+  
+            console.log(`${upload.field} for ${visaType.name} processed successfully`);
+          } catch (error) {
+            console.error(`Error processing ${upload.field} for ${visaType.name}:`, error);
+          }
+        }
+      }
+    }
+  }
 
 export async function seedStatesInNigeria(db: PrismaClient = new PrismaClient()) {
     const prisma = db;
