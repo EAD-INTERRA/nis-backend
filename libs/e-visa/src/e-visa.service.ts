@@ -2,7 +2,7 @@ import { DbService } from '@app/db';
 import { exception, ServiceResponse, success } from '@app/utils/response';
 import { Injectable } from '@nestjs/common';
 import { CreateOrUpdateApplicantDto, CreateOrUpdateContactDetailDto, CreateOrUpdateCountryDto, CreateOrUpdateNationalityDto, CreateOrUpdatePassportTypeDto, CreateOrUpdatePortOfEntryDto, CreateOrUpdateStateDto, CreateOrUpdateSupportingDocumentDto, CreateOrUpdateTravelInformationDto, CreateOrUpdateVisaRequirementDto, CreateOrUpdateVisaTypeDto } from './dtos/e-visa.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, VisaType } from '@prisma/client';
 
 @Injectable()
 export class EVisaService {
@@ -12,11 +12,27 @@ export class EVisaService {
 
     async saveBioData(createOrUpdateApplicantDto: CreateOrUpdateApplicantDto): Promise<ServiceResponse> {
         try {
-            const { id, ...data } = createOrUpdateApplicantDto;
+            const { id, visa_type_key, visa_type_id, ...data } = createOrUpdateApplicantDto;
+
+            let visa_type: VisaType;
+            if (visa_type_key) {
+                visa_type = await this.dbService.visaType.findUnique({
+                    where: {
+                        key: visa_type_key
+                    }
+                })
+            } else {
+                visa_type = await this.dbService.visaType.findUnique({
+                    where: {
+                        id: visa_type_id
+                    }
+                })
+            }
+
             const applicant = await this.dbService.applicant.upsert({
                 where: { id: id || '' },
-                update: data,
-                create: data,
+                update: {...data, visa_type_id: visa_type.id},
+                create: {...data, visa_type_id: visa_type.id},
                 include: {
                     nationality: true,
                     visa_type: true,
@@ -240,10 +256,38 @@ export class EVisaService {
         try {
             const visaTypes = await this.dbService.visaType.findMany({
                 include: {
-                    nationalities: true,
+                    // nationalities: true,
                     requirements: true
                 }
             });
+            return success(visaTypes, "Visa types loaded successfully");
+        } catch (e) {
+            console.error(e);
+            exception({ message: e, customMessage: "Failed to load visa types" });
+        }
+    }
+
+    async getVisaTypeByIdOrKey(id?: string, key?: string): Promise<ServiceResponse> {
+        try {
+            let visaTypes
+            if (id) {
+                visaTypes = await this.dbService.visaType.findUnique({
+                    where: {id},
+                    include: {
+                        nationalities: true,
+                        requirements: true
+                    }
+                });
+            }
+            if (key) {
+                visaTypes = await this.dbService.visaType.findUnique({
+                    where: {key},
+                    include: {
+                        nationalities: true,
+                        requirements: true
+                    }
+                });
+            }
             return success(visaTypes, "Visa types loaded successfully");
         } catch (e) {
             console.error(e);

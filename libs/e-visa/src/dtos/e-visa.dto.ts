@@ -41,8 +41,12 @@ export class CreateOrUpdateApplicantDto {
     passport_type_id: string;
    
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     visa_type_id: string;
+   
+    @IsString()
+    @IsOptional()
+    visa_type_key: string;
 
     @IsEnum(Gender)
     @IsNotEmpty()
@@ -55,6 +59,10 @@ export class CreateOrUpdateApplicantDto {
     @IsString()
     @IsNotEmpty()
     passport_no: string;
+    
+    @IsString()
+    @IsOptional()
+    image_url: string;
 
     @IsDate()
     @IsNotEmpty()

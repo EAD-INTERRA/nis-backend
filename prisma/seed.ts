@@ -1,4 +1,4 @@
-import { seedCountries, seedNationalities, seedNotificationChannels, seedNotificationProviders, seedPassportTypes, seedVisaTypes } from '../libs/db/src/seeders/utils.seed';
+import { seedCountries, seedNationalities, seedNotificationChannels, seedNotificationProviders, seedPassportTypes, seedStatesInNigeria, seedVisaRequirements, seedVisaTypes } from '../libs/db/src/seeders/utils.seed';
 import { createSuperAdmin } from '../libs/db/src/seeders/superadmin.seed'
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
@@ -24,7 +24,9 @@ export async function seedAll() {
         await seedCountries(prisma);
         await seedVisaTypes(prisma);
         await seedPassportTypes(prisma);
+        await seedStatesInNigeria(prisma);
         await seedNationalities(prisma);
+        await seedVisaRequirements(prisma);
     } catch (error) {
         console.error('Error seeding data:', error);
     } finally {
