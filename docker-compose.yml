@@ -6,7 +6,7 @@ version: "1"
 services:
   core-cs:
     container_name: nis_backend_core
-    image: nis-backend
+    image: eadinterra/nis-backend
     build:
       context: .
       args:
@@ -17,13 +17,13 @@ services:
       - ${BASE_PORT}:${BASE_PORT}
     env_file:
       - .env
-    volumes:
-      - .:/app
+    # volumes:
+    #   - .:/app
     command: >
-      sh -c "pnpx prisma generate && pnpm run start:${ENV}"
+      sh -c "pnpx prisma migrate dev --name initial && pnpm run start:${ENV}"
   auth-cs:
     container_name: nis_backend_auth
-    image: nis-backend
+    image: eadinterra/nis-backend
     build:
       context: .
       args:
@@ -34,10 +34,10 @@ services:
       - ${AUTH_PORT}:${AUTH_PORT}
     env_file:
       - .env
-    volumes:
-      - .:/app # in dev (for real-time updates)
+    # volumes:
+    #   - .:/app # in dev (for real-time updates)
     command: >
-      sh -c "pnpx prisma generate && pnpm run start:${ENV} auth"
+      sh -c "pnpx prisma migrate dev --name initial && pnpm run start:${ENV} auth"
   # dat-admin-cs:
   #   container_name: *dat_admin
   #   build:
