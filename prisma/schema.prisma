@@ -334,9 +334,12 @@ model Applicant {
   passport_no          String
   passport_expiry_date DateTime
   image_url            String?
-  travel_information   TravelInformation[]
-  contact_detail       ContactDetail[]
+  travel_information   TravelInformation?
+  contact_detail       ContactDetail?
   supporting_documents SupportingDocument[]
+  phone_no             String?
+  email                String?
+  is_completed         Boolean              @default(false)
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
@@ -347,8 +350,8 @@ model Applicant {
 
 model TravelInformation {
   id                      String      @id @default(uuid())
-  applicant_id            String?
-  applicant               Applicant?  @relation(fields: [applicant_id], references: [id])
+  applicant_id            String      @unique
+  applicant               Applicant   @relation(fields: [applicant_id], references: [id])
   purpose                 String
   airline                 String
   flight_no               String
@@ -367,9 +370,9 @@ model TravelInformation {
 }
 
 model ContactDetail {
-  id            String     @id @default(uuid())
-  applicant_id  String?
-  applicant     Applicant? @relation(fields: [applicant_id], references: [id])
+  id            String    @id @default(uuid())
+  applicant_id  String    @unique
+  applicant     Applicant @relation(fields: [applicant_id], references: [id])
   contact_name  String
   contact_phone String
   contact_email String

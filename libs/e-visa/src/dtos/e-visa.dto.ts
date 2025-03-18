@@ -59,6 +59,14 @@ export class CreateOrUpdateApplicantDto {
     @IsString()
     @IsNotEmpty()
     passport_no: string;
+
+    @IsString()
+    @IsNotEmpty()
+    phone_no: string;
+
+    @IsString()
+    @IsNotEmpty()
+    email: string;
     
     @IsString()
     @IsOptional()

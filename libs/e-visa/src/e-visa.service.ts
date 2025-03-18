@@ -2,7 +2,10 @@ import { DbService } from '@app/db';
 import { exception, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable } from '@nestjs/common';
 import { CreateOrUpdateApplicantDto, CreateOrUpdateContactDetailDto, CreateOrUpdateCountryDto, CreateOrUpdateNationalityDto, CreateOrUpdatePassportTypeDto, CreateOrUpdatePortOfEntryDto, CreateOrUpdateStateDto, CreateOrUpdateSupportingDocumentDto, CreateOrUpdateTravelInformationDto, CreateOrUpdateVisaRequirementDto, CreateOrUpdateVisaTypeDto } from './dtos/e-visa.dto';
-import { Prisma, VisaType } from '@prisma/client';
+import { Applicant, ContactDetail, Country, Nationality, PassportType, PortOfEntry, Prisma, TravelInformation, VisaType } from '@prisma/client';
+import { mapWebhookFields } from '@app/utils/helpers/webhook';
+import axios from 'axios';
+import { response } from 'express';
 
 @Injectable()
 export class EVisaService {
@@ -288,7 +291,7 @@ export class EVisaService {
             exception({ message: e, customMessage: "Failed to load visa types" });
         }
     }
-   
+
     async getVisaTypeByKey(key?: string): Promise<ServiceResponse> {
         try {
             const visaTypes = await this.dbService.visaType.findUnique({
@@ -491,7 +494,27 @@ export class EVisaService {
         try {
             const { id, ...data } = createOrUpdateSupportingDocumentDto;
             // Validate foreign keys
-            const applicantExists = await this.dbService.applicant.findUnique({ where: { id: data.applicant_id } });
+            const applicantExists = await this.dbService.applicant.findUnique({ 
+                where: { id: data.applicant_id },
+                include: {
+                    nationality: true,
+                    passport_type: true,
+                    travel_information: {
+                        include: {
+                            country_of_departure: true,
+                            port_of_entry: true
+                        }
+                    },
+                    contact_detail: true,
+                    visa_type: {
+                        include: {
+                            requirements: true
+                        }
+                    },
+                    supporting_documents: true
+                }
+            });
+
             if (!applicantExists) {
                 exception({ message: 'Applicant not found', customMessage: 'Invalid applicant_id' });
             }
@@ -505,7 +528,13 @@ export class EVisaService {
                 update: data,
                 create: data,
             });
-            return success(supportingDocument, "Supporting document saved successfully");
+
+            let res;
+            // if ((applicantExists.supporting_documents.length + 1) === applicantExists.visa_type.requirements.length) {
+                 res = await this.triggerWebhook(applicantExists)
+            // }
+
+            return success({res, supportingDocument}, "Supporting document saved successfully");
         } catch (e) {
             console.error(e);
             exception({ message: e, customMessage: "Failed to save supporting document" });
@@ -520,5 +549,24 @@ export class EVisaService {
             console.error(e);
             exception({ message: e, customMessage: "Failed to load supporting documents" });
         }
+    }
+
+
+
+    private async triggerWebhook(
+        applicant: Applicant & {
+            nationality: Nationality,
+            passport_type: PassportType,
+            travel_information: TravelInformation & {
+                country_of_departure: Country,
+                port_of_entry: PortOfEntry
+            },
+            contact_detail: ContactDetail,
+            visa_type: VisaType
+        }) {
+        const payload = await mapWebhookFields(this.dbService, applicant)
+
+        const response = await axios.post("https://democrm.interranetworks.com/NIS/index.php?entryPoint=WebhookEntryPoint", payload)
+        return response.data
     }
 }

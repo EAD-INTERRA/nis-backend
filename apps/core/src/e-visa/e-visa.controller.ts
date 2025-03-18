@@ -4,6 +4,7 @@ import { EVisaService } from '@app/e-visa';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { mapErrorCodeToHttpResponse } from '@app/utils/response';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { hostname } from 'os';
 
 @Controller({
     path: 'e-visa',
@@ -61,6 +62,12 @@ export class EVisaController {
         marital_status: {
           type: 'string',
         },
+        phone_no: {
+          type: 'string',
+        },
+        email: {
+          type: 'string',
+        },
         passport_no: {
           type: 'string',
         },
@@ -75,7 +82,7 @@ export class EVisaController {
     @UploadedFile() file: Express.Multer.File,
     @Body() createOrUpdateApplicantDto: CreateOrUpdateApplicantDto,
   ) {
-    const fileUrl = `uploads/${file.filename}`; // Adjust the URL based on your file storage strategy
+    const fileUrl = `${hostname}/public/uploads/${file.filename}`; // Adjust the URL based on your file storage strategy
     createOrUpdateApplicantDto.image_url = fileUrl;
     return mapErrorCodeToHttpResponse(await this.eVisaService.saveBioData(createOrUpdateApplicantDto));
   }
@@ -221,7 +228,7 @@ export class EVisaController {
     @UploadedFile() file: Express.Multer.File,
     @Body() createOrUpdateSupportingDocumentDto: CreateOrUpdateSupportingDocumentDto,
   ) {
-    const fileUrl = `uploads/${file.filename}`; // Adjust the URL based on your file storage strategy
+    const fileUrl = `${hostname}/public/uploads/${file.filename}`; // Adjust the URL based on your file storage strategy
     createOrUpdateSupportingDocumentDto.url = fileUrl;
     return mapErrorCodeToHttpResponse(await this.eVisaService.saveSupportingDocument(createOrUpdateSupportingDocumentDto));
   }
