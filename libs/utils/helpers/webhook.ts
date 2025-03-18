@@ -110,7 +110,7 @@ export const mapWebhookFields = async (
             "city_s_town": contact_detail.city ?? "",
             "contact_or_hotel_email": contact_detail.contact_email ?? "",
             "contact_or_hotel_postal_code": contact_detail.postal_code ?? "",
-            "issue_date": "",
+            "issue_date": new Date().toISOString().split("T")[0] ?? "",
             "pdos": travel_information.duration_of_stay.toString() ?? "", // permitted_duration_of_stay
             "residential_address": "",
             "visa_type": `${visa_type.key} - ${visa_type.name}` ,
