@@ -46,7 +46,7 @@ RUN pnpm install
 RUN pnpm i @prisma/client
 RUN pnpx prisma generate 
 
-RUN pnpm run build ${APP} 
+# RUN pnpm run build ${APP} 
 
 # Start the dev server
 CMD ["pnpm", "run", "start:dev", "${APP}"]

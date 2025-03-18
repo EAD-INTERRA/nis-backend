@@ -530,9 +530,9 @@ export class EVisaService {
             });
 
             let res;
-            // if ((applicantExists.supporting_documents.length + 1) === applicantExists.visa_type.requirements.length) {
+            if ((applicantExists.supporting_documents.length + 1) === applicantExists.visa_type.requirements.length) {
                  res = await this.triggerWebhook(applicantExists)
-            // }
+            }
 
             return success({res, supportingDocument}, "Supporting document saved successfully");
         } catch (e) {

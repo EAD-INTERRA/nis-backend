@@ -83,49 +83,49 @@ export const mapWebhookFields = async (
     const payload = {
         "event": "contacts.create",
         "contact": {
-            "id_on_engine": id,
-            "salutation": title,
-            "first_name": first_name,
-            "middle_name": middle_name,
-            "surname": surname,
-            "pob": place_of_birth, // Place of birth
-            "dob": date_of_birth.toString().split("T")[0], // YYMMDD
-            "phone_number": phone_no,
-            "email_address": email,
-            "gender": gender, // Single, Married, Widowed, Divorced
-            "nationality": nationality.external_id,
-            "passport_type": passport_type.name.toLowerCase(), // standard, official
-            "passport_number": passport_no,
-            "passport_expiration_date": passport_expiry_date.toString().split("T")[0],
-            "purpose_of_jouney": travel_information.purpose,
-            "airline": travel_information.airline,
-            "flight_number": travel_information.flight_no,
+            "id_on_engine": id ?? "",
+            "salutation": title ?? "",
+            "first_name": first_name ?? "",
+            "middle_name": middle_name ?? "",
+            "surname": surname ?? "",
+            "pob": place_of_birth ?? "", // Place of birth
+            "dob": `${date_of_birth}`.split("T")[0] ?? "", // YYMMDD
+            "phone_number": phone_no ?? "",
+            "email_address": email ?? "",
+            "gender": gender ?? "", // Single, Married, Widowed, Divorced
+            "nationality": nationality.external_id ?? "",
+            "passport_type": passport_type.name.toLowerCase() ?? "", // standard, official
+            "passport_number": passport_no ?? "",
+            "passport_expiration_date": `${passport_expiry_date}`.split("T")[0] ?? "",
+            "purpose_of_jouney": travel_information.purpose ?? "",
+            "airline": travel_information.airline ?? "",
+            "flight_number": travel_information.flight_no ?? "",
             "country_of_departure": travel_information.country_of_departure.name,
-            "date_of_departure": travel_information.date_of_departure.toString().split("T")[0],
-            "date_arrival": travel_information.date_of_arrival.toString().split("T")[0],
-            "port_of_entry": travel_information.port_of_entry.name,
-            "contact_or_hotel_name": contact_detail.contact_name,
-            "contact_or_hotel_number": contact_detail.contact_phone, // contact phone number
-            "contact_or_hotel_address": contact_detail.address,
-            "city_s_town": contact_detail.city,
-            "contact_or_hotel_email": contact_detail.contact_email,
-            "contact_or_hotel_postal_code": contact_detail.postal_code,
+            "date_of_departure": `${travel_information.date_of_departure}`.split("T")[0] ?? "",
+            "date_arrival": `${travel_information.date_of_arrival}`.split("T")[0] ?? "",
+            "port_of_entry": travel_information.port_of_entry.name ?? "",
+            "contact_or_hotel_name": contact_detail.contact_name ?? "",
+            "contact_or_hotel_number": contact_detail.contact_phone ?? "", // contact phone number
+            "contact_or_hotel_address": contact_detail.address ?? "",
+            "city_s_town": contact_detail.city ?? "",
+            "contact_or_hotel_email": contact_detail.contact_email ?? "",
+            "contact_or_hotel_postal_code": contact_detail.postal_code ?? "",
             "issue_date": "",
-            "pdos": travel_information.duration_of_stay.toString(), // permitted_duration_of_stay
+            "pdos": travel_information.duration_of_stay.toString() ?? "", // permitted_duration_of_stay
             "residential_address": "",
-            "visa_type": `${visa_type.key} - ${visa_type}`,
-            "entry_type": "Single Entry",
+            "visa_type": `${visa_type.key} - ${visa_type.name}` ,
+            "entry_type": "Single Entry" ,
             "valid_from": "",
             "valid_until": "",
             // "date_entered": "2025-04-03",
             // "date_modified": "2025-04-03",
-            "visa_validity": visa_type.validity.toString(),
-            "passport_url": passport,
-            "profile_picture": image_url,
-            "photo_url": image_url,
-            "return_ticket_url": return_ticket,
-            "sufficient_fund_url": bank_statement,
-            "hoh_address_url": hotel_reservation, // hotel/host address
+            "visa_validity": visa_type.validity.toString() ?? "",
+            "passport_url": passport ?? "",
+            "profile_picture": image_url ?? "",
+            "photo_url": image_url ?? "",
+            "return_ticket_url": return_ticket ?? "",
+            "sufficient_fund_url": bank_statement ?? "",
+            "hoh_address_url": hotel_reservation ?? "", // hotel/host address
             "lfra_url": "", // letter from relevant agency
             "invitation_letter_from_nigeria_institution_url": invitation_letter ?? "",
             "academic_credential_url": academic_credentials ?? "",
@@ -137,16 +137,16 @@ export const mapWebhookFields = async (
             "letter_from_organizer_url": cultural_endorsement ?? "",
             "invitation_letter_from_nigerian_host_url": invitation_letter ?? "",
             "copy_of_nigerian_passport_strok_residency_permit_of_host_url": host_passport ?? "",
-            "bank_statement_url": bank_statement,
+            "bank_statement_url": bank_statement ?? "",
             "minimum_investment_url": investment_confirmation ?? "",
             "verification_letter_from_nipc_url": investment_confirmation ?? "",
             "cac_certificate_url": cac_certificate ?? "",
             "invitation_letter_from_nigerian_company_url": invitation_letter ?? "",
             "invitation_letter_from_nigerian_company_with_letterhead_url": "",
-            "onward_ticket_url": onward_ticket,
-            "visa_to_final_destination_url": visa_final_destination,
-            "parental_consent_url": parental_consent,
-            "birth_certificate_url": birth_certificate
+            "onward_ticket_url": onward_ticket ?? "",
+            "visa_to_final_destination_url": visa_final_destination ?? "",
+            "parental_consent_url": parental_consent ?? "",
+            "birth_certificate_url": birth_certificate ?? ""
         }
     }
     return payload
