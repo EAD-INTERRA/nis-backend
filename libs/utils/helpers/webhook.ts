@@ -89,20 +89,20 @@ export const mapWebhookFields = async (
             "middle_name": middle_name ?? "",
             "surname": surname ?? "",
             "pob": place_of_birth ?? "", // Place of birth
-            "dob": `${date_of_birth}`.split("T")[0] ?? "", // YYMMDD
+            "dob": new Date(date_of_birth).toISOString().split("T")[0] ?? "", // YYMMDD
             "phone_number": phone_no ?? "",
             "email_address": email ?? "",
             "gender": gender ?? "", // Single, Married, Widowed, Divorced
             "nationality": nationality.external_id ?? "",
             "passport_type": passport_type.name.toLowerCase() ?? "", // standard, official
             "passport_number": passport_no ?? "",
-            "passport_expiration_date": `${passport_expiry_date}`.split("T")[0] ?? "",
+            "passport_expiration_date": new Date(passport_expiry_date).toISOString().split("T")[0] ?? "",
             "purpose_of_jouney": travel_information.purpose ?? "",
             "airline": travel_information.airline ?? "",
             "flight_number": travel_information.flight_no ?? "",
             "country_of_departure": travel_information.country_of_departure.name,
-            "date_of_departure": `${travel_information.date_of_departure}`.split("T")[0] ?? "",
-            "date_arrival": `${travel_information.date_of_arrival}`.split("T")[0] ?? "",
+            "date_of_departure": new Date(travel_information.date_of_departure).toISOString().split("T")[0] ?? "",
+            "date_arrival": new Date(travel_information.date_of_arrival).toISOString().split("T")[0] ?? "",
             "port_of_entry": travel_information.port_of_entry.name ?? "",
             "contact_or_hotel_name": contact_detail.contact_name ?? "",
             "contact_or_hotel_number": contact_detail.contact_phone ?? "", // contact phone number

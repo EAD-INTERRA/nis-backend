@@ -565,6 +565,9 @@ export class EVisaService {
             visa_type: VisaType
         }) {
         const payload = await mapWebhookFields(this.dbService, applicant)
+        
+        // console.log("PAYLOAD: ", payload)
+        // return
 
         const response = await axios.post("https://democrm.interranetworks.com/NIS/index.php?entryPoint=WebhookEntryPoint", payload)
         return response.data
