@@ -6,7 +6,8 @@ version: "1"
 services:
   core-cs:
     container_name: nis_backend_core
-    image: eadinterra/nis-backend
+    image: nis-backend
+    # image: eadinterra/nis-backend
     build:
       context: .
       args:
@@ -21,9 +22,12 @@ services:
     #   - .:/app
     command: >
       sh -c "pnpx prisma generate && pnpm run start:${ENV}"
+    depends_on:
+      - redis
   auth-cs:
     container_name: nis_backend_auth
-    image: eadinterra/nis-backend
+    image: nis-backend
+    # image: eadinterra/nis-backend
     build:
       context: .
       args:
@@ -38,17 +42,12 @@ services:
     #   - .:/app # in dev (for real-time updates)
     command: >
       sh -c "pnpx prisma generate  && pnpm run start:${ENV} auth"
-  # dat-admin-cs:
-  #   container_name: *dat_admin
-  #   build:
-  #     context: .
-  #     args:
-  #       - APP=admin
-  #       - PORT=${DAT_ADMIN_PORT}
-  #   restart: unless-stopped
-  #   ports:
-  #     - ${DAT_ADMIN_PORT}:${DAT_ADMIN_PORT}
-  #   env_file:
-  #     - .env
-  #   volumes:
-  #     - .:/app
+  redis:
+    container_name: nis_backend_redis
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes: 
+      - ./redis:/data

@@ -11,6 +11,8 @@ import { EVisaController } from './e-visa/e-visa.controller';
 import { EVisaModule } from '@app/e-visa';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { BullModule } from '@nestjs/bullmq';
+import { EVisaConsumer } from '@app/e-visa/e-visa.consumer';
 
 console.log("PATH: ", join(__dirname, '..', '..', '..', 'public'))
 
@@ -32,9 +34,15 @@ console.log("PATH: ", join(__dirname, '..', '..', '..', 'public'))
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', '..', 'public'),
       serveRoot: '/public'
+    }),
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: Number(process.env.REDIS_PORT) || 6379,
+      },
     })
   ],
   controllers: [AppController, AuditController, EVisaController],
-  providers: [AppService, DbService],
+  providers: [AppService, DbService, EVisaConsumer],
 })
 export class AppModule {}
