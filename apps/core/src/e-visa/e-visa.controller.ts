@@ -6,12 +6,21 @@ import { mapErrorCodeToHttpResponse } from '@app/utils/response';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller({
-    path: 'e-visa',
-    version: '1'
+  path: 'e-visa',
+  version: '1'
 })
 @ApiTags('e-visa')
 export class EVisaController {
-  constructor(private readonly eVisaService: EVisaService) {}
+  constructor(private readonly eVisaService: EVisaService) { }
+
+  @Post('webhook')
+  async triggerWebhookJob(
+    @Body() data: any
+  ) {
+    return mapErrorCodeToHttpResponse(
+      await this.eVisaService.addToQueue(data)
+    );
+  }
 
   @Post('applicants')
   @UseInterceptors(FileInterceptor('file'))
@@ -106,30 +115,30 @@ export class EVisaController {
     return mapErrorCodeToHttpResponse(await this.eVisaService.getPortOfEntries());
   }
 
-//   @Post('country')
-//   async saveCountry(@Body() createOrUpdateCountryDto: CreateOrUpdateCountryDto) {
-//     return mapErrorCodeToHttpResponse(await this.eVisaService.saveCountry(createOrUpdateCountryDto));
-//   }
+  //   @Post('country')
+  //   async saveCountry(@Body() createOrUpdateCountryDto: CreateOrUpdateCountryDto) {
+  //     return mapErrorCodeToHttpResponse(await this.eVisaService.saveCountry(createOrUpdateCountryDto));
+  //   }
 
   @Get('countries')
   async getCountries() {
     return mapErrorCodeToHttpResponse(await this.eVisaService.getCountries());
   }
 
-//   @Post('state')
-//   async saveState(@Body() createOrUpdateStateDto: CreateOrUpdateStateDto) {
-//     return mapErrorCodeToHttpResponse(await this.eVisaService.saveState(createOrUpdateStateDto));
-//   }
+  //   @Post('state')
+  //   async saveState(@Body() createOrUpdateStateDto: CreateOrUpdateStateDto) {
+  //     return mapErrorCodeToHttpResponse(await this.eVisaService.saveState(createOrUpdateStateDto));
+  //   }
 
   @Get('states')
   async getStates() {
     return mapErrorCodeToHttpResponse(await this.eVisaService.getStates());
   }
 
-//   @Post('nationality')
-//   async saveNationality(@Body() createOrUpdateNationalityDto: CreateOrUpdateNationalityDto) {
-//     return mapErrorCodeToHttpResponse(await this.eVisaService.saveNationality(createOrUpdateNationalityDto));
-//   }
+  //   @Post('nationality')
+  //   async saveNationality(@Body() createOrUpdateNationalityDto: CreateOrUpdateNationalityDto) {
+  //     return mapErrorCodeToHttpResponse(await this.eVisaService.saveNationality(createOrUpdateNationalityDto));
+  //   }
 
   @Get('nationalities')
   async getNationalities() {
@@ -145,7 +154,7 @@ export class EVisaController {
   async getVisaTypes() {
     return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypes());
   }
-  
+
   // @Get('visa-types/:id')
   // async getVisaTypeById(@Param('id') id: string) {
   //   return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypeById(id));
@@ -196,11 +205,11 @@ export class EVisaController {
     return mapErrorCodeToHttpResponse(await this.eVisaService.getContactDetails());
   }
 
-//   @Post('supporting-document')
-//   async saveSupportingDocument(@Body() createOrUpdateSupportingDocumentDto: CreateOrUpdateSupportingDocumentDto) {
-//     return mapErrorCodeToHttpResponse(await this.eVisaService.saveSupportingDocument(createOrUpdateSupportingDocumentDto));
-//   }
-@Post('supporting-documents')
+  //   @Post('supporting-document')
+  //   async saveSupportingDocument(@Body() createOrUpdateSupportingDocumentDto: CreateOrUpdateSupportingDocumentDto) {
+  //     return mapErrorCodeToHttpResponse(await this.eVisaService.saveSupportingDocument(createOrUpdateSupportingDocumentDto));
+  //   }
+  @Post('supporting-documents')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({

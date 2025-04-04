@@ -7,3 +7,7 @@
   ```bash
     pnpx prisma migrate dev --name <migration_name>
   ```
+- Run a Redis container (from the official image)
+  ```bash
+    docker run -d -p 6379:6379 --name redis redis
+  ```

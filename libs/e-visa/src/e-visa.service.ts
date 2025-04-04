@@ -5,13 +5,26 @@ import { CreateOrUpdateApplicantDto, CreateOrUpdateContactDetailDto, CreateOrUpd
 import { Applicant, ContactDetail, Country, Nationality, PassportType, PortOfEntry, Prisma, TravelInformation, VisaType } from '@prisma/client';
 import { mapWebhookFields } from '@app/utils/helpers/webhook';
 import axios from 'axios';
-import { response } from 'express';
+import { Queue } from 'bullmq';
+import { InjectQueue } from '@nestjs/bullmq';
 
 @Injectable()
 export class EVisaService {
     constructor(
         private readonly dbService: DbService,
+        @InjectQueue('e-visa') private eVisaQueue: Queue
     ) { }
+
+    // Add jobs to the queue
+    async addToQueue(data: any) {
+        const job = await this.eVisaQueue.add('e-visa-job', data, {
+            attempts: 3, // Retry up to 3 times if the job fails
+            backoff: 5000, // Wait 5 seconds before retrying
+        });
+
+        return success(job, "Job added to queue successfully");
+    }
+
 
     async saveBioData(createOrUpdateApplicantDto: CreateOrUpdateApplicantDto): Promise<ServiceResponse> {
         try {
@@ -494,7 +507,7 @@ export class EVisaService {
         try {
             const { id, ...data } = createOrUpdateSupportingDocumentDto;
             // Validate foreign keys
-            const applicantExists = await this.dbService.applicant.findUnique({ 
+            const applicantExists = await this.dbService.applicant.findUnique({
                 where: { id: data.applicant_id },
                 include: {
                     nationality: true,
@@ -531,10 +544,10 @@ export class EVisaService {
 
             let res;
             if ((applicantExists.supporting_documents.length + 1) === applicantExists.visa_type.requirements.length) {
-                 res = await this.triggerWebhook(applicantExists)
+                res = await this.triggerWebhook(applicantExists)
             }
 
-            return success({res, supportingDocument}, "Supporting document saved successfully");
+            return success({ res, supportingDocument }, "Supporting document saved successfully");
         } catch (e) {
             console.error(e);
             exception({ message: e, customMessage: "Failed to save supporting document" });
@@ -565,7 +578,7 @@ export class EVisaService {
             visa_type: VisaType
         }) {
         const payload = await mapWebhookFields(this.dbService, applicant)
-        
+
         // console.log("PAYLOAD: ", payload)
         // return
 
