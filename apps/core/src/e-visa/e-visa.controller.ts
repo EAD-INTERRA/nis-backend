@@ -4,6 +4,8 @@ import { EVisaService } from '@app/e-visa';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { mapErrorCodeToHttpResponse } from '@app/utils/response';
 import { FileInterceptor } from '@nestjs/platform-express';
+import axios from 'axios';
+import { SAMPLE_PAYLOAD } from '@app/e-visa/data';
 
 @Controller({
   path: 'e-visa',
@@ -13,6 +15,23 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class EVisaController {
   constructor(private readonly eVisaService: EVisaService) { }
 
+  @Get('test')
+  async testLive(
+  ) {
+    const res = await axios.post("https://democrm.interranetworks.com/NIS/index.php?entryPoint=WebhookEntryPoint", 
+      SAMPLE_PAYLOAD,
+      {
+        headers: {
+          "X-Webhook-Signature": "passed",
+        }
+      }
+    )
+    return res.data;
+    // return mapErrorCodeToHttpResponse(
+    //   await this.eVisaService.addToQueue(data)
+    // );
+  }
+  
   @Post('webhook')
   async triggerWebhookJob(
     @Body() data: any
