@@ -5,11 +5,15 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 
 import * as compression from 'compression';
 import { auditLogger } from '@app/db/middleware/audit.middleware';
+import { urlencoded, json } from 'express';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(auditLogger)
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   // Versioning and CORS
   app.enableVersioning({

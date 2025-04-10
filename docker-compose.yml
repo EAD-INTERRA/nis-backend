@@ -22,8 +22,8 @@ services:
     #   - .:/app
     command: >
       sh -c "pnpx prisma generate && pnpm run start:${ENV}"
-    depends_on:
-      - redis
+    # depends_on:
+    #   - redis
   auth-cs:
     container_name: nis_backend_auth
     image: nis-backend
@@ -42,12 +42,12 @@ services:
     #   - .:/app # in dev (for real-time updates)
     command: >
       sh -c "pnpx prisma generate  && pnpm run start:${ENV} auth"
-  redis:
-    container_name: nis_backend_redis
-    image: redis:6.2-alpine
-    restart: always
-    ports:
-      - '6379:6379'
-    command: redis-server --save 20 1 --loglevel warning
-    volumes: 
-      - ./redis:/data
+  # redis:
+  #   container_name: nis_backend_redis
+  #   image: redis:6.2-alpine
+  #   restart: always
+  #   ports:
+  #     - '6379:6379'
+  #   command: redis-server --save 20 1 --loglevel warning
+  #   volumes: 
+  #     - ./redis:/data
