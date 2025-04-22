@@ -43,10 +43,11 @@ COPY . .
 RUN pnpm install 
 
 # Generate Prisma client
-# RUN pnpm i @prisma/client
+RUN pnpm i @prisma/client
 RUN pnpm i @prisma/core/client
 RUN pnpm i @prisma/replica/client
-RUN pnpx prisma generate 
+# RUN pnpx prisma generate 
+RUN pnpx prisma generate --schema prisma/core/schema.prisma && pnpx prisma generate --schema prisma/replica/schema.prisma 
 
 # RUN pnpm run build ${APP} 
 
