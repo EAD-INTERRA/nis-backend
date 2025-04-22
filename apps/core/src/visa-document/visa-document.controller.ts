@@ -1,4 +1,8 @@
 
+import { CreateVisaDocumentDto } from '@app/replica/dtos/create-visadocument.dto';
+import { CreateVisaDocumentCustomDto } from '@app/replica/dtos/create-visadocumentcustom.dto';
+import { UpdateVisaDocumentDto } from '@app/replica/dtos/update-visadocument.dto';
+import { UpdateVisaDocumentCustomDto } from '@app/replica/dtos/update-visadocumentcustom.dto';
 import { VisaDocumentService } from '@app/replica/visa-document/visa-document.service';
 import { mapErrorCodeToHttpResponse } from '@app/utils/response';
 import {
@@ -23,7 +27,7 @@ export class VisaDocumentController {
     constructor(private readonly visaDocService: VisaDocumentService) { }
 
     @Post('custom')
-    async createCustomisaDocument(@Body() data: Prisma.VisaDocumentCustomCreateInput) {
+    async createCustomisaDocument(@Body() data: CreateVisaDocumentCustomDto) {
         const res = await this.visaDocService.createVisaDocumentCustom(data)
         return mapErrorCodeToHttpResponse(res);
     }
@@ -39,13 +43,13 @@ export class VisaDocumentController {
     }
 
     @Patch('custom/:id')
-    async updateCustomVisaDocument(@Param('id') id: string, @Body() data: Prisma.VisaDocumentCustomUpdateInput) {
+    async updateCustomVisaDocument(@Param('id') id: string, @Body() data: UpdateVisaDocumentCustomDto) {
         return mapErrorCodeToHttpResponse(await this.visaDocService.updateCustomVisaDocument(id, data));
     }
     
     
     @Post()
-    async createVisaDocument(@Body() data: Prisma.VisaDocumentCreateInput) {
+    async createVisaDocument(@Body() data: CreateVisaDocumentDto) {
         const res = await this.visaDocService.createVisaDocument(data)
         return mapErrorCodeToHttpResponse(res);
     }
@@ -61,7 +65,7 @@ export class VisaDocumentController {
     }
 
     @Patch(':id')
-    async updateVisaDocument(@Param('id') id: string, @Body() data: Prisma.VisaDocumentUpdateInput) {
+    async updateVisaDocument(@Param('id') id: string, @Body() data: UpdateVisaDocumentDto) {
         return mapErrorCodeToHttpResponse(await this.visaDocService.updateVisaDocument(id, data));
     }
 

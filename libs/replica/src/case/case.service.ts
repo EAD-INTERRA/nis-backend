@@ -2,15 +2,22 @@ import { ReplicaDbService } from '@app/db/replica.service';
 import { exception, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Case, Prisma } from '@prisma/replica/client';
+import { CreateCaseDto } from '../dtos/create-case.dto';
+import { UpdateCaseDto } from '../dtos/update-case.dto';
+import { CreateCaseCustomDto } from '../dtos/create-casecustom.dto';
+import { UpdateCaseCustomDto } from '../dtos/update-casecustom.dto';
 
 @Injectable()
 export class CaseService {
   constructor(private replicaService: ReplicaDbService) {}
 
-  async createCase(data: Prisma.CaseCreateInput): Promise<ServiceResponse> {
+  async createCase(data: CreateCaseDto): Promise<ServiceResponse> {
+    const prismaData: Prisma.CaseCreateInput = {
+      ...data
+    };
     try {
         const res = await this.replicaService.case.create({
-          data,
+          data: prismaData,
         });
         return success(res)
     } catch (err) {
@@ -46,23 +53,31 @@ export class CaseService {
     }
   }
 
-  async updateCase(id: string, data: Prisma.CaseUpdateInput): Promise<ServiceResponse> {
+  async updateCase(id: string, data: UpdateCaseDto): Promise<ServiceResponse> {
     const existing = await this.findCase(id); // Ensure it exists
+
+    const prismaData: Prisma.CaseUpdateInput = {
+      ...data
+    };
     
     try {
         return success(this.replicaService.case.update({
           where: { id },
-          data,
+          data: prismaData,
         }))
     } catch (err) {
         exception({customMessage: "An error occured while updating case", message: err})
     }
   }
 
-  async createCaseCustom(data: Prisma.CaseCustomCreateInput): Promise<ServiceResponse> {
+  async createCaseCustom(data: CreateCaseCustomDto): Promise<ServiceResponse> {
+    const prismaData: Prisma.CaseCustomCreateInput = {
+      ...data
+    };
+    
     try {
         const res = await this.replicaService.caseCustom.create({
-          data,
+          data: prismaData,
         });
         return success(res)
     } catch (err) {
@@ -89,13 +104,18 @@ export class CaseService {
     }
   }
 
-  async updateCustomCase(id: string, data: Prisma.CaseCustomUpdateInput): Promise<ServiceResponse> {
+  async updateCustomCase(id: string, data: UpdateCaseCustomDto): Promise<ServiceResponse> {
     const existing = await this.findCustomCase(id); // Ensure it exists
+
+    const prismaData: Prisma.CaseCustomUpdateInput = {
+      ...data
+    };
+    
     
     try {
         return success(this.replicaService.caseCustom.update({
           where: { id },
-          data,
+          data: prismaData,
         }))
     } catch (err) {
         exception({customMessage: "An error occured while updating custom case", message: err})

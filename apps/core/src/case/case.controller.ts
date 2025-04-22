@@ -1,4 +1,8 @@
 import { CaseService } from '@app/replica/case/case.service';
+import { CreateCaseDto } from '@app/replica/dtos/create-case.dto';
+import { CreateCaseCustomDto } from '@app/replica/dtos/create-casecustom.dto';
+import { UpdateCaseDto } from '@app/replica/dtos/update-case.dto';
+import { UpdateCaseCustomDto } from '@app/replica/dtos/update-casecustom.dto';
 import { mapErrorCodeToHttpResponse } from '@app/utils/response';
 import {
     Controller,
@@ -22,7 +26,7 @@ export class CaseController {
     constructor(private readonly caseService: CaseService) { }
 
     @Post('custom')
-    async createCustomCase(@Body() data: Prisma.CaseCustomCreateInput) {
+    async createCustomCase(@Body() data: CreateCaseCustomDto) {
         const res = await this.caseService.createCaseCustom(data)
         return mapErrorCodeToHttpResponse(res);
     }
@@ -38,13 +42,13 @@ export class CaseController {
     }
 
     @Patch('custom/:id')
-    async updateCustomCase(@Param('id') id: string, @Body() data: Prisma.CaseCustomUpdateInput) {
+    async updateCustomCase(@Param('id') id: string, @Body() data: UpdateCaseCustomDto) {
         return mapErrorCodeToHttpResponse(await this.caseService.updateCustomCase(id, data));
     }
     
     
     @Post()
-    async createCase(@Body() data: Prisma.CaseCreateInput) {
+    async createCase(@Body() data: CreateCaseDto) {
         const res = await this.caseService.createCase(data)
         return mapErrorCodeToHttpResponse(res);
     }
@@ -60,7 +64,7 @@ export class CaseController {
     }
 
     @Patch(':id')
-    async updateCase(@Param('id') id: string, @Body() data: Prisma.CaseUpdateInput) {
+    async updateCase(@Param('id') id: string, @Body() data: UpdateCaseDto) {
         return mapErrorCodeToHttpResponse(await this.caseService.updateCase(id, data));
     }
 

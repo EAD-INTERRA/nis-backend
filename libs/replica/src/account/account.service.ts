@@ -2,15 +2,22 @@ import { ReplicaDbService } from '@app/db/replica.service';
 import { exception, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Account, Prisma } from '@prisma/replica/client';
+import { CreateAccountDto } from '../dtos/create-account.dto';
+import { UpdateAccountDto } from '../dtos/update-account.dto';
+import { CreateAccountCustomDto } from '../dtos/create-accountcustom.dto';
+import { UpdateAccountCustomDto } from '../dtos/update-accountcustom.dto';
 
 @Injectable()
 export class AccountService {
   constructor(private replicaService: ReplicaDbService) {}
 
-  async createAccount(data: Prisma.AccountCreateInput): Promise<ServiceResponse> {
+  async createAccount(data: CreateAccountDto): Promise<ServiceResponse> {
+    const prismaData: Prisma.AccountCreateInput = {
+      ...data
+    };
     try {
         const res = await this.replicaService.account.create({
-          data,
+          data: prismaData,
         });
         return success(res)
     } catch (err) {
@@ -44,23 +51,30 @@ export class AccountService {
     }
   }
 
-  async updateAccount(id: string, data: Prisma.AccountUpdateInput): Promise<ServiceResponse> {
+  async updateAccount(id: string, data: UpdateAccountDto): Promise<ServiceResponse> {
     const existing = await this.findAccount(id); // Ensure it exists
+
+    const prismaData: Prisma.AccountUpdateInput = {
+      ...data
+    };
     
     try {
         return success(this.replicaService.account.update({
           where: { id },
-          data,
+          data: prismaData,
         }))
     } catch (err) {
         exception({customMessage: "An error occured while updating account", message: err})
     }
   }
 
-  async createAccountCustom(data: Prisma.AccountCustomCreateInput): Promise<ServiceResponse> {
+  async createAccountCustom(data: CreateAccountCustomDto): Promise<ServiceResponse> {
+    const prismaData: Prisma.AccountCustomCreateInput = {
+      ...data
+    };
     try {
         const res = await this.replicaService.accountCustom.create({
-          data,
+          data: prismaData,
         });
         return success(res)
     } catch (err) {
@@ -87,13 +101,17 @@ export class AccountService {
     }
   }
 
-  async updateAccountCustom(id: string, data: Prisma.AccountCustomUpdateInput): Promise<ServiceResponse> {
+  async updateAccountCustom(id: string, data: UpdateAccountCustomDto): Promise<ServiceResponse> {
     const existing = await this.findAccount(id); // Ensure it exists
+
+    const prismaData: Prisma.AccountCustomUpdateInput = {
+      ...data
+    };
     
     try {
         return success(this.replicaService.accountCustom.update({
           where: { id },
-          data,
+          data: prismaData,
         }))
     } catch (err) {
         exception({customMessage: "An error occured while updating account custom", message: err})

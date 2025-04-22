@@ -1,4 +1,8 @@
 import { AccountService } from '@app/replica/account/account.service';
+import { CreateAccountDto } from '@app/replica/dtos/create-account.dto';
+import { CreateAccountCustomDto } from '@app/replica/dtos/create-accountcustom.dto';
+import { UpdateAccountDto } from '@app/replica/dtos/update-account.dto';
+import { UpdateAccountCustomDto } from '@app/replica/dtos/update-accountcustom.dto';
 import { mapErrorCodeToHttpResponse } from '@app/utils/response';
 import {
     Controller,
@@ -22,7 +26,7 @@ export class AccountController {
     constructor(private readonly accountService: AccountService) { }
 
     @Post('custom')
-    async createAccountCustom(@Body() data: Prisma.AccountCustomCreateInput) {
+    async createAccountCustom(@Body() data: CreateAccountCustomDto) {
         const res = await this.accountService.createAccountCustom(data)
         return mapErrorCodeToHttpResponse(res);
     }
@@ -38,12 +42,12 @@ export class AccountController {
     }
 
     @Patch('custom/:id')
-    async updateCustom(@Param('id') id: string, @Body() data: Prisma.AccountCustomUpdateInput) {
+    async updateCustom(@Param('id') id: string, @Body() data: UpdateAccountCustomDto) {
         return mapErrorCodeToHttpResponse(await this.accountService.updateAccountCustom(id, data));
     }
 
     @Post()
-    async createAccount(@Body() data: Prisma.AccountCreateInput) {
+    async createAccount(@Body() data: CreateAccountDto) {
         const res = await this.accountService.createAccount(data)
         return mapErrorCodeToHttpResponse(res);
     }
@@ -59,7 +63,7 @@ export class AccountController {
     }
 
     @Patch(':id')
-    async update(@Param('id') id: string, @Body() data: Prisma.AccountUpdateInput) {
+    async update(@Param('id') id: string, @Body() data: UpdateAccountDto) {
         return mapErrorCodeToHttpResponse(await this.accountService.updateAccount(id, data));
     }
 

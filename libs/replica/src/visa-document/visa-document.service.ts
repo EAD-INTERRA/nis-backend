@@ -2,15 +2,23 @@ import { ReplicaDbService } from '@app/db/replica.service';
 import { exception, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Case, Prisma } from '@prisma/replica/client';
+import { CreateVisaDocumentDto } from '../dtos/create-visadocument.dto';
+import { UpdateVisaDocumentDto } from '../dtos/update-visadocument.dto';
+import { CreateVisaDocumentCustomDto } from '../dtos/create-visadocumentcustom.dto';
+import { UpdateVisaDocumentCustomDto } from '../dtos/update-visadocumentcustom.dto';
 
 @Injectable()
 export class VisaDocumentService {
   constructor(private replicaService: ReplicaDbService) {}
 
-  async createVisaDocument(data: Prisma.VisaDocumentCreateInput): Promise<ServiceResponse> {
+  async createVisaDocument(data: CreateVisaDocumentDto): Promise<ServiceResponse> {
+    const prismaData: Prisma.VisaDocumentCreateInput = {
+      ...data
+    };
+    
     try {
         const res = await this.replicaService.visaDocument.create({
-          data,
+          data: prismaData,
         });
         return success(res)
     } catch (err) {
@@ -44,23 +52,30 @@ export class VisaDocumentService {
     }
   }
 
-  async updateVisaDocument(id: string, data: Prisma.VisaDocumentUpdateInput): Promise<ServiceResponse> {
+  async updateVisaDocument(id: string, data: UpdateVisaDocumentDto): Promise<ServiceResponse> {
     const existing = await this.findVisaDocument(id); // Ensure it exists
+
+    const prismaData: Prisma.VisaDocumentUpdateInput = {
+      ...data
+    };
     
     try {
         return success(this.replicaService.visaDocument.update({
           where: { id },
-          data,
+          data: prismaData,
         }))
     } catch (err) {
         exception({customMessage: "An error occured while updating visa document", message: err})
     }
   }
 
-  async createVisaDocumentCustom(data: Prisma.VisaDocumentCustomCreateInput): Promise<ServiceResponse> {
+  async createVisaDocumentCustom(data: CreateVisaDocumentCustomDto): Promise<ServiceResponse> {
+    const prismaData: Prisma.VisaDocumentCustomCreateInput = {
+      ...data
+    };
     try {
         const res = await this.replicaService.visaDocumentCustom.create({
-          data,
+          data: prismaData,
         });
         return success(res)
     } catch (err) {
@@ -87,13 +102,17 @@ export class VisaDocumentService {
     }
   }
 
-  async updateCustomVisaDocument(id: string, data: Prisma.VisaDocumentCustomUpdateInput): Promise<ServiceResponse> {
+  async updateCustomVisaDocument(id: string, data: UpdateVisaDocumentCustomDto): Promise<ServiceResponse> {
     const existing = await this.findCustomVisaDocument(id); // Ensure it exists
+
+    const prismaData: Prisma.VisaDocumentCustomUpdateInput = {
+      ...data
+    };
     
     try {
         return success(this.replicaService.visaDocumentCustom.update({
           where: { id },
-          data,
+          data: prismaData,
         }))
     } catch (err) {
         exception({customMessage: "An error occured while updating custom visa document ", message: err})
