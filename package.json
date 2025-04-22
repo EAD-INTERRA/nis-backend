@@ -20,9 +20,9 @@
     "test:e2e": "jest --config ./apps/core/test/jest-e2e.json",
     "seed": "ts-node prisma/seed.ts",
     "generate:dto": "ts-node libs/utils/generate-dtos.ts",
-    "prisma:migrate:core": "pnpx prisma migrate dev --schema prisma/core/schema.prisma --name migration ",
-    "prisma:migrate:replica": "pnpx prisma migrate dev --schema prisma/replica/schema.prisma --name migration ",
-    "prisma:migrate:all": "pnpx prisma migrate dev --schema prisma/core/schema.prisma --name migration && pnpx prisma migrate dev --schema prisma/replica/schema.prisma --name migration "
+    "db:migrate:core": "pnpx prisma migrate dev --schema prisma/core/schema.prisma --name migration ",
+    "db:migrate:replica": "pnpx prisma migrate dev --schema prisma/replica/schema.prisma --name migration ",
+    "db:migrate:all": "pnpx prisma migrate dev --schema prisma/core/schema.prisma --name migration && pnpx prisma migrate dev --schema prisma/replica/schema.prisma --name migration "
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

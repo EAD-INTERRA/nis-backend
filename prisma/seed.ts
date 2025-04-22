@@ -35,4 +35,4 @@ export async function seedAll() {
 }
 
 // Run the main seeding function
-// seedAll();
+seedAll();

@@ -27,12 +27,17 @@ The project now supports multiple databases (Core and Replica) using Prisma. Eac
 
 - **Core Database**:
   ```bash
-  npm run prisma:migrate:core
+  pnpm run db:migrate:core
   ```
 
 - **Replica Database**:
   ```bash
-  npm run prisma:migrate:replica
+  pnpm run db:migrate:replica
+  ```
+
+- **All at once**:
+  ```bash
+  pnpm run db:migrate:all
   ```
 
 ### Seed Data
