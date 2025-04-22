@@ -1,7 +1,7 @@
 
 import * as crypto from "crypto"
 import axios from "axios";
-import { NotificationType, PrismaClient } from "@prisma/client";
+import { NotificationType, PrismaClient } from "@prisma/core/client";
 
 const prisma = new PrismaClient();
 

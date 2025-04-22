@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/core/client';
 import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
 import { Parser } from 'json2csv';

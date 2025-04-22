@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsOptional, IsDate, IsEnum, IsInt, IsArray, IsBoolean, IsNumber, IsPhoneNumber } from 'class-validator';
-import { Gender, MaritalStatus } from '@prisma/client';
+import { Gender, MaritalStatus } from '@prisma/core/client';
 import { Type } from 'class-transformer';
 
 export class CreateOrUpdateApplicantDto {

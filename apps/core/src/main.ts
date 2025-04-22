@@ -25,7 +25,7 @@ async function bootstrap() {
 
   // Swagger config
   const config = new DocumentBuilder()
-    .setTitle('DAT Base Services')
+    .setTitle('E-Visa Base Services')
     .setDescription('This contains the swagger docs for the Core/Base Module')
     .setVersion('1.0')
     .addBearerAuth()

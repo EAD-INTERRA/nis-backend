@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/core/client";
 import { COMMON_UPLOADS, COUNTRIES, NATIONALITIES, PASSPORT_TYPES, PORTS_OF_ENTRY, STATES_IN_NIGERIA, VISA_SPECIFIC_UPLOADS_MAP, VISA_TYPES } from "../data/nationality";
 
 const providers = ["COURE", "AFRICASTALKING", "SENDGRID"]

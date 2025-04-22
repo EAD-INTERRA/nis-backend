@@ -124,6 +124,24 @@
           }
         ]
       }
+    },
+    "replica": {
+      "type": "library",
+      "root": "libs/replica",
+      "entryFile": "index",
+      "sourceRoot": "libs/replica/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/replica/tsconfig.lib.json",
+        "plugins": [
+          {
+            "name": "@nestjs/swagger",
+            "options": {
+              "classValidatorShim": false,
+              "introspectComments": true
+            }
+          }
+        ]
+      }
     }
   }
 }

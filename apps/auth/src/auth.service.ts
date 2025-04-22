@@ -1,4 +1,4 @@
-import { DbService } from '@app/db';
+import { CoreDbService } from '@app/db';
 import * as bcrypt from 'bcrypt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -10,13 +10,13 @@ import { sendEmail } from '@app/utils/notification/email';
 import { notifyCoure, sendSMS } from '@app/utils/notification/sms';
 import { ChangePasswordDto, CreateUserDto, LoginDto, OtpLoginDto, ResetPasswordDto } from './dto/auth.dto';
 import { differenceInMinutes } from 'date-fns';
-import { Prisma, Role, User, UserDetail } from '@prisma/client';
+import { Prisma, Role, User, UserDetail } from '@prisma/core/client';
 
 
 @Injectable()
 export class AuthService {
   constructor(
-    private dbService: DbService,
+    private dbService: CoreDbService,
     private jwtService: JwtService,
     private readonly eventEmitter: EventEmitter2
   ) { }

@@ -30,6 +30,30 @@ const responseMessages = {
 };
 
 
+export function extractMeaningfulError(
+  error: any,
+  keywords: string[] = ['Invalid', 'Missing', 'Failed', 'not found', 'required']
+): string {
+  const raw = typeof error === 'string' ? error : error?.message || String(error);
+
+  // Split error into lines
+  const lines = raw.split('\n').map(line => line.trim());
+
+  // Filter lines that match any keyword
+  const meaningfulLines = lines.filter(line =>
+    keywords.some(keyword => line.toLowerCase().includes(keyword.toLowerCase()))
+  );
+
+  // Fallback: return first non-empty line if no match
+  if (meaningfulLines.length === 0) {
+    return lines.find(line => line.length > 0) || 'An unexpected error occurred';
+  }
+
+  return meaningfulLines.join(' | ');
+}
+
+
+
 export interface ServiceResponse {
   code: number,
   body: any,
@@ -40,7 +64,7 @@ export interface ServiceResponse {
 export interface CustomHttpResponse {
   statusCode?: number,
   body?: any,
-  message?: string,
+  message?: any,
   customMessage?: string,
 }
 
@@ -59,6 +83,7 @@ export function badRequest(data: CustomHttpResponse) {
     statusCode: responseCodes.INVALID_REQUEST,
     body: null,
     message,
+    error: extractMeaningfulError(message?.stack) || JSON.stringify(message, null, 2),
     customMessage
   })
 }
@@ -69,6 +94,7 @@ export function unauthorized(data: CustomHttpResponse) {
     code: responseCodes.UNAUTHORIZED,
     body: null,
     message,
+    error: extractMeaningfulError(message?.stack) || JSON.stringify(message, null, 2),
     customMessage
   })
 }
@@ -79,6 +105,7 @@ export function notFound(data: CustomHttpResponse) {
     code: responseCodes.NOT_FOUND,
     body: null,
     message,
+    error: extractMeaningfulError(message?.stack) || JSON.stringify(message, null, 2),
     customMessage
   })
 }
@@ -89,6 +116,7 @@ export function exception(data: CustomHttpResponse) {
     code: responseCodes.EXCEPTION,
     body: null,
     message,
+    error: extractMeaningfulError(message?.stack) || JSON.stringify(message, null, 2),
     customMessage
   })
 }
@@ -99,6 +127,7 @@ export function forbidden(data: CustomHttpResponse) {
     code: responseCodes.FORBIDDEN,
     body: null,
     message,
+    error: extractMeaningfulError(message?.stack) || JSON.stringify(message, null, 2),
     customMessage
   })
 }

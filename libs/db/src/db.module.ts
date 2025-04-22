@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { DbService } from './db.service';
+import { CoreDbService } from './db.service';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ReplicaDbService } from './replica.service';
 
 @Module({
   imports: [EventEmitterModule.forRoot()],
-  providers: [DbService],
-  exports: [DbService],
+  providers: [CoreDbService, ReplicaDbService],
+  exports: [CoreDbService],
 })
 export class DbModule {}

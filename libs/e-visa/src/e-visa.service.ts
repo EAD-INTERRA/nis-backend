@@ -1,8 +1,8 @@
-import { DbService } from '@app/db';
+import { CoreDbService } from '@app/db';
 import { exception, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable } from '@nestjs/common';
 import { CreateOrUpdateApplicantDto, CreateOrUpdateContactDetailDto, CreateOrUpdateCountryDto, CreateOrUpdateNationalityDto, CreateOrUpdatePassportTypeDto, CreateOrUpdatePortOfEntryDto, CreateOrUpdateStateDto, CreateOrUpdateSupportingDocumentDto, CreateOrUpdateTravelInformationDto, CreateOrUpdateVisaRequirementDto, CreateOrUpdateVisaTypeDto } from './dtos/e-visa.dto';
-import { Applicant, ContactDetail, Country, Nationality, PassportType, PortOfEntry, Prisma, TravelInformation, VisaType } from '@prisma/client';
+import { Applicant, ContactDetail, Country, Nationality, PassportType, PortOfEntry, Prisma, TravelInformation, VisaType } from '@prisma/core/client';
 import { mapWebhookFields } from '@app/utils/helpers/webhook';
 import axios from 'axios';
 import { Queue } from 'bullmq';
@@ -11,7 +11,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 @Injectable()
 export class EVisaService {
     constructor(
-        private readonly dbService: DbService,
+        private readonly dbService: CoreDbService,
         @InjectQueue('e-visa') private eVisaQueue: Queue
     ) { }
 

@@ -1,6 +1,6 @@
 import * as nodemailer from 'nodemailer'
 import * as dotenv from 'dotenv';
-import { NotificationType, PrismaClient } from '@prisma/client';
+import { NotificationType, PrismaClient } from '@prisma/core/client';
 import { EmailTemplateDto, SendEmailDto } from './types';
 
 dotenv.config()

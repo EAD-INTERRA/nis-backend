@@ -17,7 +17,7 @@
 // // import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/core/client';
 import { Request, Response, NextFunction } from 'express';
 
 const prisma = new PrismaClient();

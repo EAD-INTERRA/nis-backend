@@ -1,0 +1,230 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/@prisma/replica/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL_REPLICA")
+}
+
+enum CaseTypes {
+  e_visa
+  landing
+  exit
+}
+
+model Account {
+  id            String   @id @default(uuid())
+  name          String?
+  alias         String?
+  surname       String?
+  date_entered  DateTime @default(now())
+  date_modified DateTime @updatedAt
+  phone_office  String?
+  deleted       Boolean  @default(false)
+
+  custom AccountCustom?
+  cases  Case[]
+
+  @@index([name, alias, surname])
+  @@map("accounts")
+}
+
+model AccountCustom {
+  id                         String    @id @default(uuid())
+  first_name_c               String?
+  last_name_c                String?
+  middle_name_c              String?
+  profile_picture_c          String?
+  place_of_birth_c           String?
+  dob_c                      DateTime?
+  nationality_c              String?
+  passport_type_c            String?
+  passport_number_c          String?
+  issue_date_c               DateTime?
+  id_on_engine_c             String?
+  passport_expiration_date_c DateTime?
+  salutation_c               String?
+  applicant_name_c           String?
+  gender_c                   String?
+  address_c                  String?
+
+  account Account @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  @@map("accounts_cstm")
+}
+
+model Case {
+  id               String   @id @default(uuid())
+  name             String?
+  alias            String?
+  subject          String?
+  date_entered     DateTime @default(now())
+  modified_user_id String?
+  date_modified    DateTime @updatedAt
+  created_by       String?
+  deleted          Boolean  @default(false)
+  assigned_user_id String?
+  case_number      String?
+  account_id       String?
+  type             String // NEW FIELD TO DISTINGUISH CASE TYPE (e.g., 'visa', 'landing', 'exit')
+
+  account Account?    @relation(fields: [account_id], references: [id], onDelete: SetNull)
+  custom  CaseCustom?
+
+  @@index([case_number, account_id])
+  @@map("cases")
+}
+
+model CaseCustom {
+  id                             String    @id @default(uuid())
+  visa_type_c                    String?
+  active_status_c                String?
+  in_country_c                   String?
+  duration_of_stay_actual_c      String?
+  id_on_engine_c                 String?
+  vetting_checks_c               String?
+  approving_status_c             String?
+  is_active_c                    Boolean?
+  contact_or_hotel_postal_code_c String?
+  contact_or_hotel_email_c       String?
+  city_s_town_c                  String?
+  contact_or_hotel_address_c     String?
+  contact_or_hotel_number_c      String?
+  contact_or_hotel_name_c        String?
+  date_arrival_c                 DateTime?
+  date_of_departure_c            DateTime?
+  country_of_departure_c         String?
+  flight_number_c                String?
+  airline_c                      String?
+  purpose_of_jouney_c            String?
+  final_status_c                 String?
+  vetting_status_c               String?
+  visa_validity_c                String?
+  reference_no_c                 String?
+  port_of_departure_c            String?
+  port_of_entry_c                String?
+  departure_date_c               DateTime?
+  entry_date_c                   DateTime?
+  entry_type_c                   String?
+  duration_of_stay_c             String?
+  ticket_num_c                   String?
+
+  case Case @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  @@map("cases_cstm")
+}
+
+model VisaDocument {
+  id               String   @id @default(uuid())
+  date_entered     DateTime @default(now())
+  date_modified    DateTime @updatedAt
+  modified_user_id String?
+  created_by       String?
+  deleted          Boolean  @default(false)
+  assigned_user_id String?
+  document_name    String?
+  filename         String?
+  file_ext         String?
+  file_mime_type   String?
+
+  custom VisaDocumentCustom?
+
+  @@index([document_name, filename])
+  @@map("visa_documents")
+}
+
+model VisaDocumentCustom {
+  id                                                               String  @id @default(uuid())
+  doc_contact_id_c                                                 String?
+  passport_c                                                       String?
+  return_ticket_c                                                  String?
+  sufficient_funds_c                                               String?
+  letter_from_relevant_govt_agency_or_mou_on_cultural_exchange_c   String?
+  invitation_letter_from_nigeria_institution_c                     String?
+  academic_credential_c                                            String?
+  acceptance_letter_from_home_institution_c                        String?
+  invitation_letter_from_event_organizer_c                         String?
+  govt_state_endorsement_for_cultural_activities_c                 String?
+  tournament_event_invitation_c                                    String?
+  athlete_credentials_c                                            String?
+  letter_from_organizer_c                                          String?
+  copy_of_nigerian_passport_residency_permit_of_host_c             String?
+  invitation_letter_from_nigerian_host_c                           String?
+  bank_statement_c                                                 String?
+  minimum_investment_c                                             String?
+  verification_letter_from_nipc_c                                  String?
+  cac_certificate_c                                                String?
+  invitation_letter_from_nigerian_company_c                        String?
+  invitation_letter_from_nigerian_company_with_letterhead_c        String?
+  onward_ticket_c                                                  String?
+  parental_consent_c                                               String?
+  visa_to_final_destination_c                                      String?
+  birth_certificate_c                                              String?
+  photo_status_c                                                   String?
+  return_ticket_status_c                                           String?
+  sufficient_funds_status_c                                        String?
+  hoh_address_status_c                                             String?
+  letter_from_relevant_agency_or_mou_on_cultural_exchange_c        String?
+  invitation_letter_from_nigeria_institution_status_c              String?
+  academic_credential_status_c                                     String?
+  acceptance_letter_from_home_institution_status_c                 String?
+  invitation_letter_from_event_organizer_status_c                  String?
+  govt_state_endorsement_for_cultural_activities_status_c          String?
+  tournament_event_invitation_status_c                             String?
+  athlete_credentials_status_c                                     String?
+  letter_from_organizer_status_c                                   String?
+  invitation_letter_from_nigerian_host_status_c                    String?
+  letter_from_relevant_agency_or_mou_on_cultural_exchange_status_c String?
+  final_dest_visa_status_c                                         String?
+  hotel_or_host_address_status_c                                   String?
+  hotel_or_host_address_c                                          String?
+  passport_status_c                                                String?
+  birth_certificate_status_c                                       String?
+  parental_consent_status_c                                        String?
+  visa_to_final_destination_status_c                               String?
+  onward_ticket_status_c                                           String?
+  ilfncwl_status_c                                                 String?
+  invitation_letter_from_nigerian_company_status_c                 String?
+  cac_certificate_status_c                                         String?
+  verification_letter_from_nipc_status_c                           String?
+  minimum_investment_status_c                                      String?
+  copy_of_nigerian_passport_residency_permit_of_host_status_c      String?
+  bank_statement_status_c                                          String?
+  lfra_c                                                           String?
+  ilfni_c                                                          String?
+  alfhi_c                                                          String?
+  ilfeo_c                                                          String?
+  efca_c                                                           String?
+  tei_c                                                            String?
+  ilfnh_c                                                          String?
+  cnpsrph_c                                                        String?
+  vlfn_c                                                           String?
+  ilfnc_c                                                          String?
+  ilfncwl_c                                                        String?
+  lfra_status_c                                                    String?
+  ilfni_status_c                                                   String?
+  alfhi_status_c                                                   String?
+  ilfeo_status_c                                                   String?
+  efca_status_c                                                    String?
+  tei_status_c                                                     String?
+  ilfnh_status_c                                                   String?
+  cnpsrph_status_c                                                 String?
+  vlfn_status_c                                                    String?
+  ilfnc_status_c                                                   String?
+  hoh_address_c                                                    String?
+  hoh_address_doc_status_c                                         String?
+  file_url_c                                                       String?
+  status_c                                                         String?
+
+  visa_document VisaDocument @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  @@map("visa_documents_cstm")
+}
