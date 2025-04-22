@@ -1,6 +1,6 @@
 import { seedCountries, seedNationalities, seedNotificationChannels, seedNotificationProviders, seedPassportTypes, seedStatesInNigeria, seedVisaRequirements, seedVisaTypes } from '../libs/db/src/seeders/utils.seed';
 import { createSuperAdmin } from '../libs/db/src/seeders/superadmin.seed'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/core/client'
 const prisma = new PrismaClient()
 
 // createSuperAdmin(prisma)
@@ -35,4 +35,4 @@ export async function seedAll() {
 }
 
 // Run the main seeding function
-seedAll();
+// seedAll();

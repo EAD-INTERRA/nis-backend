@@ -1,14 +1,14 @@
-import { DbService } from '@app/db';
+import { CoreDbService } from '@app/db';
 import { exception, ServiceResponse, success } from '@app/utils/response';
 import { GenericFilterInterface } from '@app/utils/types';
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/core/client';
 import { addDays, startOfDay } from 'date-fns';
 
 @Injectable()
 export class AuditService {
     constructor(
-        private readonly dbService: DbService,
+        private readonly dbService: CoreDbService,
     ) { }
 
     async getAllAuditLogs(

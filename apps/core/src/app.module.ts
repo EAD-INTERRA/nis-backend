@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuditController } from './audit/audit.controller';
-import { DbModule, DbService } from '@app/db';
+import { DbModule, CoreDbService } from '@app/db';
 import { AuthModule } from 'apps/auth/src/auth.module';
 import { AuditModule } from '@app/audit';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -13,6 +13,11 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { BullModule } from '@nestjs/bullmq';
 import { EVisaConsumer } from '@app/e-visa/e-visa.consumer';
+import { CaseController } from './case/case.controller';
+import { ReplicaModule } from '@app/replica';
+import { ReplicaDbService } from '@app/db/replica.service';
+import { AccountController } from './account/account.controller';
+import { VisaDocumentController } from './visa-document/visa-document.controller';
 
 console.log("PATH: ", join(__dirname, '..', '..', '..', 'public'))
 
@@ -22,6 +27,7 @@ console.log("PATH: ", join(__dirname, '..', '..', '..', 'public'))
     AuthModule, 
     AuditModule, 
     EVisaModule,
+    ReplicaModule,
     MulterModule.register({
       storage: diskStorage({
         destination: './public/uploads',
@@ -42,7 +48,7 @@ console.log("PATH: ", join(__dirname, '..', '..', '..', 'public'))
       },
     })
   ],
-  controllers: [AppController, AuditController, EVisaController],
-  providers: [AppService, DbService, EVisaConsumer],
+  controllers: [AppController, AuditController, EVisaController, CaseController, AccountController, VisaDocumentController],
+  providers: [AppService, CoreDbService, EVisaConsumer, ReplicaDbService],
 })
 export class AppModule {}

@@ -41,6 +41,12 @@
       ],
       "@app/e-visa/*": [
         "libs/e-visa/src/*"
+      ],
+      "@app/replica": [
+        "libs/replica/src"
+      ],
+      "@app/replica/*": [
+        "libs/replica/src/*"
       ]
     }
   }

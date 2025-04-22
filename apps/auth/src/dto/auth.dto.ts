@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { Gender } from '@prisma/client';
+import { Gender } from '@prisma/core/client';
 import { IsEmail, IsNotEmpty } from 'class-validator';  
 
 export class LoginDto {

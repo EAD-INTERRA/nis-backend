@@ -1,4 +1,4 @@
-import { Applicant, ContactDetail, Country, Nationality, PassportType, PortOfEntry, PrismaClient, TravelInformation, VisaType } from "@prisma/client"
+import { Applicant, ContactDetail, Country, Nationality, PassportType, PortOfEntry, PrismaClient, TravelInformation, VisaType } from "@prisma/core/client"
 
 export const mapWebhookFields = async (
     dbService: PrismaClient,

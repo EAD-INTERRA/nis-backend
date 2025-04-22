@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { EVisaService } from './e-visa.service';
-import { DbService } from '@app/db';
+import { CoreDbService } from '@app/db';
 import { BullModule } from '@nestjs/bullmq';
 import { EVisaConsumer } from './e-visa.consumer';
 
@@ -10,7 +10,7 @@ import { EVisaConsumer } from './e-visa.consumer';
       name: 'e-visa',
     }),
   ],
-  providers: [EVisaService, DbService, EVisaConsumer],
+  providers: [EVisaService, CoreDbService, EVisaConsumer],
   exports: [EVisaService, EVisaConsumer],
 })
 export class EVisaModule {}

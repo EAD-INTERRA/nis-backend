@@ -9,15 +9,15 @@ import {
   import { Reflector } from '@nestjs/core';
 
   import * as dotenv from 'dotenv';
-import { DbService } from '@app/db';
-import { Permission, PermissionLevel, UserDetail } from '@prisma/client';
+import { CoreDbService } from '@app/db';
+import { Permission, PermissionLevel, UserDetail } from '@prisma/core/client';
 import { Permissions } from '../decorators/permissions.decorator';
   
   dotenv.config()
   
   @Injectable()
   export class AuthGuard implements CanActivate {
-    constructor(private jwtService: JwtService, private reflector: Reflector, private readonly dbService: DbService) { }
+    constructor(private jwtService: JwtService, private reflector: Reflector, private readonly dbService: CoreDbService) { }
   
     async canActivate(context: ExecutionContext): Promise<boolean> {
       const request: Request = context.switchToHttp().getRequest();

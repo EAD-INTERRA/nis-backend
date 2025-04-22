@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AuditService } from './audit.service';
-import { DbService } from '@app/db';
+import { CoreDbService } from '@app/db';
 
 @Module({
-  providers: [AuditService, DbService],
+  providers: [AuditService, CoreDbService],
   exports: [AuditService],
 })
 export class AuditModule {}
