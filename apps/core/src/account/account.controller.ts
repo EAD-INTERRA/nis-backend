@@ -25,26 +25,26 @@ import { Prisma } from '@prisma/replica/client';
 export class AccountController {
     constructor(private readonly accountService: AccountService) { }
 
-    @Post('custom')
-    async createAccountCustom(@Body() data: CreateAccountCustomDto) {
-        const res = await this.accountService.createAccountCustom(data)
-        return mapErrorCodeToHttpResponse(res);
-    }
+    // @Post('custom')
+    // async createAccountCustom(@Body() data: CreateAccountCustomDto) {
+    //     const res = await this.accountService.createAccountCustom(data)
+    //     return mapErrorCodeToHttpResponse(res);
+    // }
    
-    @Get('custom')
-    async findAllAccountsCustom() {
-        return mapErrorCodeToHttpResponse(await this.accountService.findAllAccountsCustom());
-    }
+    // @Get('custom')
+    // async findAllAccountsCustom() {
+    //     return mapErrorCodeToHttpResponse(await this.accountService.findAllAccountsCustom());
+    // }
 
-    @Get('custom/:id')
-    async findAccountCustom(@Param('id') id: string) {
-        return mapErrorCodeToHttpResponse(await this.accountService.findAccountCustom(id));
-    }
+    // @Get('custom/:id')
+    // async findAccountCustom(@Param('id') id: string) {
+    //     return mapErrorCodeToHttpResponse(await this.accountService.findAccountCustom(id));
+    // }
 
-    @Patch('custom/:id')
-    async updateCustom(@Param('id') id: string, @Body() data: UpdateAccountCustomDto) {
-        return mapErrorCodeToHttpResponse(await this.accountService.updateAccountCustom(id, data));
-    }
+    // @Patch('custom/:id')
+    // async updateCustom(@Param('id') id: string, @Body() data: UpdateAccountCustomDto) {
+    //     return mapErrorCodeToHttpResponse(await this.accountService.updateAccountCustom(id, data));
+    // }
 
     @Post()
     async createAccount(@Body() data: CreateAccountDto) {
@@ -57,13 +57,13 @@ export class AccountController {
         return mapErrorCodeToHttpResponse(await this.accountService.findAllAccounts());
     }
    
-    @Get(':id')
-    async findOne(@Param('id') id: string) {
+    @Get(':id-or-passport-no')
+    async findOne(@Param('id-or-passport-no') id: string) {
         return mapErrorCodeToHttpResponse(await this.accountService.findAccount(id));
     }
 
-    @Patch(':id')
-    async update(@Param('id') id: string, @Body() data: UpdateAccountDto) {
+    @Patch(':id-or-passport-no')
+    async update(@Param('id-or-passport-no') id: string, @Body() data: UpdateAccountDto) {
         return mapErrorCodeToHttpResponse(await this.accountService.updateAccount(id, data));
     }
 

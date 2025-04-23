@@ -28,7 +28,12 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   app.useGlobalPipes(new ValidationPipe({
-    transform: true
+    transform: true,
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
+    whitelist: true,
+    forbidNonWhitelisted: false,
   }));
 
   // Enable gzip compression

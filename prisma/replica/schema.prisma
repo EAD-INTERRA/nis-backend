@@ -47,7 +47,7 @@ model AccountCustom {
   dob_c                      DateTime?
   nationality_c              String?
   passport_type_c            String?
-  passport_number_c          String?
+  passport_number_c          String?   @unique
   issue_date_c               DateTime?
   id_on_engine_c             String?
   passport_expiration_date_c DateTime?
@@ -58,6 +58,7 @@ model AccountCustom {
 
   account Account @relation(fields: [id], references: [id], onDelete: Cascade)
 
+  @@index([passport_number_c])
   @@map("accounts_cstm")
 }
 
@@ -116,6 +117,17 @@ model CaseCustom {
   entry_type_c                   String?
   duration_of_stay_c             String?
   ticket_num_c                   String?
+  organization_c                 String?
+  visa_number_c                  String?
+  visa_class_c                   String?
+  mode_of_travel_c               String?
+  mode_of_travel_no_c            String?
+  new_passport_number_c          String?
+  issue_date_c                   String?
+  expiration_date_c              String?
+  nigerian_passport_c            String?
+  yes_passport_no_c              String?
+  principal_passport_number_c    String?
 
   case Case @relation(fields: [id], references: [id], onDelete: Cascade)
 

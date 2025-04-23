@@ -1,32 +1,50 @@
 import { ReplicaDbService } from '@app/db/replica.service';
-import { exception, notFound, ServiceResponse, success } from '@app/utils/response';
+import { badRequest, exception, forbidden, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Account, Prisma } from '@prisma/replica/client';
 import { CreateAccountDto } from '../dtos/create-account.dto';
 import { UpdateAccountDto } from '../dtos/update-account.dto';
 import { CreateAccountCustomDto } from '../dtos/create-accountcustom.dto';
 import { UpdateAccountCustomDto } from '../dtos/update-accountcustom.dto';
+import { differenceInYears } from 'date-fns';
 
 @Injectable()
 export class AccountService {
-  constructor(private replicaService: ReplicaDbService) {}
+  constructor(private replicaService: ReplicaDbService) { }
 
   async createAccount(data: CreateAccountDto): Promise<ServiceResponse> {
+    const { custom, ...rest } = data
     const prismaData: Prisma.AccountCreateInput = {
-      ...data
+      ...rest,
+      custom: {
+        create: custom,
+      }
     };
+    // Check if account with the same passport number already exists
+    if (custom) {
+      const existing = await this.replicaService.accountCustom.findUnique({
+        where: { passport_number_c: custom.passport_number_c },
+      });
+      if (existing) {
+        badRequest({ customMessage: 'Account with this Passport Number already exists' });
+      }
+    }
+
     try {
-        const res = await this.replicaService.account.create({
-          data: prismaData,
-        });
-        return success(res)
+      const res = await this.replicaService.account.create({
+        data: prismaData,
+        include: {
+          custom: true,
+        }
+      });
+      return success(res)
     } catch (err) {
-        exception({ customMessage: "Unable to create account", message: err })
+      exception({ customMessage: "Unable to create account", message: err })
     }
   }
 
   async findAllAccounts(): Promise<ServiceResponse> {
-    return success (this.replicaService.account.findMany({
+    return success(await this.replicaService.account.findMany({
       where: { deleted: false },
       include: {
         custom: true,
@@ -34,37 +52,106 @@ export class AccountService {
     }))
   }
 
-  async findAccount(id: string): Promise<ServiceResponse> {
+  async findAccount(id: string, internal: boolean = false): Promise<ServiceResponse> {
     try {
-        const found = await this.replicaService.account.findUnique({
-          where: { id },
-          include: {
-            custom: true,
+      const account = await this.replicaService.account.findFirst({
+        where: {
+          OR: [
+            { id },
+            { custom: { passport_number_c: id } },
+            {
+              cases: {
+                some: {
+                  custom: {
+                    principal_passport_number_c: id,
+                  }
+                }
+              }
+            }
+          ]
+        },
+        include: {
+          custom: true,
+        },
+      });
+
+      if (!account || account.deleted) {
+        notFound({ customMessage: 'Account not found' });
+      }
+
+      const visaCase = await this.replicaService.case.findFirst({
+        where: {
+          account_id: account.id,
+          deleted: false,
+          custom: {
+            active_status_c: {
+              in: ['active', 'approved', 'true']
+            },
+          }
+        },
+        orderBy: {
+          date_modified: 'desc',
+        },
+        include: {
+          account: {
+            include: {
+              custom: true,
+            }
           },
-        });
-        if (!found || found.deleted) {
-          notFound({customMessage: 'Account not found'});
+          custom: true,
         }
-        return success(found);
+      })
+
+      if (!visaCase) {
+        notFound({ customMessage: 'Visa case not found' });
+      }
+
+      const age = differenceInYears(new Date(), visaCase.account.custom.dob_c)
+
+      if (age < 18 && !internal) {
+        // If the call is not internal, we return a forbidden error
+        forbidden({ customMessage: 'The passport holder is under 18 years old' });
+      }
+
+      return success({ account, visaCase });
     } catch (err) {
-        exception({customMessage: "An error occured while fetching case", message: err})
+      exception({ customMessage: "An error occured while fetching case", message: err })
     }
   }
 
   async updateAccount(id: string, data: UpdateAccountDto): Promise<ServiceResponse> {
-    const existing = await this.findAccount(id); // Ensure it exists
+    const existing = await this.findAccount(id, true); // Ensure it exists (specify that this is an internal call)
+    const { custom, ...rest } = data
 
     const prismaData: Prisma.AccountUpdateInput = {
-      ...data
+      ...rest,
+      custom: {
+        update: {
+          ...custom,
+        }
+      }
     };
-    
+
+    // Check if account with the same passport number already exists
+    // if (custom) {
+    //   const existing = await this.replicaService.accountCustom.findUnique({
+    //     where: { passport_number_c: custom.passport_number_c },
+    //   });
+    //   if (existing) {
+    //     badRequest({customMessage: 'Account with this Passport Number already exists'});
+    //   }
+    // }
+
     try {
-        return success(this.replicaService.account.update({
-          where: { id },
-          data: prismaData,
-        }))
+      return success(await this.replicaService.account.update({
+        where: { id: existing.body.account.id },
+        data: prismaData,
+        include: {
+          custom: true,
+        }
+      }))
     } catch (err) {
-        exception({customMessage: "An error occured while updating account", message: err})
+      exception({ customMessage: "An error occured while updating account", message: err })
     }
   }
 
@@ -73,31 +160,31 @@ export class AccountService {
       ...data
     };
     try {
-        const res = await this.replicaService.accountCustom.create({
-          data: prismaData,
-        });
-        return success(res)
+      const res = await this.replicaService.accountCustom.create({
+        data: prismaData,
+      });
+      return success(res)
     } catch (err) {
-        exception({ customMessage: "Unable to create account", message: err })
+      exception({ customMessage: "Unable to create account", message: err })
     }
   }
 
   async findAllAccountsCustom(): Promise<ServiceResponse> {
-    return success (this.replicaService.accountCustom.findMany({
+    return success(await this.replicaService.accountCustom.findMany({
     }))
   }
 
   async findAccountCustom(id: string): Promise<ServiceResponse> {
     try {
-        const found = await this.replicaService.accountCustom.findUnique({
-          where: { id },
-        });
-        if (!found) {
-          notFound({customMessage: 'Account custom not found'});
-        }
-        return success(found);
+      const found = await this.replicaService.accountCustom.findUnique({
+        where: { id },
+      });
+      if (!found) {
+        notFound({ customMessage: 'Account custom not found' });
+      }
+      return success(found);
     } catch (err) {
-        exception({customMessage: "An error occured while fetching case", message: err})
+      exception({ customMessage: "An error occured while fetching case", message: err })
     }
   }
 
@@ -107,22 +194,22 @@ export class AccountService {
     const prismaData: Prisma.AccountCustomUpdateInput = {
       ...data
     };
-    
+
     try {
-        return success(this.replicaService.accountCustom.update({
-          where: { id },
-          data: prismaData,
-        }))
+      return success(await this.replicaService.accountCustom.update({
+        where: { id },
+        data: prismaData,
+      }))
     } catch (err) {
-        exception({customMessage: "An error occured while updating account custom", message: err})
+      exception({ customMessage: "An error occured while updating account custom", message: err })
     }
   }
 
-//   async remove(id: string): Promise<Case> {
-//     await this.findOne(id); // Ensure it exists
-//     return this.replicaService.case.update({
-//       where: { id },
-//       data: { deleted: true },
-//     });
-//   }
+  //   async remove(id: string): Promise<Case> {
+  //     await this.findOne(id); // Ensure it exists
+  //     return this.replicaService.case.update({
+  //       where: { id },
+  //       data: { deleted: true },
+  //     });
+  //   }
 }

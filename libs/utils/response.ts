@@ -110,13 +110,22 @@ export function notFound(data: CustomHttpResponse) {
   })
 }
 
-export function exception(data: CustomHttpResponse) {
+export function exception(data: CustomHttpResponse | Error) {
+  if (data instanceof Error) {
+    throw data; // Just throw the native error
+  }
+
   const { message, customMessage, ...rest } = data
   throw new InternalServerErrorException({
     code: responseCodes.EXCEPTION,
     body: null,
     message,
-    error: extractMeaningfulError(message?.stack) || JSON.stringify(message, null, 2),
+    error: 
+    // extractMeaningfulError(
+      message?.stack,
+    // ) 
+    // || 
+    // JSON.stringify(message, null, 2),
     customMessage
   })
 }

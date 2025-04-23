@@ -9,25 +9,29 @@ import { UpdateVisaDocumentCustomDto } from '../dtos/update-visadocumentcustom.d
 
 @Injectable()
 export class VisaDocumentService {
-  constructor(private replicaService: ReplicaDbService) {}
+  constructor(private replicaService: ReplicaDbService) { }
 
   async createVisaDocument(data: CreateVisaDocumentDto): Promise<ServiceResponse> {
+    const { custom, ...rest } = data
     const prismaData: Prisma.VisaDocumentCreateInput = {
-      ...data
+      ...rest,
+      custom: {
+        create: custom,
+      }
     };
-    
+
     try {
-        const res = await this.replicaService.visaDocument.create({
-          data: prismaData,
-        });
-        return success(res)
+      const res = await this.replicaService.visaDocument.create({
+        data: prismaData,
+      });
+      return success(res)
     } catch (err) {
-        exception({ customMessage: "Unable to create visa document", message: err })
+      exception({ customMessage: "Unable to create visa document", message: err })
     }
   }
 
   async findAllVisaDocuments(): Promise<ServiceResponse> {
-    return success (this.replicaService.visaDocument.findMany({
+    return success(await this.replicaService.visaDocument.findMany({
       where: { deleted: false },
       include: {
         custom: true,
@@ -37,35 +41,44 @@ export class VisaDocumentService {
 
   async findVisaDocument(id: string): Promise<ServiceResponse> {
     try {
-        const found = await this.replicaService.visaDocument.findUnique({
-          where: { id },
-          include: {
-            custom: true,
-          },
-        });
-        if (!found || found.deleted) {
-          notFound({customMessage: 'Visa Document not found'});
-        }
-        return success(found);
+      const found = await this.replicaService.visaDocument.findUnique({
+        where: { id },
+        include: {
+          custom: true,
+        },
+      });
+      if (!found || found.deleted) {
+        notFound({ customMessage: 'Visa Document not found' });
+      }
+      return success(found);
     } catch (err) {
-        exception({customMessage: "An error occured while fetching visa document", message: err})
+      exception({ customMessage: "An error occured while fetching visa document", message: err })
     }
   }
 
   async updateVisaDocument(id: string, data: UpdateVisaDocumentDto): Promise<ServiceResponse> {
     const existing = await this.findVisaDocument(id); // Ensure it exists
+    const { custom, ...rest } = data
 
     const prismaData: Prisma.VisaDocumentUpdateInput = {
-      ...data
+      ...rest,
+      custom: {
+        update: {
+          ...custom,
+        }
+      }
     };
-    
+
     try {
-        return success(this.replicaService.visaDocument.update({
-          where: { id },
-          data: prismaData,
-        }))
+      return success(await this.replicaService.visaDocument.update({
+        where: { id },
+        data: prismaData,
+        include: {
+          custom: true,
+        }
+      }))
     } catch (err) {
-        exception({customMessage: "An error occured while updating visa document", message: err})
+      exception({ customMessage: "An error occured while updating visa document", message: err })
     }
   }
 
@@ -74,31 +87,31 @@ export class VisaDocumentService {
       ...data
     };
     try {
-        const res = await this.replicaService.visaDocumentCustom.create({
-          data: prismaData,
-        });
-        return success(res)
+      const res = await this.replicaService.visaDocumentCustom.create({
+        data: prismaData,
+      });
+      return success(res)
     } catch (err) {
-        exception({ customMessage: "Unable to create custom visa document", message: err })
+      exception({ customMessage: "Unable to create custom visa document", message: err })
     }
   }
 
   async findAllCustomVisaDocuments(): Promise<ServiceResponse> {
-    return success (this.replicaService.visaDocumentCustom.findMany({
+    return success(await this.replicaService.visaDocumentCustom.findMany({
     }))
   }
 
   async findCustomVisaDocument(id: string): Promise<ServiceResponse> {
     try {
-        const found = await this.replicaService.visaDocumentCustom.findUnique({
-          where: { id },
-        });
-        if (!found) {
-          notFound({customMessage: 'Custom visa document not found'});
-        }
-        return success(found);
+      const found = await this.replicaService.visaDocumentCustom.findUnique({
+        where: { id },
+      });
+      if (!found) {
+        notFound({ customMessage: 'Custom visa document not found' });
+      }
+      return success(found);
     } catch (err) {
-        exception({customMessage: "An error occured while fetching case", message: err})
+      exception({ customMessage: "An error occured while fetching case", message: err })
     }
   }
 
@@ -108,22 +121,22 @@ export class VisaDocumentService {
     const prismaData: Prisma.VisaDocumentCustomUpdateInput = {
       ...data
     };
-    
+
     try {
-        return success(this.replicaService.visaDocumentCustom.update({
-          where: { id },
-          data: prismaData,
-        }))
+      return success(await this.replicaService.visaDocumentCustom.update({
+        where: { id },
+        data: prismaData,
+      }))
     } catch (err) {
-        exception({customMessage: "An error occured while updating custom visa document ", message: err})
+      exception({ customMessage: "An error occured while updating custom visa document ", message: err })
     }
   }
 
-//   async remove(id: string): Promise<Case> {
-//     await this.findOne(id); // Ensure it exists
-//     return this.replicaService.case.update({
-//       where: { id },
-//       data: { deleted: true },
-//     });
-//   }
+  //   async remove(id: string): Promise<Case> {
+  //     await this.findOne(id); // Ensure it exists
+  //     return this.replicaService.case.update({
+  //       where: { id },
+  //       data: { deleted: true },
+  //     });
+  //   }
 }

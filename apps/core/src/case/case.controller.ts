@@ -25,26 +25,26 @@ import { Prisma } from '@prisma/replica/client';
 export class CaseController {
     constructor(private readonly caseService: CaseService) { }
 
-    @Post('custom')
-    async createCustomCase(@Body() data: CreateCaseCustomDto) {
-        const res = await this.caseService.createCaseCustom(data)
-        return mapErrorCodeToHttpResponse(res);
-    }
+    // @Post('custom')
+    // async createCustomCase(@Body() data: CreateCaseCustomDto) {
+    //     const res = await this.caseService.createCaseCustom(data)
+    //     return mapErrorCodeToHttpResponse(res);
+    // }
 
-    @Get('custom')
-    async findAllCustomCases() {
-        return mapErrorCodeToHttpResponse(await this.caseService.findAllCustomCases());
-    }
+    // @Get('custom')
+    // async findAllCustomCases() {
+    //     return mapErrorCodeToHttpResponse(await this.caseService.findAllCustomCases());
+    // }
 
-    @Get('custom/:id')
-    async findCustomCase(@Param('id') id: string) {
-        return mapErrorCodeToHttpResponse(await this.caseService.findCustomCase(id));
-    }
+    // @Get('custom/:id')
+    // async findCustomCase(@Param('id') id: string) {
+    //     return mapErrorCodeToHttpResponse(await this.caseService.findCustomCase(id));
+    // }
 
-    @Patch('custom/:id')
-    async updateCustomCase(@Param('id') id: string, @Body() data: UpdateCaseCustomDto) {
-        return mapErrorCodeToHttpResponse(await this.caseService.updateCustomCase(id, data));
-    }
+    // @Patch('custom/:id')
+    // async updateCustomCase(@Param('id') id: string, @Body() data: UpdateCaseCustomDto) {
+    //     return mapErrorCodeToHttpResponse(await this.caseService.updateCustomCase(id, data));
+    // }
     
     
     @Post()
