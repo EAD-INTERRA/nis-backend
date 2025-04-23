@@ -21,7 +21,7 @@ services:
     # volumes:
     #   - .:/app
     command: >
-      sh -c "pnpm run db:generate:all && pnpm run start:${ENV}"
+      sh -c "pnpm run db:migrate:all && pnpm run db:generate:all && pnpm run start:${ENV}"
     # depends_on:
     #   - redis
   auth-cs:
@@ -41,7 +41,7 @@ services:
     # volumes:
     #   - .:/app # in dev (for real-time updates)
     command: >
-      sh -c "pnpm run db:generate:all  && pnpm run start:${ENV} auth"
+      sh -c "pnpm run db:migrate:all && pnpm run db:generate:all && pnpm run start:${ENV} auth"
   # redis:
   #   container_name: nis_backend_redis
   #   image: redis:6.2-alpine

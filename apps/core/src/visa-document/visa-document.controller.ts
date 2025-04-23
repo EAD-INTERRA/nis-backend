@@ -26,26 +26,26 @@ import { Prisma } from '@prisma/replica/client';
 export class VisaDocumentController {
     constructor(private readonly visaDocService: VisaDocumentService) { }
 
-    @Post('custom')
-    async createCustomisaDocument(@Body() data: CreateVisaDocumentCustomDto) {
-        const res = await this.visaDocService.createVisaDocumentCustom(data)
-        return mapErrorCodeToHttpResponse(res);
-    }
+    // @Post('custom')
+    // async createCustomisaDocument(@Body() data: CreateVisaDocumentCustomDto) {
+    //     const res = await this.visaDocService.createVisaDocumentCustom(data)
+    //     return mapErrorCodeToHttpResponse(res);
+    // }
 
-    @Get('custom')
-    async findAllCustomVisaDocuments() {
-        return mapErrorCodeToHttpResponse(await this.visaDocService.findAllCustomVisaDocuments());
-    }
+    // @Get('custom')
+    // async findAllCustomVisaDocuments() {
+    //     return mapErrorCodeToHttpResponse(await this.visaDocService.findAllCustomVisaDocuments());
+    // }
 
-    @Get('custom/:id')
-    async findCustomVisaDocument(@Param('id') id: string) {
-        return mapErrorCodeToHttpResponse(await this.visaDocService.findCustomVisaDocument(id));
-    }
+    // @Get('custom/:id')
+    // async findCustomVisaDocument(@Param('id') id: string) {
+    //     return mapErrorCodeToHttpResponse(await this.visaDocService.findCustomVisaDocument(id));
+    // }
 
-    @Patch('custom/:id')
-    async updateCustomVisaDocument(@Param('id') id: string, @Body() data: UpdateVisaDocumentCustomDto) {
-        return mapErrorCodeToHttpResponse(await this.visaDocService.updateCustomVisaDocument(id, data));
-    }
+    // @Patch('custom/:id')
+    // async updateCustomVisaDocument(@Param('id') id: string, @Body() data: UpdateVisaDocumentCustomDto) {
+    //     return mapErrorCodeToHttpResponse(await this.visaDocService.updateCustomVisaDocument(id, data));
+    // }
     
     
     @Post()
