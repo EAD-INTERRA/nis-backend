@@ -32,7 +32,7 @@ model Account {
 
   custom    AccountCustom?
   cases     Case[]
-  documents VisaDocument[]
+  // documents VisaDocument[]
 
   @@index([name, alias, surname])
   @@map("accounts")
@@ -80,6 +80,7 @@ model Case {
 
   account Account?    @relation(fields: [account_id], references: [id], onDelete: SetNull)
   custom  CaseCustom?
+  visa_document VisaDocument? @relation("CaseVisaDocument")
 
   @@index([case_number, account_id])
   @@map("cases")
@@ -147,9 +148,9 @@ model VisaDocument {
   filename         String?
   file_ext         String?
   file_mime_type   String?
-  account_id       String?
+  case_id           String? @unique
 
-  account Account?            @relation(fields: [account_id], references: [id], onDelete: SetNull)
+  case Case? @relation("CaseVisaDocument", fields: [case_id], references: [id], onDelete: SetNull)
   custom  VisaDocumentCustom?
 
   @@index([document_name, filename])
