@@ -5,7 +5,7 @@ import { Transform } from 'class-transformer';
 
 export class CreateVisaDocumentDto {
   @ApiProperty()
-  @Transform(({ value }) => new Date(value))
+  @Transform(({ value }) => new Date(value).toISOString())
   @IsOptional()
   date_modified: string;
 
@@ -36,6 +36,14 @@ export class CreateVisaDocumentDto {
   @ApiProperty({ required: false })
   @IsOptional()
   file_mime_type?: string;
+  
+  @ApiProperty({ required: false })
+  @IsOptional()
+  account_id?: string;
+  
+  @ApiProperty({ required: false })
+  @IsOptional()
+  passport_number?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

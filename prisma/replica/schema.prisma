@@ -30,8 +30,9 @@ model Account {
   phone_office  String?
   deleted       Boolean  @default(false)
 
-  custom AccountCustom?
-  cases  Case[]
+  custom    AccountCustom?
+  cases     Case[]
+  documents VisaDocument[]
 
   @@index([name, alias, surname])
   @@map("accounts")
@@ -146,8 +147,10 @@ model VisaDocument {
   filename         String?
   file_ext         String?
   file_mime_type   String?
+  account_id       String?
 
-  custom VisaDocumentCustom?
+  account Account?            @relation(fields: [account_id], references: [id], onDelete: SetNull)
+  custom  VisaDocumentCustom?
 
   @@index([document_name, filename])
   @@map("visa_documents")

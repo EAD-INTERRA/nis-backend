@@ -12,8 +12,9 @@ import {
     Patch,
     Param,
     Delete,
+    Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Prisma } from '@prisma/replica/client';
 
 
@@ -57,14 +58,18 @@ export class AccountController {
         return mapErrorCodeToHttpResponse(await this.accountService.findAllAccounts());
     }
    
-    @Get(':id-or-passport-no')
-    async findOne(@Param('id-or-passport-no') id: string) {
-        return mapErrorCodeToHttpResponse(await this.accountService.findAccount(id));
+    @Get(':id_or_passport_no')
+    @ApiQuery({ name: 'principal_passport_number', required: false })
+    async findOne(
+        @Param('id_or_passport_no') id_or_passport_no: string,
+        @Query('principal_passport_number') principal_passport_number?: string,
+    ) {
+        return mapErrorCodeToHttpResponse(await this.accountService.findAccount(id_or_passport_no, principal_passport_number));
     }
 
-    @Patch(':id-or-passport-no')
-    async update(@Param('id-or-passport-no') id: string, @Body() data: UpdateAccountDto) {
-        return mapErrorCodeToHttpResponse(await this.accountService.updateAccount(id, data));
+    @Patch(':id_or_passport_no')
+    async update(@Param('id_or_passport_no') id_or_passport_no: string, @Body() data: UpdateAccountDto) {
+        return mapErrorCodeToHttpResponse(await this.accountService.updateAccount(id_or_passport_no, data));
     }
 
     // @Delete(':id')

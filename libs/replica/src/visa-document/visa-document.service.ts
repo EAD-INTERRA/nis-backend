@@ -1,7 +1,7 @@
 import { ReplicaDbService } from '@app/db/replica.service';
 import { exception, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Case, Prisma } from '@prisma/replica/client';
+import { Account, AccountCustom, Case, Prisma } from '@prisma/replica/client';
 import { CreateVisaDocumentDto } from '../dtos/create-visadocument.dto';
 import { UpdateVisaDocumentDto } from '../dtos/update-visadocument.dto';
 import { CreateVisaDocumentCustomDto } from '../dtos/create-visadocumentcustom.dto';
@@ -12,13 +12,44 @@ export class VisaDocumentService {
   constructor(private replicaService: ReplicaDbService) { }
 
   async createVisaDocument(data: CreateVisaDocumentDto): Promise<ServiceResponse> {
-    const { custom, ...rest } = data
-    const prismaData: Prisma.VisaDocumentCreateInput = {
-      ...rest,
-      custom: {
-        create: custom,
-      }
-    };
+    const { custom, passport_number, ...rest } = data
+
+    // Check if account with the same passport number already exists
+    let existingAccount: Account & { custom: AccountCustom } = null;
+    if (passport_number) {
+      existingAccount = await this.replicaService.account.findFirst({
+        where: {
+          custom: {
+            passport_number_c: passport_number,
+          }
+        },
+        include: {
+          custom: true,
+        }
+      })
+    }
+
+    let prismaData: Prisma.VisaDocumentCreateInput
+    if (existingAccount) {
+      prismaData = {
+        ...rest,
+        account: {
+          connect: {
+            id: existingAccount.id,
+          }
+        },
+        custom: {
+          create: { ...custom },
+        }
+      };
+    } else {
+      prismaData = {
+        ...rest,
+        custom: {
+          create: { ...custom },
+        }
+      };
+    }
 
     try {
       const res = await this.replicaService.visaDocument.create({
@@ -58,16 +89,53 @@ export class VisaDocumentService {
 
   async updateVisaDocument(id: string, data: UpdateVisaDocumentDto): Promise<ServiceResponse> {
     const existing = await this.findVisaDocument(id); // Ensure it exists
-    const { custom, ...rest } = data
+    const { custom, passport_number, ...rest } = data
 
-    const prismaData: Prisma.VisaDocumentUpdateInput = {
-      ...rest,
-      custom: {
-        update: {
-          ...custom,
+    // const prismaData: Prisma.VisaDocumentUpdateInput = {
+    //   ...rest,
+    //   custom: {
+    //     update: {
+    //       ...custom,
+    //     }
+    //   }
+    // };
+
+    // Check if account with the same passport number already exists
+    let existingAccount: Account & { custom: AccountCustom } = null;
+    if (passport_number) {
+      existingAccount = await this.replicaService.account.findFirst({
+        where: {
+          custom: {
+            passport_number_c: passport_number,
+          }
+        },
+        include: {
+          custom: true,
         }
-      }
-    };
+      })
+    }
+
+    let prismaData: Prisma.VisaDocumentUpdateInput
+    if (existingAccount) {
+      prismaData = {
+        ...rest,
+        account: {
+          connect: {
+            id: existingAccount.id,
+          }
+        },
+        custom: {
+          update: { ...custom },
+        }
+      };
+    } else {
+      prismaData = {
+        ...rest,
+        custom: {
+          update: { ...custom },
+        }
+      };
+    }
 
     try {
       return success(await this.replicaService.visaDocument.update({

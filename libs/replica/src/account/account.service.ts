@@ -1,7 +1,7 @@
 import { ReplicaDbService } from '@app/db/replica.service';
 import { badRequest, exception, forbidden, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Account, Prisma } from '@prisma/replica/client';
+import { Account, AccountCustom, Prisma } from '@prisma/replica/client';
 import { CreateAccountDto } from '../dtos/create-account.dto';
 import { UpdateAccountDto } from '../dtos/update-account.dto';
 import { CreateAccountCustomDto } from '../dtos/create-accountcustom.dto';
@@ -17,7 +17,7 @@ export class AccountService {
     const prismaData: Prisma.AccountCreateInput = {
       ...rest,
       custom: {
-        create: custom,
+        create: { ...custom },
       }
     };
     // Check if account with the same passport number already exists
@@ -52,42 +52,51 @@ export class AccountService {
     }))
   }
 
-  async findAccount(id: string, internal: boolean = false): Promise<ServiceResponse> {
+  async findAccount(id: string, principal_passport_number?: string, internal: boolean = false): Promise<ServiceResponse> {
     try {
-      const account = await this.replicaService.account.findFirst({
+      let account: Account & { custom: AccountCustom } = null;
+
+      // Step 1: Try to find the account by id or passport_number_c
+      account = await this.replicaService.account.findFirst({
         where: {
           OR: [
             { id },
             { custom: { passport_number_c: id } },
-            {
-              cases: {
-                some: {
-                  custom: {
-                    principal_passport_number_c: id,
-                  }
-                }
-              }
-            }
           ]
         },
-        include: {
-          custom: true,
-        },
+        include: { custom: true },
       });
 
+      // Step 2: If no account or it's deleted, throw
       if (!account || account.deleted) {
         notFound({ customMessage: 'Account not found' });
+      }
+
+      // Step 3: If principal_passport_number is provided, check for matching case
+      if (principal_passport_number) {
+        const hasMatchingCase = await this.replicaService.case.findFirst({
+          where: {
+            account_id: account.id,
+            custom: {
+              principal_passport_number_c: principal_passport_number
+            }
+          }
+        });
+
+        if (!hasMatchingCase) {
+          notFound({ customMessage: 'Account does not have matching principal passport number in any case' });
+        }
       }
 
       const visaCase = await this.replicaService.case.findFirst({
         where: {
           account_id: account.id,
           deleted: false,
-          custom: {
-            active_status_c: {
-              in: ['active', 'approved', 'true']
-            },
-          }
+          // custom: {
+          //   active_status_c: {
+          //     in: ['active', 'approved', 'true']
+          //   },
+          // }
         },
         orderBy: {
           date_modified: 'desc',
@@ -102,25 +111,27 @@ export class AccountService {
         }
       })
 
-      if (!visaCase) {
-        notFound({ customMessage: 'Visa case not found' });
+      // if (!visaCase) {
+      //   notFound({ customMessage: 'Visa case not found' });
+      // }
+
+      const age = differenceInYears(new Date(), account.custom.dob_c)
+
+      if (age < 18) {
+        if (!internal) {
+          // If the call is not internal, we return a forbidden error
+          forbidden({ customMessage: 'The passport holder is under 18 years old' });
+        }
       }
 
-      const age = differenceInYears(new Date(), visaCase.account.custom.dob_c)
-
-      if (age < 18 && !internal) {
-        // If the call is not internal, we return a forbidden error
-        forbidden({ customMessage: 'The passport holder is under 18 years old' });
-      }
-
-      return success({ account, visaCase });
+      return success({ account, visaCase, age });
     } catch (err) {
       exception({ customMessage: "An error occured while fetching case", message: err })
     }
   }
 
   async updateAccount(id: string, data: UpdateAccountDto): Promise<ServiceResponse> {
-    const existing = await this.findAccount(id, true); // Ensure it exists (specify that this is an internal call)
+    const existing = await this.findAccount(id, undefined, true); // Ensure it exists (specify that this is an internal call)
     const { custom, ...rest } = data
 
     const prismaData: Prisma.AccountUpdateInput = {
