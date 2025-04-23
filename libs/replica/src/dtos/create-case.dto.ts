@@ -21,7 +21,7 @@ export class CreateCaseDto {
   modified_user_id?: string;
 
   @ApiProperty()
-  @Transform(({ value }) => new Date(value))
+  @Transform(({ value }) => new Date(value).toISOString())
   @IsOptional()
   date_modified: string;
   

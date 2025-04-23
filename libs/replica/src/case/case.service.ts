@@ -16,7 +16,7 @@ export class CaseService {
     const prismaData: Prisma.CaseCreateInput = {
       ...rest,
       custom: {
-        create: custom,
+        create: {...custom},
       }
     };
 

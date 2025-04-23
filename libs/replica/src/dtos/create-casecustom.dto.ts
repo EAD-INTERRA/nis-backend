@@ -60,12 +60,12 @@ export class CreateCaseCustomDto {
   contact_or_hotel_name_c?: string;
   
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value))
+  @Transform(({ value }) => new Date(value).toISOString())
   @IsOptional()
   date_arrival_c?: string;
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value))
+  @Transform(({ value }) => new Date(value).toISOString())
   @IsOptional()
   date_of_departure_c?: string;
 
@@ -110,12 +110,12 @@ export class CreateCaseCustomDto {
   port_of_entry_c?: string;
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value))
+  @Transform(({ value }) => new Date(value).toISOString())
   @IsOptional()
   departure_date_c?: string;
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value))
+  @Transform(({ value }) => new Date(value).toISOString())
   @IsOptional()
   entry_date_c?: string;
 
@@ -156,12 +156,12 @@ export class CreateCaseCustomDto {
   new_passport_number_c: string
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value))
+  @Transform(({ value }) => new Date(value).toISOString())
   @IsOptional()
   issue_date_c: string
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value))
+  @Transform(({ value }) => new Date(value).toISOString())
   @IsOptional()
   expiration_date_c: string
 
