@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsOptional } from 'class-validator';
+import { isValid, parseISO } from 'date-fns';
 
 export class CreateCaseCustomDto {
   @ApiProperty({ required: false })
@@ -60,12 +61,38 @@ export class CreateCaseCustomDto {
   contact_or_hotel_name_c?: string;
   
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value).toISOString())
+  @Transform(({ value }) => {
+  let parsed = parseISO(value);
+  if (!isValid(parsed)) {
+    // Try to fix a "YYYY-MM-DD" format manually
+    try {
+      const fixed = `${value}T00:00:00.000Z`;
+      parsed = new Date(fixed);
+    } catch {
+      return null;
+    }
+  }
+
+  return isValid(parsed) ? parsed.toISOString() : null;
+})
   @IsOptional()
   date_arrival_c?: string;
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value).toISOString())
+  @Transform(({ value }) => {
+  let parsed = parseISO(value);
+  if (!isValid(parsed)) {
+    // Try to fix a "YYYY-MM-DD" format manually
+    try {
+      const fixed = `${value}T00:00:00.000Z`;
+      parsed = new Date(fixed);
+    } catch {
+      return null;
+    }
+  }
+
+  return isValid(parsed) ? parsed.toISOString() : null;
+})
   @IsOptional()
   date_of_departure_c?: string;
 
@@ -110,12 +137,38 @@ export class CreateCaseCustomDto {
   port_of_entry_c?: string;
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value).toISOString())
+  @Transform(({ value }) => {
+  let parsed = parseISO(value);
+  if (!isValid(parsed)) {
+    // Try to fix a "YYYY-MM-DD" format manually
+    try {
+      const fixed = `${value}T00:00:00.000Z`;
+      parsed = new Date(fixed);
+    } catch {
+      return null;
+    }
+  }
+
+  return isValid(parsed) ? parsed.toISOString() : null;
+})
   @IsOptional()
   departure_date_c?: string;
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value).toISOString())
+  @Transform(({ value }) => {
+  let parsed = parseISO(value);
+  if (!isValid(parsed)) {
+    // Try to fix a "YYYY-MM-DD" format manually
+    try {
+      const fixed = `${value}T00:00:00.000Z`;
+      parsed = new Date(fixed);
+    } catch {
+      return null;
+    }
+  }
+
+  return isValid(parsed) ? parsed.toISOString() : null;
+})
   @IsOptional()
   entry_date_c?: string;
 
@@ -156,12 +209,38 @@ export class CreateCaseCustomDto {
   new_passport_number_c: string
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value).toISOString())
+  @Transform(({ value }) => {
+  let parsed = parseISO(value);
+  if (!isValid(parsed)) {
+    // Try to fix a "YYYY-MM-DD" format manually
+    try {
+      const fixed = `${value}T00:00:00.000Z`;
+      parsed = new Date(fixed);
+    } catch {
+      return null;
+    }
+  }
+
+  return isValid(parsed) ? parsed.toISOString() : null;
+})
   @IsOptional()
   issue_date_c: string
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => new Date(value).toISOString())
+  @Transform(({ value }) => {
+  let parsed = parseISO(value);
+  if (!isValid(parsed)) {
+    // Try to fix a "YYYY-MM-DD" format manually
+    try {
+      const fixed = `${value}T00:00:00.000Z`;
+      parsed = new Date(fixed);
+    } catch {
+      return null;
+    }
+  }
+
+  return isValid(parsed) ? parsed.toISOString() : null;
+})
   @IsOptional()
   expiration_date_c: string
 
