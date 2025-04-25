@@ -11,69 +11,6 @@ import { UpdateCaseCustomDto } from '../dtos/update-casecustom.dto';
 export class CaseService {
   constructor(private replicaService: ReplicaDbService) { }
 
-  // async createCase(data: CreateCaseDto): Promise<ServiceResponse> {
-  //   const { custom, passport_number, visa_document, ...rest } = data
-
-  //   try {
-  //     // Check if account with the same passport number already exists
-  //     let existingAccount: Account & { custom: AccountCustom } = null;
-
-  //     if (passport_number) {
-  //       existingAccount = await this.replicaService.account.findFirst({
-  //         where: {
-  //           custom: {
-  //             passport_number_c: passport_number,
-  //           }
-  //         },
-  //         include: {
-  //           custom: true,
-  //         }
-  //       })
-  //     }
-
-  //     let prismaData: Prisma.CaseCreateInput = {
-  //       ...rest
-  //     }
-
-  //     if (existingAccount) {
-  //       prismaData.account = {
-  //         connect: {
-  //           id: existingAccount.id,
-  //         }
-  //       }
-  //     }
-
-  //     if (custom) {
-  //       prismaData.custom = {
-  //         create: { ...custom },
-  //       }
-  //     }
-
-  //     if (visa_document) {
-  //       const { custom: visaCustom, ...restVisa } = visa_document
-  //       prismaData.visa_document = {
-  //         create: {
-  //           ...restVisa,
-  //           ...(visaCustom && {
-  //             custom: {
-  //               create: { ...visaCustom },
-  //             }
-  //           })
-  //         }
-
-  //       }
-  //     }
-
-  //     const res = await this.replicaService.case.create({
-  //       data: prismaData,
-  //     });
-
-  //     return success(res)
-  //   } catch (err) {
-  //     exception({ customMessage: "Unable to create case", message: err })
-  //   }
-  // }
-
   async createCase(data: CreateCaseDto): Promise<ServiceResponse> {
     const { custom, passport_number, visa_document, ...rest } = data;
 
@@ -131,7 +68,20 @@ export class CaseService {
         });
       }
 
-      return success(createdCase);
+      return success(await this.replicaService.case.findUnique({
+        where: {
+          id: createdCase.id,
+        },
+        include: {
+          custom: true,
+          account: true,
+          visa_document: {
+            include: {
+              custom: true,
+            }
+          },
+        },
+      }));
     } catch (err) {
       exception({ customMessage: "Unable to create case", message: err });
     }
@@ -155,6 +105,7 @@ export class CaseService {
         include: {
           custom: true,
           account: true,
+          visa_document: true
         },
       });
       if (!found || found.deleted) {
@@ -166,75 +117,6 @@ export class CaseService {
     }
   }
 
-  // async updateCase(id: string, data: UpdateCaseDto): Promise<ServiceResponse> {
-  //   const existing = await this.findCase(id); // Ensure it exists
-  //   const { custom, passport_number, visa_document, ...rest } = data
-
-  //   // Check if account with the same passport number already exists
-  //   let existingAccount: Account & { custom: AccountCustom } = null;
-  //   if (passport_number) {
-  //     existingAccount = await this.replicaService.account.findFirst({
-  //       where: {
-  //         custom: {
-  //           passport_number_c: passport_number,
-  //         }
-  //       },
-  //       include: {
-  //         custom: true,
-  //       }
-  //     })
-  //   }
-
-  //   let prismaData: Prisma.CaseUpdateInput
-  //   if (existingAccount) {
-  //     prismaData = {
-  //       ...rest,
-  //       account: {
-  //         connect: {
-  //           id: existingAccount.id,
-  //         }
-  //       },
-  //       custom: {
-  //         update: { ...custom },
-  //       },
-  //       visa_document: {
-  //         update: {
-  //           ...visa_document,
-  //           custom: {
-  //             create: { ...visa_document.custom },
-  //           }
-  //         }
-  //       }
-  //     }
-  //   } else {
-  //     prismaData = {
-  //       ...rest,
-  //       custom: {
-  //         update: { ...custom },
-  //       },
-  //       visa_document: {
-  //         update: {
-  //           ...visa_document,
-  //           custom: {
-  //             create: { ...visa_document.custom },
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   try {
-  //     return success(await this.replicaService.case.update({
-  //       where: { id },
-  //       data: prismaData,
-  //       include: {
-  //         custom: true,
-  //       }
-  //     }))
-  //   } catch (err) {
-  //     exception({ customMessage: "An error occured while updating case", message: err })
-  //   }
-  // }
   async updateCase(id: string, data: UpdateCaseDto): Promise<ServiceResponse> {
     const existing = await this.findCase(id); // Ensure it exists
     const { custom, passport_number, visa_document, ...rest } = data;
@@ -258,6 +140,7 @@ export class CaseService {
       ...rest
     };
 
+    // Handle account update if needed
     if (existingAccount) {
       prismaData.account = {
         connect: {
@@ -266,39 +149,73 @@ export class CaseService {
       };
     }
 
+    // Handle custom update if needed
     if (custom) {
       prismaData.custom = {
         update: { ...custom }
       };
     }
 
+    // Step 1: Handle VisaDocument update or creation (if visa_document exists in input)
     if (visa_document) {
-      const { custom: visaCustom, ...restVisa } = visa_document;
-      prismaData.visa_document = {
-        update: {
-          ...restVisa,
-          ...(visaCustom && {
-            custom: {
-              create: { ...visaCustom }
-            }
-          })
-        }
-      };
+      const { custom: visaCustom, case_id, ...restVisa } = visa_document;
+
+      if (existing.body.visa_document) {
+        // If a VisaDocument exists, update it
+        await this.replicaService.visaDocument.update({
+          where: {
+            id: existing.body.visa_document.id
+          },
+          data: {
+            ...restVisa,
+            ...(visaCustom && {
+              custom: {
+                update: { ...visaCustom }
+              }
+            }),
+          },
+        });
+      } else {
+        // If no existing VisaDocument, create one and link to Case
+        await this.replicaService.visaDocument.create({
+          data: {
+            ...restVisa,
+            case_id: id, // Link to the current case by its id
+            ...(visaCustom && {
+              custom: {
+                create: { ...visaCustom }
+              }
+            })
+          },
+        });
+      }
     }
 
     try {
-      return success(await this.replicaService.case.update({
+      // Update the Case with all necessary data
+      const updatedCase = await this.replicaService.case.update({
         where: { id },
         data: prismaData,
         include: {
           custom: true,
+          account: {
+            include: {
+              custom: true,
+            }
+          },
+          visa_document: {
+            include: {
+              custom: true,
+            }
+          },
         }
-      }));
+      });
+
+      return success(updatedCase);
     } catch (err) {
       exception({ customMessage: "An error occurred while updating case", message: err });
     }
   }
-
 
   async createCaseCustom(data: CreateCaseCustomDto): Promise<ServiceResponse> {
     const prismaData: Prisma.CaseCustomCreateInput = {
