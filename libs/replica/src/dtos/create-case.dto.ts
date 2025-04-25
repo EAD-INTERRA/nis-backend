@@ -52,9 +52,9 @@ export class CreateCaseDto {
   @IsOptional()
   case_number?: string;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
-  account_id?: string;
+  // @ApiProperty({ required: false })
+  // @IsOptional()
+  // account_id?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

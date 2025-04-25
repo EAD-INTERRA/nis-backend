@@ -30,6 +30,12 @@ export class CaseService {
         });
       }
 
+      if (!existingAccount) {
+        // If no existing account, throw an error
+        notFound({ customMessage: 'Account with this Passport Number does not exist' });
+      }
+      // const accountId = existingAccount ? existingAccount.id : account_id;
+
       let prismaData: Prisma.CaseCreateInput = {
         ...rest,
         ...(existingAccount && {
