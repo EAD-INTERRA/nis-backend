@@ -57,7 +57,7 @@ export class CreateVisaDocumentDto {
   
   // @ApiProperty({ required: false })
   // @IsOptional()
-  // passport_number?: string;
+  // is_deleted?: boolean;
   
   @ApiProperty({ required: false })
   @IsOptional()
