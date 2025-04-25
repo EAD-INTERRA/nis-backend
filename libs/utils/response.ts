@@ -52,8 +52,6 @@ export function extractMeaningfulError(
   return meaningfulLines.join(' | ');
 }
 
-
-
 export interface ServiceResponse {
   code: number,
   body: any,
@@ -80,33 +78,33 @@ export function success(body: any, message?: string) {
 export function badRequest(data: CustomHttpResponse) {
   const { message, customMessage, ...rest } = data
   throw new BadRequestException({
+    customMessage,
     statusCode: responseCodes.INVALID_REQUEST,
     body: null,
     message,
     error: extractMeaningfulError(message?.stack) || JSON.stringify(message, null, 2),
-    customMessage
   })
 }
 
 export function unauthorized(data: CustomHttpResponse) {
   const { message, customMessage, ...rest } = data
   throw new UnauthorizedException({
+    customMessage,
     code: responseCodes.UNAUTHORIZED,
     body: null,
     message,
     error: extractMeaningfulError(message?.stack) || JSON.stringify(message, null, 2),
-    customMessage
   })
 }
 
 export function notFound(data: CustomHttpResponse) {
   const { message, customMessage, ...rest } = data
   throw new NotFoundException({
+    customMessage,
     code: responseCodes.NOT_FOUND,
     body: null,
     message,
     error: extractMeaningfulError(message?.stack) || JSON.stringify(message, null, 2),
-    customMessage
   })
 }
 
@@ -117,6 +115,7 @@ export function exception(data: CustomHttpResponse | Error) {
 
   const { message, customMessage, ...rest } = data
   throw new InternalServerErrorException({
+    customMessage,
     code: responseCodes.EXCEPTION,
     body: null,
     message,
@@ -126,18 +125,17 @@ export function exception(data: CustomHttpResponse | Error) {
     // ) 
     // || 
     // JSON.stringify(message, null, 2),
-    customMessage
   })
 }
 
 export function forbidden(data: CustomHttpResponse) {
   const { message, customMessage, ...rest } = data
   throw new ForbiddenException({
+    customMessage,
     code: responseCodes.FORBIDDEN,
     body: null,
     message,
     error: extractMeaningfulError(message?.stack) || JSON.stringify(message, null, 2),
-    customMessage
   })
 }
 
@@ -156,52 +154,52 @@ export function mapErrorCodeToHttpResponse(data: ServiceResponse): CustomHttpRes
   switch (code) {
     case errorCodes.SUCCESS:
       return {
+        customMessage: message,
         statusCode: responseCodes.SUCCESS,
         message: responseMessages.SUCCESS,
         body: body,
-        customMessage: message
       };
     case errorCodes.BAD_REQUEST:
       return {
+        customMessage: message,
         statusCode: responseCodes.INVALID_REQUEST,
         message: responseMessages.INVALID_REQUEST,
         body: body,
-        customMessage: message
       };
     case errorCodes.UNAUTHORIZED:
       return {
+        customMessage: message,
         statusCode: responseCodes.UNAUTHORIZED,
         message: responseMessages.UNAUTHORIZED,
         body: body,
-        customMessage: message
       };
     case errorCodes.NOT_FOUND:
       return {
+        customMessage: message,
         statusCode: responseCodes.NOT_FOUND,
         message: responseMessages.NOT_FOUND,
         body: body,
-        customMessage: message
       };
     case errorCodes.EXCEPTION:
       return {
+        customMessage: message,
         statusCode: responseCodes.EXCEPTION,
         message: responseMessages.EXCEPTION,
         body: body,
-        customMessage: message
       };
     case errorCodes.FORBIDDEN:
       return {
+        customMessage: message,
         statusCode: responseCodes.FORBIDDEN,
         message: responseMessages.FORBIDDEN,
         body: body,
-        customMessage: message
       };
     default:
       return {
+        customMessage: message,
         statusCode: responseCodes.EXCEPTION,
         message: responseMessages.EXCEPTION,
         body: body,
-        customMessage: message
       };
   }
 }
