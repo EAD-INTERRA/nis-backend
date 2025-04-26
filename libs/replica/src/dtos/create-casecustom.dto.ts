@@ -340,4 +340,8 @@ export class CreateCaseCustomDto {
   @ApiProperty({ required: false })
   @IsOptional()
   new_passport_type_c: string
+  
+  @ApiProperty({ required: false })
+  @IsOptional()
+  validity_counter_c: string
 }
