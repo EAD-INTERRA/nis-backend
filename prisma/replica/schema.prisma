@@ -139,6 +139,7 @@ model CaseCustom {
   new_issue_date_c               DateTime?
   new_expiration_date_c          DateTime?
   new_passport_type_c            String?
+  validity_counter_c             String?
 
   case Case @relation(fields: [id], references: [id], onDelete: Cascade)
 
