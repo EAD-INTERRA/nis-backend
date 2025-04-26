@@ -109,10 +109,10 @@ export function notFound(data: CustomHttpResponse) {
 }
 
 export function exception(data: CustomHttpResponse) {
-  if (data.message instanceof Error && data.message.name.includes('Exception')) {
-    // throw data; // Just throw the native error
-    throw data.message
-  }
+  // if (data.message instanceof Error && data.message.name.includes('Exception')) {
+  //   // throw data; // Just throw the native error
+  //   throw data.message
+  // }
 
   const { message, customMessage, ...rest } = data
   throw new InternalServerErrorException({
