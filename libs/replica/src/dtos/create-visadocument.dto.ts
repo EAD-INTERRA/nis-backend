@@ -29,6 +29,10 @@ export class CreateVisaDocumentDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  id_c?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
   created_by?: string;
 
   @ApiProperty({ required: false })

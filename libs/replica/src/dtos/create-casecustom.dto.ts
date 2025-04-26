@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsOptional } from 'class-validator';
+import { IsDataURI, IsOptional } from 'class-validator';
 import { isValid, parseISO } from 'date-fns';
 
 export class CreateCaseCustomDto {
@@ -255,4 +255,89 @@ export class CreateCaseCustomDto {
   @ApiProperty({ required: false })
   @IsOptional()
   principal_passport_number_c: string
+
+  // @ApiProperty({ required: false })
+  // @IsOptional()
+  // visa_type_c: string
+
+  @ApiProperty({ required: false })
+  @Transform(({ value }) => {
+      let parsed = parseISO(value);
+      if (!isValid(parsed)) {
+        // Try to fix a "YYYY-MM-DD" format manually
+        try {
+          const fixed = `${value}T00:00:00.000Z`;
+          parsed = new Date(fixed);
+        } catch {
+          return null;
+        }
+      }
+    
+      return isValid(parsed) ? parsed.toISOString() : null;
+    })
+  @IsOptional()
+  valid_from_c: string
+
+  @ApiProperty({ required: false })
+  @Transform(({ value }) => {
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+      // Try to fix a "YYYY-MM-DD" format manually
+      try {
+        const fixed = `${value}T00:00:00.000Z`;
+        parsed = new Date(fixed);
+      } catch {
+        return null;
+      }
+    }
+  
+    return isValid(parsed) ? parsed.toISOString() : null;
+  })
+  @IsOptional()
+  valid_until_c: string
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  new_passport_no_c: string
+
+  @ApiProperty({ required: false })
+  @Transform(({ value }) => {
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+      // Try to fix a "YYYY-MM-DD" format manually
+      try {
+        const fixed = `${value}T00:00:00.000Z`;
+        parsed = new Date(fixed);
+      } catch {
+        return null;
+      }
+    }
+  
+    return isValid(parsed) ? parsed.toISOString() : null;
+  })
+  @IsOptional()
+  new_issue_date_c: string
+
+  @ApiProperty({ required: false })
+  @Transform(({ value }) => {
+      let parsed = parseISO(value);
+      if (!isValid(parsed)) {
+        // Try to fix a "YYYY-MM-DD" format manually
+        try {
+          const fixed = `${value}T00:00:00.000Z`;
+          parsed = new Date(fixed);
+        } catch {
+          return null;
+        }
+      }
+    
+      return isValid(parsed) ? parsed.toISOString() : null;
+    })
+  @IsDataURI()
+  @IsOptional()
+  new_expiration_date_c: string
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  new_passport_type_c: string
 }

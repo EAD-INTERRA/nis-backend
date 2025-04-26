@@ -57,6 +57,11 @@ export class AccountController {
     async findAllAccounts() {
         return mapErrorCodeToHttpResponse(await this.accountService.findAllAccounts());
     }
+
+    @Get('crm/:id_c')
+    async findAccountByIdC(@Param('id_c') id_c: string) {
+        return mapErrorCodeToHttpResponse(await this.accountService.findByIdC(id_c));
+    }
    
     @Get(':id_or_passport_no')
     @ApiQuery({ name: 'principal_passport_number', required: false })
