@@ -8,6 +8,10 @@ export class CreateAccountDto {
   @ApiProperty({ required: false })
   @IsOptional()
   name?: string;
+ 
+  @ApiProperty({ required: false })
+  @IsOptional()
+  id_c?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

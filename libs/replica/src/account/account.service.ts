@@ -20,6 +20,16 @@ export class AccountService {
         create: { ...custom },
       }
     };
+
+    const existing = await this.replicaService.account.findUnique({
+      where: { id_c: rest.id_c },
+    });
+
+    if (existing) {
+      // If the case already exists, throw an error
+      badRequest({ customMessage: 'Account with this CRM ID (id_c) already exists' });
+    }
+
     // Check if account with the same passport number already exists
     if (custom) {
       const existing = await this.replicaService.accountCustom.findUnique({
@@ -50,6 +60,29 @@ export class AccountService {
         custom: true,
       },
     }))
+  }
+
+  async findByIdC(id_c: string): Promise<ServiceResponse> {
+    try {
+      const found = await this.replicaService.account.findUnique({
+        where: { id_c },
+        include: {
+          custom: true,
+          cases: {
+            // where: { deleted: false },
+            include: {
+              custom: true,
+            }
+          }
+        }
+      });
+      if (!found) {
+        notFound({ customMessage: 'Account not found' });
+      }
+      return success(found);
+    } catch (err) {
+      exception({ customMessage: "An error occured while fetching account", message: err })
+    }
   }
 
   async findAccount(id: string, principal_passport_number?: string, internal: boolean = false): Promise<ServiceResponse> {

@@ -58,6 +58,11 @@ export class CaseController {
         return mapErrorCodeToHttpResponse(await this.caseService.findAllCases());
     }
 
+    @Get('crm/:id_c')
+    async findCaseByIdC(@Param('id_c') id_c: string) {
+        return mapErrorCodeToHttpResponse(await this.caseService.findByIdC(id_c));
+    }
+
     @Get(':id')
     async findCase(@Param('id') id: string) {
         return mapErrorCodeToHttpResponse(await this.caseService.findCase(id));

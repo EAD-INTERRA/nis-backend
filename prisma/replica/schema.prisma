@@ -22,6 +22,7 @@ enum CaseTypes {
 
 model Account {
   id            String   @id @default(uuid())
+  id_c          String?  @unique
   name          String?
   alias         String?
   surname       String?
@@ -65,6 +66,7 @@ model AccountCustom {
 
 model Case {
   id               String   @id @default(uuid())
+  id_c             String?  @unique
   name             String?
   alias            String?
   subject          String?
@@ -130,6 +132,13 @@ model CaseCustom {
   nigerian_passport_c            String?
   yes_passport_no_c              String?
   principal_passport_number_c    String?
+  // visa_type_c                    String?
+  valid_from_c                   DateTime?
+  valid_until_c                  DateTime?
+  new_passport_no_c              String?
+  new_issue_date_c               DateTime?
+  new_expiration_date_c          DateTime?
+  new_passport_type_c            String?
 
   case Case @relation(fields: [id], references: [id], onDelete: Cascade)
 
@@ -138,6 +147,7 @@ model CaseCustom {
 
 model VisaDocument {
   id               String   @id @default(uuid())
+  id_c             String?  @unique
   date_entered     DateTime @default(now())
   date_modified    DateTime @updatedAt
   modified_user_id String?

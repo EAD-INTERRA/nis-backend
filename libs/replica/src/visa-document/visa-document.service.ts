@@ -1,5 +1,5 @@
 import { ReplicaDbService } from '@app/db/replica.service';
-import { exception, notFound, ServiceResponse, success } from '@app/utils/response';
+import { badRequest, exception, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Account, AccountCustom, Case, Prisma } from '@prisma/replica/client';
 import { CreateVisaDocumentDto } from '../dtos/create-visadocument.dto';
@@ -15,6 +15,15 @@ export class VisaDocumentService {
     const { custom, ...rest } = data
 
     let prismaData: Prisma.VisaDocumentCreateInput;
+
+    const existing = await this.replicaService.visaDocument.findUnique({
+      where: { id_c: rest.id_c },
+    });
+
+    if (existing) {
+      // If the case already exists, throw an error
+      badRequest({ customMessage: 'Visa Document with this CRM ID (id_c) already exists' });
+    }
 
     prismaData = {
       ...rest,
@@ -40,6 +49,24 @@ export class VisaDocumentService {
         custom: true,
       },
     }))
+  }
+
+  async findByIdC(id_c: string): Promise<ServiceResponse> {
+    try {
+      const found = await this.replicaService.visaDocument.findUnique({
+        where: { id_c },
+        include: {
+          custom: true,
+          case: true,
+        }
+      });
+      if (!found) {
+        notFound({ customMessage: 'Visa Document not found' });
+      }
+      return success(found);
+    } catch (err) {
+      exception({ customMessage: "An error occured while fetching visa document", message: err })
+    }
   }
 
   async findVisaDocument(id: string): Promise<ServiceResponse> {

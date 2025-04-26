@@ -12,6 +12,10 @@ export class CreateCaseDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  id_c?: string;
+  
+  @ApiProperty({ required: false })
+  @IsOptional()
   alias?: string;
 
   @ApiProperty({ required: false })

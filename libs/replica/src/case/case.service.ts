@@ -1,5 +1,5 @@
 import { ReplicaDbService } from '@app/db/replica.service';
-import { exception, notFound, ServiceResponse, success } from '@app/utils/response';
+import { badRequest, exception, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Account, AccountCustom, Case, Prisma } from '@prisma/replica/client';
 import { CreateCaseDto } from '../dtos/create-case.dto';
@@ -16,6 +16,15 @@ export class CaseService {
 
     try {
       let existingAccount: Account & { custom: AccountCustom } = null;
+
+      const existing = await this.replicaService.case.findUnique({
+        where: { id_c: rest.id_c },
+      });
+
+      if (existing) {
+        // If the case already exists, throw an error
+        badRequest({ customMessage: 'Case with this CRM ID (id_c) already exists' });
+      }
 
       if (passport_number) {
         existingAccount = await this.replicaService.account.findFirst({
@@ -102,6 +111,25 @@ export class CaseService {
         account: true,
       },
     }))
+  }
+
+  async findByIdC(id_c: string): Promise<ServiceResponse> {
+    try {
+      const found = await this.replicaService.case.findUnique({
+        where: { id_c },
+        include: {
+          custom: true,
+          account: true,
+          visa_document: true
+        }
+      });
+      if (!found) {
+        notFound({ customMessage: 'Case not found' });
+      }
+      return success(found);
+    } catch (err) {
+      exception({ customMessage: "An error occured while fetching acccaseount", message: err })
+    }
   }
 
   async findCase(id: string): Promise<ServiceResponse> {

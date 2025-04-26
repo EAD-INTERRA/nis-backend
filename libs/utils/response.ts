@@ -108,9 +108,10 @@ export function notFound(data: CustomHttpResponse) {
   })
 }
 
-export function exception(data: CustomHttpResponse | Error) {
-  if (data instanceof Error) {
-    throw data; // Just throw the native error
+export function exception(data: CustomHttpResponse) {
+  if (data.message instanceof Error && data.message.name.includes('Exception')) {
+    // throw data; // Just throw the native error
+    throw data.message
   }
 
   const { message, customMessage, ...rest } = data

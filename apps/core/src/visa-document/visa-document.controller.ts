@@ -59,6 +59,11 @@ export class VisaDocumentController {
         return mapErrorCodeToHttpResponse(await this.visaDocService.findAllVisaDocuments());
     }
 
+    @Get('crm/:id_c')
+    async findVisaDocumentByIdC(@Param('id_c') id_c: string) {
+        return mapErrorCodeToHttpResponse(await this.visaDocService.findByIdC(id_c));
+    }
+
     @Get(':id')
     async findVisaDocument(@Param('id') id: string) {
         return mapErrorCodeToHttpResponse(await this.visaDocService.findVisaDocument(id));
