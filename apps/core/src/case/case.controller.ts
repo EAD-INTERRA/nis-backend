@@ -12,9 +12,12 @@ import {
     Patch,
     Param,
     Delete,
+    Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Prisma } from '@prisma/replica/client';
+import { GenerateApiQueryParams, GenerateQueryParams } from '../helpers/utils';
+import { CaseFilterInterface } from '@app/replica/interfaces';
 
 
 @Controller({
@@ -45,8 +48,8 @@ export class CaseController {
     // async updateCustomCase(@Param('id') id: string, @Body() data: UpdateCaseCustomDto) {
     //     return mapErrorCodeToHttpResponse(await this.caseService.updateCustomCase(id, data));
     // }
-    
-    
+
+
     @Post()
     async createCase(@Body() data: CreateCaseDto) {
         const res = await this.caseService.createCase(data)
@@ -54,8 +57,34 @@ export class CaseController {
     }
 
     @Get()
-    async findAllCases() {
-        return mapErrorCodeToHttpResponse(await this.caseService.findAllCases());
+    @GenerateApiQueryParams(CaseFilterInterface)
+    async findAllCases(
+        @Query('account_id') account_id: string,
+        @Query('type') type: string,
+        @Query('assigned_user_id') assigned_user_id: string,
+        // @Query('date_entered') date_entered: string,
+        // @Query('date_modified') date_modified: string,
+        @Query('created_by') created_by: string,
+        @Query('case_number') case_number: string,
+        @Query('passport_number') passport_number: string,
+        @Query('active_status_c') active_status_c: string,
+        @Query('page') page: string,
+        @Query('page_size') page_size: string,
+        // @GenerateQueryParams(CaseFilterInterface) 
+    ) {
+        return mapErrorCodeToHttpResponse(await this.caseService.findAllCases({
+            account_id,
+            type,
+            assigned_user_id,
+            // date_entered,
+            // date_modified,
+            created_by,
+            case_number,
+            passport_number,
+            active_status_c,
+            page: Number(page) || 1,
+            page_size: Number(page_size) || 10,
+        } as CaseFilterInterface));
     }
 
     @Get('crm/:id_c')

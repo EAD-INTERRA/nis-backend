@@ -6,6 +6,7 @@ import { CreateCaseDto } from '../dtos/create-case.dto';
 import { UpdateCaseDto } from '../dtos/update-case.dto';
 import { CreateCaseCustomDto } from '../dtos/create-casecustom.dto';
 import { UpdateCaseCustomDto } from '../dtos/update-casecustom.dto';
+import { CaseFilterInterface } from '../interfaces';
 
 @Injectable()
 export class CaseService {
@@ -103,14 +104,52 @@ export class CaseService {
   }
 
 
-  async findAllCases(): Promise<ServiceResponse> {
-    return success(await this.replicaService.case.findMany({
-      where: { deleted: false },
+  async findAllCases(filters?: CaseFilterInterface): Promise<ServiceResponse> {
+
+    const { passport_number, active_status_c, account_id, page, page_size, ...rest } = filters;
+
+    let where: Prisma.CaseWhereInput = {
+      ...rest,
+      deleted: false,
+    }
+
+    console.log('filters', filters)
+    
+    if (account_id) {
+      where.account = {
+        id: account_id,
+      }
+    }
+   
+    if (passport_number) {
+      where.account = {
+        custom: {
+          passport_number_c: passport_number,
+        }
+      }
+    }
+    
+    if (active_status_c) {
+      where.custom = {
+        active_status_c: active_status_c,
+      }
+    }
+    console.log('where', where)
+    
+    const res = await this.replicaService.case.findMany({
+      where,
       include: {
         custom: true,
         account: true,
       },
-    }))
+      orderBy: {
+        date_modified: 'desc',
+      },
+      take: page_size,
+      skip: (page - 1) * page_size,
+    })
+    
+    return success(res);
   }
 
   async findByIdC(id_c: string): Promise<ServiceResponse> {
