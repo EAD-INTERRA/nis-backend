@@ -157,7 +157,7 @@ export class AccountService {
         }
       }
 
-      return success({ account, visaCase, age });
+      return success({ account, visaCase });
     } catch (err) {
       exception({ customMessage: "An error occured while fetching account", message: err })
     }
