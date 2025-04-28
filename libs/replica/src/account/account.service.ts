@@ -135,11 +135,11 @@ export class AccountService {
           date_modified: 'desc',
         },
         include: {
-          account: {
-            include: {
-              custom: true,
-            }
-          },
+          // account: {
+          //   include: {
+          //     custom: true,
+          //   }
+          // },
           custom: true,
         }
       })
