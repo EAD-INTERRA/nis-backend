@@ -15,9 +15,10 @@ datasource db {
 }
 
 enum CaseTypes {
-  e_visa
-  landing
-  exit
+  EVISA
+  LANDINGCARD
+  EPERMIT
+  RVISA
 }
 
 model Account {
