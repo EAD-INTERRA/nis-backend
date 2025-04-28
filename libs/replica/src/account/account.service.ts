@@ -135,11 +135,11 @@ export class AccountService {
           date_modified: 'desc',
         },
         include: {
-          account: {
-            include: {
-              custom: true,
-            }
-          },
+          // account: {
+          //   include: {
+          //     custom: true,
+          //   }
+          // },
           custom: true,
         }
       })
@@ -157,7 +157,7 @@ export class AccountService {
         }
       }
 
-      return success({ account, visaCase, age });
+      return success({ account, visaCase });
     } catch (err) {
       exception({ customMessage: "An error occured while fetching account", message: err })
     }
