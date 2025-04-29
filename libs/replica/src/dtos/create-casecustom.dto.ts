@@ -47,7 +47,7 @@ export class CreateCaseCustomDto {
   @ApiProperty({ required: false })
   @IsOptional()
   city_s_town_c?: string;
-  
+
   @ApiProperty({ required: false })
   @IsOptional()
   contact_or_hotel_address_c?: string;
@@ -59,40 +59,40 @@ export class CreateCaseCustomDto {
   @ApiProperty({ required: false })
   @IsOptional()
   contact_or_hotel_name_c?: string;
-  
+
   @ApiProperty({ required: false })
   @Transform(({ value }) => {
-  let parsed = parseISO(value);
-  if (!isValid(parsed)) {
-    // Try to fix a "YYYY-MM-DD" format manually
-    try {
-      const fixed = `${value}T00:00:00.000Z`;
-      parsed = new Date(fixed);
-    } catch {
-      return null;
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+      // Try to fix a "YYYY-MM-DD" format manually
+      try {
+        const fixed = `${value}T00:00:00.000Z`;
+        parsed = new Date(fixed);
+      } catch {
+        return null;
+      }
     }
-  }
 
-  return isValid(parsed) ? parsed.toISOString() : null;
-})
+    return isValid(parsed) ? parsed.toISOString() : null;
+  })
   @IsOptional()
   date_arrival_c?: string;
 
   @ApiProperty({ required: false })
   @Transform(({ value }) => {
-  let parsed = parseISO(value);
-  if (!isValid(parsed)) {
-    // Try to fix a "YYYY-MM-DD" format manually
-    try {
-      const fixed = `${value}T00:00:00.000Z`;
-      parsed = new Date(fixed);
-    } catch {
-      return null;
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+      // Try to fix a "YYYY-MM-DD" format manually
+      try {
+        const fixed = `${value}T00:00:00.000Z`;
+        parsed = new Date(fixed);
+      } catch {
+        return null;
+      }
     }
-  }
 
-  return isValid(parsed) ? parsed.toISOString() : null;
-})
+    return isValid(parsed) ? parsed.toISOString() : null;
+  })
   @IsOptional()
   date_of_departure_c?: string;
 
@@ -119,7 +119,7 @@ export class CreateCaseCustomDto {
   @ApiProperty({ required: false })
   @IsOptional()
   vetting_status_c?: string;
-  
+
   @ApiProperty({ required: false })
   @IsOptional()
   visa_validity_c?: string;
@@ -138,37 +138,37 @@ export class CreateCaseCustomDto {
 
   @ApiProperty({ required: false })
   @Transform(({ value }) => {
-  let parsed = parseISO(value);
-  if (!isValid(parsed)) {
-    // Try to fix a "YYYY-MM-DD" format manually
-    try {
-      const fixed = `${value}T00:00:00.000Z`;
-      parsed = new Date(fixed);
-    } catch {
-      return null;
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+      // Try to fix a "YYYY-MM-DD" format manually
+      try {
+        const fixed = `${value}T00:00:00.000Z`;
+        parsed = new Date(fixed);
+      } catch {
+        return null;
+      }
     }
-  }
 
-  return isValid(parsed) ? parsed.toISOString() : null;
-})
+    return isValid(parsed) ? parsed.toISOString() : null;
+  })
   @IsOptional()
   departure_date_c?: string;
 
   @ApiProperty({ required: false })
   @Transform(({ value }) => {
-  let parsed = parseISO(value);
-  if (!isValid(parsed)) {
-    // Try to fix a "YYYY-MM-DD" format manually
-    try {
-      const fixed = `${value}T00:00:00.000Z`;
-      parsed = new Date(fixed);
-    } catch {
-      return null;
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+      // Try to fix a "YYYY-MM-DD" format manually
+      try {
+        const fixed = `${value}T00:00:00.000Z`;
+        parsed = new Date(fixed);
+      } catch {
+        return null;
+      }
     }
-  }
 
-  return isValid(parsed) ? parsed.toISOString() : null;
-})
+    return isValid(parsed) ? parsed.toISOString() : null;
+  })
   @IsOptional()
   entry_date_c?: string;
 
@@ -210,37 +210,37 @@ export class CreateCaseCustomDto {
 
   @ApiProperty({ required: false })
   @Transform(({ value }) => {
-  let parsed = parseISO(value);
-  if (!isValid(parsed)) {
-    // Try to fix a "YYYY-MM-DD" format manually
-    try {
-      const fixed = `${value}T00:00:00.000Z`;
-      parsed = new Date(fixed);
-    } catch {
-      return null;
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+      // Try to fix a "YYYY-MM-DD" format manually
+      try {
+        const fixed = `${value}T00:00:00.000Z`;
+        parsed = new Date(fixed);
+      } catch {
+        return null;
+      }
     }
-  }
 
-  return isValid(parsed) ? parsed.toISOString() : null;
-})
+    return isValid(parsed) ? parsed.toISOString() : null;
+  })
   @IsOptional()
   issue_date_c: string
 
   @ApiProperty({ required: false })
   @Transform(({ value }) => {
-  let parsed = parseISO(value);
-  if (!isValid(parsed)) {
-    // Try to fix a "YYYY-MM-DD" format manually
-    try {
-      const fixed = `${value}T00:00:00.000Z`;
-      parsed = new Date(fixed);
-    } catch {
-      return null;
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+      // Try to fix a "YYYY-MM-DD" format manually
+      try {
+        const fixed = `${value}T00:00:00.000Z`;
+        parsed = new Date(fixed);
+      } catch {
+        return null;
+      }
     }
-  }
 
-  return isValid(parsed) ? parsed.toISOString() : null;
-})
+    return isValid(parsed) ? parsed.toISOString() : null;
+  })
   @IsOptional()
   expiration_date_c: string
 
@@ -262,19 +262,19 @@ export class CreateCaseCustomDto {
 
   @ApiProperty({ required: false })
   @Transform(({ value }) => {
-      let parsed = parseISO(value);
-      if (!isValid(parsed)) {
-        // Try to fix a "YYYY-MM-DD" format manually
-        try {
-          const fixed = `${value}T00:00:00.000Z`;
-          parsed = new Date(fixed);
-        } catch {
-          return null;
-        }
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+      // Try to fix a "YYYY-MM-DD" format manually
+      try {
+        const fixed = `${value}T00:00:00.000Z`;
+        parsed = new Date(fixed);
+      } catch {
+        return null;
       }
-    
-      return isValid(parsed) ? parsed.toISOString() : null;
-    })
+    }
+
+    return isValid(parsed) ? parsed.toISOString() : null;
+  })
   @IsOptional()
   valid_from_c: string
 
@@ -290,7 +290,7 @@ export class CreateCaseCustomDto {
         return null;
       }
     }
-  
+
     return isValid(parsed) ? parsed.toISOString() : null;
   })
   @IsOptional()
@@ -312,7 +312,7 @@ export class CreateCaseCustomDto {
         return null;
       }
     }
-  
+
     return isValid(parsed) ? parsed.toISOString() : null;
   })
   @IsOptional()
@@ -320,19 +320,19 @@ export class CreateCaseCustomDto {
 
   @ApiProperty({ required: false })
   @Transform(({ value }) => {
-      let parsed = parseISO(value);
-      if (!isValid(parsed)) {
-        // Try to fix a "YYYY-MM-DD" format manually
-        try {
-          const fixed = `${value}T00:00:00.000Z`;
-          parsed = new Date(fixed);
-        } catch {
-          return null;
-        }
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+      // Try to fix a "YYYY-MM-DD" format manually
+      try {
+        const fixed = `${value}T00:00:00.000Z`;
+        parsed = new Date(fixed);
+      } catch {
+        return null;
       }
-    
-      return isValid(parsed) ? parsed.toISOString() : null;
-    })
+    }
+
+    return isValid(parsed) ? parsed.toISOString() : null;
+  })
   @IsDataURI()
   @IsOptional()
   new_expiration_date_c: string
@@ -340,8 +340,38 @@ export class CreateCaseCustomDto {
   @ApiProperty({ required: false })
   @IsOptional()
   new_passport_type_c: string
-  
+
   @ApiProperty({ required: false })
   @IsOptional()
   validity_counter_c: string
+
+
+  // Newly added fields
+  
+  @ApiProperty({ required: false })
+  @Transform(({ value }) => {
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+      // Try to fix a "YYYY-MM-DD" format manually
+      try {
+        const fixed = `${value}T00:00:00.000Z`;
+        parsed = new Date(fixed);
+      } catch {
+        return null;
+      }
+    }
+
+    return isValid(parsed) ? parsed.toISOString() : null;
+  })
+  @IsOptional()
+  visa_issued_date_c?: string
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  refusal_to_pay_c?: string
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  landing_card_is_valid?: string
+
 }
