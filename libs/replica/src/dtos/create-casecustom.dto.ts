@@ -1,3 +1,4 @@
+import { transformDate } from '@app/utils/helpers/utils';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsDataURI, IsOptional } from 'class-validator';
@@ -61,38 +62,12 @@ export class CreateCaseCustomDto {
   contact_or_hotel_name_c?: string;
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => {
-    let parsed = parseISO(value);
-    if (!isValid(parsed)) {
-      // Try to fix a "YYYY-MM-DD" format manually
-      try {
-        const fixed = `${value}T00:00:00.000Z`;
-        parsed = new Date(fixed);
-      } catch {
-        return null;
-      }
-    }
-
-    return isValid(parsed) ? parsed.toISOString() : null;
-  })
+  @Transform(({ value }) => transformDate(value))
   @IsOptional()
   date_arrival_c?: string;
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => {
-    let parsed = parseISO(value);
-    if (!isValid(parsed)) {
-      // Try to fix a "YYYY-MM-DD" format manually
-      try {
-        const fixed = `${value}T00:00:00.000Z`;
-        parsed = new Date(fixed);
-      } catch {
-        return null;
-      }
-    }
-
-    return isValid(parsed) ? parsed.toISOString() : null;
-  })
+  @Transform(({ value }) => transformDate(value))
   @IsOptional()
   date_of_departure_c?: string;
 
@@ -137,38 +112,12 @@ export class CreateCaseCustomDto {
   port_of_entry_c?: string;
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => {
-    let parsed = parseISO(value);
-    if (!isValid(parsed)) {
-      // Try to fix a "YYYY-MM-DD" format manually
-      try {
-        const fixed = `${value}T00:00:00.000Z`;
-        parsed = new Date(fixed);
-      } catch {
-        return null;
-      }
-    }
-
-    return isValid(parsed) ? parsed.toISOString() : null;
-  })
+  @Transform(({ value }) => transformDate(value))
   @IsOptional()
   departure_date_c?: string;
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => {
-    let parsed = parseISO(value);
-    if (!isValid(parsed)) {
-      // Try to fix a "YYYY-MM-DD" format manually
-      try {
-        const fixed = `${value}T00:00:00.000Z`;
-        parsed = new Date(fixed);
-      } catch {
-        return null;
-      }
-    }
-
-    return isValid(parsed) ? parsed.toISOString() : null;
-  })
+  @Transform(({ value }) => transformDate(value))
   @IsOptional()
   entry_date_c?: string;
 
@@ -209,38 +158,12 @@ export class CreateCaseCustomDto {
   new_passport_number_c: string
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => {
-    let parsed = parseISO(value);
-    if (!isValid(parsed)) {
-      // Try to fix a "YYYY-MM-DD" format manually
-      try {
-        const fixed = `${value}T00:00:00.000Z`;
-        parsed = new Date(fixed);
-      } catch {
-        return null;
-      }
-    }
-
-    return isValid(parsed) ? parsed.toISOString() : null;
-  })
+  @Transform(({ value }) => transformDate(value))
   @IsOptional()
   issue_date_c: string
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => {
-    let parsed = parseISO(value);
-    if (!isValid(parsed)) {
-      // Try to fix a "YYYY-MM-DD" format manually
-      try {
-        const fixed = `${value}T00:00:00.000Z`;
-        parsed = new Date(fixed);
-      } catch {
-        return null;
-      }
-    }
-
-    return isValid(parsed) ? parsed.toISOString() : null;
-  })
+  @Transform(({ value }) => transformDate(value))
   @IsOptional()
   expiration_date_c: string
 
@@ -261,38 +184,12 @@ export class CreateCaseCustomDto {
   // visa_type_c: string
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => {
-    let parsed = parseISO(value);
-    if (!isValid(parsed)) {
-      // Try to fix a "YYYY-MM-DD" format manually
-      try {
-        const fixed = `${value}T00:00:00.000Z`;
-        parsed = new Date(fixed);
-      } catch {
-        return null;
-      }
-    }
-
-    return isValid(parsed) ? parsed.toISOString() : null;
-  })
+  @Transform(({ value }) => transformDate(value))
   @IsOptional()
   valid_from_c: string
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => {
-    let parsed = parseISO(value);
-    if (!isValid(parsed)) {
-      // Try to fix a "YYYY-MM-DD" format manually
-      try {
-        const fixed = `${value}T00:00:00.000Z`;
-        parsed = new Date(fixed);
-      } catch {
-        return null;
-      }
-    }
-
-    return isValid(parsed) ? parsed.toISOString() : null;
-  })
+  @Transform(({ value }) => transformDate(value))
   @IsOptional()
   valid_until_c: string
 
@@ -301,38 +198,12 @@ export class CreateCaseCustomDto {
   new_passport_no_c: string
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => {
-    let parsed = parseISO(value);
-    if (!isValid(parsed)) {
-      // Try to fix a "YYYY-MM-DD" format manually
-      try {
-        const fixed = `${value}T00:00:00.000Z`;
-        parsed = new Date(fixed);
-      } catch {
-        return null;
-      }
-    }
-
-    return isValid(parsed) ? parsed.toISOString() : null;
-  })
+  @Transform(({ value }) => transformDate(value))
   @IsOptional()
   new_issue_date_c: string
 
   @ApiProperty({ required: false })
-  @Transform(({ value }) => {
-    let parsed = parseISO(value);
-    if (!isValid(parsed)) {
-      // Try to fix a "YYYY-MM-DD" format manually
-      try {
-        const fixed = `${value}T00:00:00.000Z`;
-        parsed = new Date(fixed);
-      } catch {
-        return null;
-      }
-    }
-
-    return isValid(parsed) ? parsed.toISOString() : null;
-  })
+  @Transform(({ value }) => transformDate(value))
   @IsDataURI()
   @IsOptional()
   new_expiration_date_c: string
@@ -349,20 +220,7 @@ export class CreateCaseCustomDto {
   // Newly added fields
   
   @ApiProperty({ required: false })
-  @Transform(({ value }) => {
-    let parsed = parseISO(value);
-    if (!isValid(parsed)) {
-      // Try to fix a "YYYY-MM-DD" format manually
-      try {
-        const fixed = `${value}T00:00:00.000Z`;
-        parsed = new Date(fixed);
-      } catch {
-        return null;
-      }
-    }
-
-    return isValid(parsed) ? parsed.toISOString() : null;
-  })
+  @Transform(({ value }) => transformDate(value))
   @IsOptional()
   visa_issued_date_c?: string
 

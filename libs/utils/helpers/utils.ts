@@ -3,6 +3,8 @@ import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
 import { Parser } from 'json2csv';
 import * as fs from 'fs';
+import { parseISO, isValid } from 'date-fns';
+
 
 // Encryption imports
 import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
@@ -154,4 +156,24 @@ export class Encryption {
 
         return output
     }
+}
+
+
+
+export const transformDate = (value: any): string | null => {
+    if (!value) {
+        return null;
+    }
+    let parsed = parseISO(value);
+    if (!isValid(parsed)) {
+        // Try to fix a "YYYY-MM-DD" format manually
+        try {
+            const fixed = `${value}T00:00:00.000Z`;
+            parsed = new Date(fixed);
+        } catch {
+            return null;
+        }
+    }
+
+    return isValid(parsed) ? parsed.toISOString() : null;
 }

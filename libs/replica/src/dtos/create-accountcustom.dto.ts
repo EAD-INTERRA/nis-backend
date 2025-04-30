@@ -1,3 +1,4 @@
+import { transformDate } from '@app/utils/helpers/utils';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
@@ -26,20 +27,7 @@ export class CreateAccountCustomDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @Transform(({ value }) => {
-  let parsed = parseISO(value);
-  if (!isValid(parsed)) {
-    // Try to fix a "YYYY-MM-DD" format manually
-    try {
-      const fixed = `${value}T00:00:00.000Z`;
-      parsed = new Date(fixed);
-    } catch {
-      return null;
-    }
-  }
-
-  return isValid(parsed) ? parsed.toISOString() : null;
-})
+  @Transform(({ value }) => transformDate(value))
   dob_c?: string;
 
   @ApiProperty({ required: false })
@@ -56,20 +44,7 @@ export class CreateAccountCustomDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @Transform(({ value }) => {
-  let parsed = parseISO(value);
-  if (!isValid(parsed)) {
-    // Try to fix a "YYYY-MM-DD" format manually
-    try {
-      const fixed = `${value}T00:00:00.000Z`;
-      parsed = new Date(fixed);
-    } catch {
-      return null;
-    }
-  }
-
-  return isValid(parsed) ? parsed.toISOString() : null;
-})
+  @Transform(({ value }) => transformDate(value))
   issue_date_c?: string;
 
   @ApiProperty({ required: false })
@@ -78,20 +53,7 @@ export class CreateAccountCustomDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @Transform(({ value }) => {
-  let parsed = parseISO(value);
-  if (!isValid(parsed)) {
-    // Try to fix a "YYYY-MM-DD" format manually
-    try {
-      const fixed = `${value}T00:00:00.000Z`;
-      parsed = new Date(fixed);
-    } catch {
-      return null;
-    }
-  }
-
-  return isValid(parsed) ? parsed.toISOString() : null;
-})
+  @Transform(({ value }) => transformDate(value))
   passport_expiration_date_c?: string;
 
   @ApiProperty({ required: false })

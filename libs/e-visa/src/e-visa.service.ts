@@ -1,6 +1,6 @@
 import { CoreDbService } from '@app/db';
 import { exception, notFound, ServiceResponse, success } from '@app/utils/response';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateOrUpdateApplicantDto, CreateOrUpdateContactDetailDto, CreateOrUpdateCountryDto, CreateOrUpdateNationalityDto, CreateOrUpdatePassportTypeDto, CreateOrUpdatePortOfEntryDto, CreateOrUpdateStateDto, CreateOrUpdateSupportingDocumentDto, CreateOrUpdateTravelInformationDto, CreateOrUpdateVisaRequirementDto, CreateOrUpdateVisaTypeDto } from './dtos/e-visa.dto';
 import { Applicant, ContactDetail, Country, Nationality, PassportType, PortOfEntry, Prisma, TravelInformation, VisaType } from '@prisma/core/client';
 import { mapWebhookFields } from '@app/utils/helpers/webhook';
@@ -12,7 +12,8 @@ import { InjectQueue } from '@nestjs/bullmq';
 export class EVisaService {
     constructor(
         private readonly dbService: CoreDbService,
-        @InjectQueue('e-visa') private eVisaQueue: Queue
+        @InjectQueue('e-visa') private eVisaQueue: Queue,
+        // private readonly logger = new Logger(EVisaService.name)
     ) { }
 
     // Add jobs to the queue
@@ -22,7 +23,9 @@ export class EVisaService {
             backoff: 5000, // Wait 5 seconds before retrying
         });
 
-        return success(job, "Job added to queue successfully");
+        console.log(`Job added to queue : ${job}`);
+
+        return success("", "Job added to queue successfully");
     }
 
 
