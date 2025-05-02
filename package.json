@@ -27,7 +27,7 @@
     "db:generate:replica": "pnpx prisma generate --schema prisma/replica/schema.prisma ",
     "db:generate:crm": "pnpx prisma generate --schema prisma/crm/schema.prisma ",
     "db:generate:watchlist": "pnpx prisma generate --schema prisma/watchlist/schema.prisma ",
-    "db:generate:all": "pnpx prisma generate --schema prisma/core/schema.prisma && pnpx prisma generate --schema prisma/replica/schema.prisma "
+    "db:generate:all": "pnpx prisma generate --schema prisma/core/schema.prisma && pnpx prisma generate --schema prisma/replica/schema.prisma && pnpx prisma generate --schema prisma/crm/schema.prisma && pnpx prisma generate --schema prisma/watchlist/schema.prisma"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
