@@ -97,6 +97,11 @@ export class CaseController {
         return mapErrorCodeToHttpResponse(await this.caseService.findCase(id));
     }
 
+    @Patch('crm/:id_c')
+    async updateCaseByIdC(@Param('id_c') id_c: string, @Body() data: UpdateCaseDto) {
+        return mapErrorCodeToHttpResponse(await this.caseService.updateCase(undefined, data, id_c));
+    }
+    
     @Patch(':id')
     async updateCase(@Param('id') id: string, @Body() data: UpdateCaseDto) {
         return mapErrorCodeToHttpResponse(await this.caseService.updateCase(id, data));

@@ -3,6 +3,7 @@ import { CreateAccountCustomDto } from './create-accountcustom.dto';
 import { Transform, Type } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
 import { isValid, parseISO } from 'date-fns';
+import { transformDate } from '@app/utils/helpers/utils';
 
 export class CreateAccountDto {
   @ApiProperty({ required: false })
@@ -23,20 +24,7 @@ export class CreateAccountDto {
 
   @ApiProperty()
   @IsOptional()
-  @Transform(({ value }) => {
-  let parsed = parseISO(value);
-  if (!isValid(parsed)) {
-    // Try to fix a "YYYY-MM-DD" format manually
-    try {
-      const fixed = `${value}T00:00:00.000Z`;
-      parsed = new Date(fixed);
-    } catch {
-      return null;
-    }
-  }
-
-  return isValid(parsed) ? parsed.toISOString() : null;
-})
+  @Transform(({ value }) => transformDate(value))
   date_modified: string;
 
   @ApiProperty({ required: false })

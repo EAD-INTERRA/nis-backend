@@ -1,7 +1,7 @@
 import { ReplicaDbService } from '@app/db/replica.service';
 import { badRequest, exception, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Account, AccountCustom, Case, Prisma } from '@prisma/replica/client';
+import { Account, AccountCustom, Case, CaseCustom, Prisma, VisaDocument } from '@prisma/replica/client';
 import { CreateCaseDto } from '../dtos/create-case.dto';
 import { UpdateCaseDto } from '../dtos/update-case.dto';
 import { CreateCaseCustomDto } from '../dtos/create-casecustom.dto';
@@ -167,12 +167,13 @@ export class CaseService {
       }
       return success(found);
     } catch (err) {
-      exception({ customMessage: "An error occured while fetching acccaseount", message: err })
+      exception({ customMessage: "An error occured while fetching case", message: err })
     }
   }
 
   async findCase(id: string): Promise<ServiceResponse> {
     try {
+      // const where: Prisma.CaseWhereUniqueInput = id_c ? { id_c } : { id };
       const found = await this.replicaService.case.findUnique({
         where: { id },
         include: {
@@ -190,8 +191,13 @@ export class CaseService {
     }
   }
 
-  async updateCase(id: string, data: UpdateCaseDto): Promise<ServiceResponse> {
-    const existing = await this.findCase(id); // Ensure it exists
+  async updateCase(id: string, data: UpdateCaseDto, id_c?: string): Promise<ServiceResponse> {
+    let existing: Case & { custom: CaseCustom, account: Account, visa_document?: VisaDocument } = null;
+    if (id_c) {
+      existing = (await this.findByIdC(id_c)).body; // Ensure it exists
+    } else {
+      existing = (await this.findCase(id)).body; // Ensure it exists
+    }
     const { custom, passport_number, visa_document, ...rest } = data;
 
     // Check if account with the same passport number already exists
@@ -233,11 +239,11 @@ export class CaseService {
     if (visa_document) {
       const { custom: visaCustom, case_id, ...restVisa } = visa_document;
 
-      if (existing.body.visa_document) {
+      if (existing.visa_document) {
         // If a VisaDocument exists, update it
         await this.replicaService.visaDocument.update({
           where: {
-            id: existing.body.visa_document.id
+            id: existing.visa_document.id
           },
           data: {
             ...restVisa,
@@ -267,7 +273,7 @@ export class CaseService {
     try {
       // Update the Case with all necessary data
       const updatedCase = await this.replicaService.case.update({
-        where: { id },
+        where: { id: existing.id },
         data: prismaData,
         include: {
           custom: true,
