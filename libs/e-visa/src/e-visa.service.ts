@@ -42,7 +42,7 @@ export class EVisaService {
         ;
 
         if (watchlistHit.HitTime) {
-            return success(watchlistHit, "Watchlist hit fetched successfully");
+            return success(watchlistHit, "Security Investigation Required for this Passport Number");
         }
         const job = await this.eVisaQueue.add('e-visa-job', data, {
             attempts: 3, // Retry up to 3 times if the job fails
