@@ -9,12 +9,14 @@ import { Queue } from 'bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
 import { EVisaWebhookPayload } from './dtos/entities';
 import { CrmDbService } from '@app/db/crm/crm.service';
+import { WatchlistDbService } from '@app/db/watchlist/watchlist.service';
 
 @Injectable()
 export class EVisaService {
     constructor(
         private readonly dbService: CoreDbService,
         private readonly crmService: CrmDbService,
+        private readonly watchlistService: WatchlistDbService,
         @InjectQueue('e-visa') private eVisaQueue: Queue,
         // private readonly logger = new Logger(EVisaService.name)
     ) { }
@@ -27,10 +29,20 @@ export class EVisaService {
             WHERE reference_no_c = ${data.application_id}
             AND active_status_c IN ('Active', 'New');
         `;
+
         console.log("EXISTING APPLICATION: ", existing_application)
         if (existing_application.length > 0) {
             badRequest({ message: "Visa Application with this <application_id> already exists", customMessage: "Visa Application already exists" });
             // return success(existing_application, "Application already exists");
+        }
+
+        const ppNumber = data.passport_number.replace(/\s/g, '')
+        const [watchlistHit]: any[] = await this.watchlistService.$queryRaw
+            `SET NOCOUNT ON; EXEC SelectAndUpdateDocumentHit @DocumentNumber = ${ppNumber}`
+        ;
+
+        if (watchlistHit.HitTime) {
+            return success(watchlistHit, "Watchlist hit fetched successfully");
         }
         const job = await this.eVisaQueue.add('e-visa-job', data, {
             attempts: 3, // Retry up to 3 times if the job fails
