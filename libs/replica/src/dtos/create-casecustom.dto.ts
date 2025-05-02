@@ -99,9 +99,9 @@ export class CreateCaseCustomDto {
   @IsOptional()
   visa_validity_c?: string;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
-  reference_no_c?: string;
+  // @ApiProperty({ required: false })
+  // @IsOptional()
+  // reference_no_c?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

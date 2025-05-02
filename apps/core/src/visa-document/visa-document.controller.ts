@@ -69,6 +69,11 @@ export class VisaDocumentController {
         return mapErrorCodeToHttpResponse(await this.visaDocService.findVisaDocument(id));
     }
 
+    @Patch(':id_c')
+    async updateVisaDocumentByIdC(@Param('id_c') id_c: string, @Body() data: UpdateVisaDocumentDto) {
+        return mapErrorCodeToHttpResponse(await this.visaDocService.updateVisaDocument(undefined, data, id_c));
+    }
+    
     @Patch(':id')
     async updateVisaDocument(@Param('id') id: string, @Body() data: UpdateVisaDocumentDto) {
         return mapErrorCodeToHttpResponse(await this.visaDocService.updateVisaDocument(id, data));

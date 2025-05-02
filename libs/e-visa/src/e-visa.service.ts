@@ -1,5 +1,5 @@
 import { CoreDbService } from '@app/db';
-import { exception, notFound, ServiceResponse, success } from '@app/utils/response';
+import { badRequest, exception, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable, Logger } from '@nestjs/common';
 import { CreateOrUpdateApplicantDto, CreateOrUpdateContactDetailDto, CreateOrUpdateCountryDto, CreateOrUpdateNationalityDto, CreateOrUpdatePassportTypeDto, CreateOrUpdatePortOfEntryDto, CreateOrUpdateStateDto, CreateOrUpdateSupportingDocumentDto, CreateOrUpdateTravelInformationDto, CreateOrUpdateVisaRequirementDto, CreateOrUpdateVisaTypeDto } from './dtos/e-visa.dto';
 import { Applicant, ContactDetail, Country, Nationality, PassportType, PortOfEntry, Prisma, TravelInformation, VisaType } from '@prisma/core/client';
@@ -7,17 +7,31 @@ import { mapWebhookFields } from '@app/utils/helpers/webhook';
 import axios from 'axios';
 import { Queue } from 'bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
+import { EVisaWebhookPayload } from './dtos/entities';
+import { CrmDbService } from '@app/db/crm/crm.service';
 
 @Injectable()
 export class EVisaService {
     constructor(
         private readonly dbService: CoreDbService,
+        private readonly crmService: CrmDbService,
         @InjectQueue('e-visa') private eVisaQueue: Queue,
         // private readonly logger = new Logger(EVisaService.name)
     ) { }
 
     // Add jobs to the queue
-    async addToQueue(data: any) {
+    async addToQueue(data: EVisaWebhookPayload): Promise<ServiceResponse> {
+        // Validate the incoming data
+        const existing_application: any[] = await this.crmService.$queryRaw`
+            SELECT * FROM cases_cstm
+            WHERE reference_no_c = ${data.application_id}
+            AND active_status_c IN ('Active', 'New');
+        `;
+        console.log("EXISTING APPLICATION: ", existing_application)
+        if (existing_application.length > 0) {
+            badRequest({ message: "Visa Application with this <application_id> already exists", customMessage: "Visa Application already exists" });
+            // return success(existing_application, "Application already exists");
+        }
         const job = await this.eVisaQueue.add('e-visa-job', data, {
             attempts: 3, // Retry up to 3 times if the job fails
             backoff: 5000, // Wait 5 seconds before retrying

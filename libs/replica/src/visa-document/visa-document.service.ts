@@ -1,7 +1,7 @@
 import { ReplicaDbService } from '@app/db/replica.service';
 import { badRequest, exception, notFound, ServiceResponse, success } from '@app/utils/response';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Account, AccountCustom, Case, Prisma } from '@prisma/replica/client';
+import { Account, AccountCustom, Case, Prisma, VisaDocumentCustom } from '@prisma/replica/client';
 import { CreateVisaDocumentDto } from '../dtos/create-visadocument.dto';
 import { UpdateVisaDocumentDto } from '../dtos/update-visadocument.dto';
 import { CreateVisaDocumentCustomDto } from '../dtos/create-visadocumentcustom.dto';
@@ -75,6 +75,7 @@ export class VisaDocumentService {
         where: { id },
         include: {
           custom: true,
+          case: true,
         },
       });
       if (!found || found.deleted) {
@@ -86,8 +87,14 @@ export class VisaDocumentService {
     }
   }
 
-  async updateVisaDocument(id: string, data: UpdateVisaDocumentDto): Promise<ServiceResponse> {
-    const existing = await this.findVisaDocument(id); // Ensure it exists
+  async updateVisaDocument(id: string, data: UpdateVisaDocumentDto, id_c?: string): Promise<ServiceResponse> {
+    let existing: Case & { custom: VisaDocumentCustom, case: Case} = null;
+    if (id_c) {
+      existing = (await this.findByIdC(id_c)).body
+    } else {
+      existing = (await this.findVisaDocument(id)).body
+    }
+    // const existing = await this.findVisaDocument(id); // Ensure it exists
     const { custom, ...rest } = data
 
     const prismaData: Prisma.VisaDocumentUpdateInput = {
@@ -101,10 +108,11 @@ export class VisaDocumentService {
 
     try {
       return success(await this.replicaService.visaDocument.update({
-        where: { id },
+        where: { id: existing.id },
         data: prismaData,
         include: {
           custom: true,
+          case: true,
         }
       }))
     } catch (err) {
