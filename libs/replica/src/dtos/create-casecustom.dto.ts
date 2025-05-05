@@ -231,5 +231,9 @@ export class CreateCaseCustomDto {
   @ApiProperty({ required: false })
   @IsOptional()
   landing_card_is_valid?: string
+  
+  @ApiProperty({ required: false })
+  @IsOptional()
+  over_stay_c?: string
 
 }
