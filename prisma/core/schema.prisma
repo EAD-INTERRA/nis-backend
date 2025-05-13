@@ -54,10 +54,10 @@ model User {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  activation_token        String?
+  activation_token        Int?      @unique
   activation_token_sentAt DateTime? @default(now())
 
-  password_reset_token        String?
+  password_reset_token        Int?      @unique
   password_reset_token_sentAt DateTime? @default(now())
 
   login_token        Int?      @unique
@@ -73,8 +73,10 @@ model User {
 }
 
 model UserDetail {
-  id   String @id @default(uuid())
-  name String
+  id          String  @id @default(uuid())
+  first_name  String  @default("")
+  middle_name String?
+  surname     String  @default("")
 
   user_id String @unique
   user    User?  @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -93,6 +95,7 @@ model UserDetail {
   address String?
 
   is_active      Boolean @default(false)
+  is_admin       Boolean @default(false)
   is_super_admin Boolean @default(false)
 
   creator_id    String? // Foreign key for creator
@@ -173,7 +176,7 @@ model NotificationLog {
   status_code   Int?
   content       String
   reference_no  String?
-  // patientId    Int?
+  success       Boolean?
   phone_numbers String[]
   emails        String[]
   user_id       Int?

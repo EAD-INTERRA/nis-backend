@@ -1,7 +1,7 @@
 import * as nodemailer from 'nodemailer'
 import * as dotenv from 'dotenv';
-import { NotificationType, PrismaClient } from '@prisma/core/client';
-import { EmailTemplateDto, SendEmailDto } from './types';
+import { NotificationType, PrismaClient } from '@prisma/client';
+import { EmailTemplateDto, EmailType, SendEmailDto } from './types';
 
 dotenv.config()
 
@@ -27,11 +27,33 @@ const emailTemplate = ({
     senderEmail,
     senderPhone
 }: EmailTemplateDto) => {
-    if (type === 'activate') {
+    if (type === EmailType.activate) {
         return `
       <!DOCTYPE html>
       <html lang="en">
           <head>
+          Here is your activation token: ${token}
+          <style>
+          </head>
+        </html?
+        `
+    } else if (type === EmailType.activation_success) {
+        return `
+      <!DOCTYPE html>
+      <html lang="en">
+          <head>
+          Account activated successfully
+          <style>
+          </head>
+        </html?
+        `
+    } else if (type === EmailType.change_password) {
+        return `
+      <!DOCTYPE html>
+      <html lang="en">
+          <head>
+          Here is your password reset token: ${token}
+          <style>
           </head>
         </html?
         `
@@ -60,7 +82,7 @@ export async function sendEmail(data: SendEmailDto): Promise<any> {
         let info;
         if (data.fileName) {
             info = await transport.sendMail({
-                from: data.sender,
+                from: `${data.senderName} <${data.sender}>`,
                 to: data.recipient,
                 subject: data.subject,
                 html: data.template,
@@ -73,7 +95,7 @@ export async function sendEmail(data: SendEmailDto): Promise<any> {
             });
         } else {
             info = await transport.sendMail({
-                from: data.sender,
+                from: `${data.senderName} <${data.sender}>`,
                 to: data.recipient,
                 subject: data.subject,
                 html: data.template,

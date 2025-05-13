@@ -4,7 +4,7 @@ import { CustomHttpResponse, mapErrorCodeToHttpResponse } from '@app/utils/respo
 import { JwtService } from '@nestjs/jwt';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from './guards/auth.guard';
-import { ChangePasswordDto, CreateUserDto, LoginDto, OtpLoginDto } from './dto/auth.dto';
+import { ActivateAccountDto, ChangePasswordDto, CreateUserDto, ForgotPasswordDto, LoginDto, OtpLoginDto, ResetPasswordDto } from './dto/auth.dto';
 
 @Controller({
   path: 'auth',
@@ -27,6 +27,8 @@ export class AuthController {
   //   return mapErrorCodeToHttpResponse(res)
   // }
   
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @Post("register")
   async register(
     @Body() userToRegister: CreateUserDto
@@ -47,6 +49,11 @@ export class AuthController {
     return mapErrorCodeToHttpResponse({code: 0, body: { access_token: newAccessToken, refresh_token }});
   }
 
+   @Post('activate')
+  async activateAccount(@Body() body: ActivateAccountDto): Promise<CustomHttpResponse> {
+    const res = await this.authService.activateAccount({token: +body.token})
+    return mapErrorCodeToHttpResponse(res)
+  }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -77,15 +84,15 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('resetPassword')
-  async resetPassword(@Body() userToResetPassword: { email?: string, phone?: string, newPassword: string, resetToken: string }) {
+  @Post('reset-password')
+  async resetPassword(@Body() userToResetPassword: ResetPasswordDto) {
     const res = await this.authService.resetPassword(userToResetPassword);
     return mapErrorCodeToHttpResponse(res);
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('forgotPassword')
-  async forgotPassword(@Body() body: { email?: string, phone?: string }) {
+  @Post('forgot-password')
+  async forgotPassword(@Body() body: ForgotPasswordDto) {
     const res = await this.authService.sendPasswordResetToken(body);
     return mapErrorCodeToHttpResponse(res);
   }

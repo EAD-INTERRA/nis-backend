@@ -144,6 +144,9 @@ model CaseCustom {
   visa_issued_date_c             DateTime?
   refusal_to_pay_c               String?
   landing_card_is_valid          String?
+  over_stay_c                    String?
+  landing_card_id_c              String?
+  exit_card_id_c                 String?
 
   case Case @relation(fields: [id], references: [id], onDelete: Cascade)
 

@@ -2,7 +2,7 @@ import { AuditService } from '@app/audit';
 import { ApiCustomResponse } from '@app/utils/decorators/swagger.decorator';
 import { CustomHttpResponse, mapErrorCodeToHttpResponse } from '@app/utils/response';
 import { Controller, Get, Param, Query, Request, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'apps/auth/src/guards/auth.guard';
 
 @Controller({
@@ -33,17 +33,19 @@ export class AuditController {
         }
     })
     // @Permissions([Resource.AUDIT_MANAGEMENT, PermissionLevel.READ])
+    @ApiBearerAuth()
     @Get()
     async getAllAuditController(
         @Request() req,
         @Query('user_id') user_id?: string, 
         @Query('org_id') org_id?: string, 
-        @Query('state_id') stateId?: string, 
         @Query('ip') ip?: string,
         @Query('action') action?: string,
         @Query('search_term') search_term?: string,
         @Query('from_date') from_date?: string | Date,
-        @Query('to_date') to_date?: string | Date
+        @Query('to_date') to_date?: string | Date,
+        @Query('page') page?: number, 
+        @Query('page_size') page_size?: number
     ): Promise<CustomHttpResponse>{
         const authenticatedUser = req.user;
        
@@ -53,7 +55,9 @@ export class AuditController {
             ip,
             search_term,
             from_date,
-            to_date
+            to_date,
+            page,
+            page_size
         })
         return mapErrorCodeToHttpResponse(res)
     }

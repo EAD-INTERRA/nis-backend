@@ -23,6 +23,7 @@ export class EVisaService {
 
     // Add jobs to the queue
     async addToQueue(data: EVisaWebhookPayload): Promise<ServiceResponse> {
+        const { hoh_address, sufficient_fund, ...rest } = data;
         // Validate the incoming data
         const existing_application: any[] = await this.crmService.$queryRaw`
             SELECT * FROM cases_cstm
@@ -44,7 +45,15 @@ export class EVisaService {
         if (watchlistHit.HitTime) {
             return success(watchlistHit, "Security Investigation Required for this Passport Number");
         }
-        const job = await this.eVisaQueue.add('e-visa-job', data, {
+
+        // Swap hoh_address and sufficient_fund fields (for NewWorks mapping issues)
+        const jobData = {
+            ...rest,
+            hoh_address: sufficient_fund ?? null,
+            sufficient_fund: hoh_address ?? null,
+        }
+
+        const job = await this.eVisaQueue.add('e-visa-job', jobData, {
             attempts: 3, // Retry up to 3 times if the job fails
             backoff: 5000, // Wait 5 seconds before retrying
         });

@@ -19,5 +19,7 @@ export function ApiCustomResponse(options: { summary: string, example: any }) {
     ApiQuery({ name: 'search_term', required: false, description: 'Search term' }),
     ApiQuery({ name: 'from_date', required: false, description: 'Filter from date' }),
     ApiQuery({ name: 'to_date', required: false, description: 'Filter to date' }),
+    ApiQuery({ name: 'page', required: false, description: 'Page number' }),
+    ApiQuery({ name: 'page_size', required: false, description: 'Number per page' }),
   );
 }

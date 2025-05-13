@@ -1,5 +1,6 @@
 import { CoreDbService } from '@app/db';
-import { exception, ServiceResponse, success } from '@app/utils/response';
+import { paginate } from '@app/utils/helpers/utils';
+import { exception, ServiceResponse, success, successPaginated } from '@app/utils/response';
 import { GenericFilterInterface } from '@app/utils/types';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/core/client';
@@ -42,17 +43,24 @@ export class AuditService {
                 }
             }
 
-            const res = await this.dbService.audit.findMany({
-                where: filters,
-                include: {
-                    user: true
-                },
-                orderBy: {
-                    date: "desc"
-                }
-            })
-
-            return success(res, "Audit trail loaded successfully")
+            const [res, totalCount] = await Promise.all([
+                this.dbService.audit.findMany({
+                    where: filters,
+                    include: {
+                        user: true
+                    },
+                    orderBy: {
+                        date: "desc"
+                    },
+                    skip: (+data.page - 1) * +data.page_size || 1,
+                    take: +data.page_size || 20,
+                }),
+                this.dbService.audit.count({
+                    where: filters
+                })
+            ]);
+            const results = await paginate({ page: data.page, page_size: data.page_size, totalCount, data: res })
+            return successPaginated(results, "Audit trail loaded successfully");
         } catch (e) {
             console.error(e)
             exception({ message: e, customMessage: "Failed to load audit trail" })
