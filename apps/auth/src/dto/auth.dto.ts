@@ -1,6 +1,6 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Gender } from '@prisma/core/client';
-import { IsEmail, IsNotEmpty } from 'class-validator';  
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from 'class-validator';  
 
 export class LoginDto {
     @IsEmail()
@@ -20,20 +20,79 @@ export class OtpLoginDto extends PartialType(LoginDto) {
     otp?: number;
 }
 
+export class ForgotPasswordDto {
+    @IsString()
+    @IsOptional()
+    email?: string;
+
+    @IsString()
+    @IsOptional()
+    phone?: string;
+}
+
+export class ActivateAccountDto {
+    @IsString()
+    @IsOptional()
+    userId?: string;
+
+    @IsNumber()
+    @IsOptional()
+    token?: number;
+}
 
 export class ResetPasswordDto { 
+    @IsString()
+    @IsOptional()
+    // @IsEmail() 
     email?: string;
+    
+    @IsString()
+    @IsOptional() 
+    // @IsPhoneNumber("NG")
     phone?: string; 
-    newPassword: string; 
-    resetToken: string 
+
+    @IsString()
+    @IsNotEmpty() 
+    newPassword: string;
+    
+    @IsNumber()
+    @IsNotEmpty() 
+    resetToken: number 
 }
 
 
 export class CreateUserDto {
-    name?: string;
-    email?: string;
+
+    // @IsString()
+    // @IsOptional()
+    // id?: string;
+
+    @IsString()
+    @IsNotEmpty()    
+    first_name: string;
+
+    @IsString()
+    @IsOptional() 
+    middle_name?: string;
+
+    @IsString()
+    @IsNotEmpty() 
+    surname: string;
+    
+    // @IsString()
+    // @IsNotEmpty() 
+    // state_id: string;
+
+    @IsString()
+    // @IsEmail() 
+    email: string;
+
+    @IsString()
+    @IsOptional() 
     password?: string;
 
+    @IsString()
+    // @IsPhoneNumber("NG") 
     phone?: string;
 
     /**
@@ -45,5 +104,8 @@ export class CreateUserDto {
         example: Gender,
       })
     gender?: Gender;
+
+    @IsString()
+    @IsOptional() 
     address?: string;
 }

@@ -3,13 +3,13 @@ import * as bcrypt from 'bcrypt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import { badRequest, exception, forbidden, notFound, ServiceResponse, success } from '@app/utils/response';
+import { badRequest, exception, forbidden, notFound, ServiceResponse, success, unauthorized } from '@app/utils/response';
 import { EmailType } from '@app/utils/notification/types';
 import { generateActivationToken, generateLoginOtp, generateResetToken, generateToken, hashPassword } from '@app/utils/helpers/utils';
 import { sendEmail } from '@app/utils/notification/email';
 import { notifyCoure, sendSMS } from '@app/utils/notification/sms';
-import { ChangePasswordDto, CreateUserDto, LoginDto, OtpLoginDto, ResetPasswordDto } from './dto/auth.dto';
-import { differenceInMinutes } from 'date-fns';
+import { ActivateAccountDto, ChangePasswordDto, CreateUserDto, ForgotPasswordDto, LoginDto, OtpLoginDto, ResetPasswordDto } from './dto/auth.dto';
+import { differenceInHours, differenceInMinutes } from 'date-fns';
 import { Prisma, Role, User, UserDetail } from '@prisma/core/client';
 
 
@@ -30,9 +30,28 @@ export class AuthService {
     else {
       badRequest({ message: "out", customMessage: "Wahala ti de" })
     }
-    // } catch (err) {
-    //   badRequest({ message: err.message, customMessage: err.stack })
-    // }
+  }
+
+  @OnEvent('activationEmail.send', { async: true })
+  private async sendActivationEmail(email: string, token: string, subject: string, type: EmailType): Promise<void> {
+    const user = await this.dbService.user.findUnique({
+      where: {
+        email
+      },
+      include: {
+        details: true
+      }
+    })
+    await sendEmail({
+      sender: 'no-reply@nis.com',
+      recipient: email,
+      subject: subject,
+      message: `${process.env.DAT_AUTH_URL}?token=${token}`,
+      recipientName: `${user.details.first_name} ${user.details.surname}`,
+      senderName: 'NIS',
+      type: type,
+      token: token
+    })
   }
 
   private otpMsg(name: string, token: string): string {
@@ -59,19 +78,19 @@ MedAdher.`
     })
     const loginToken = await generateLoginOtp()
     await sendEmail({
-      sender: process.env.EMAIL_SENDER_EMAIL ?? 'no-reply@medadher.com',
+      sender: process.env.EMAIL_SENDER_EMAIL ?? 'no-reply@nis.com',
       recipient: email,
       subject: subject,  // 
       message: message,
-      recipientName: user.details.name,
-      senderName: process.env.EMAIL_SENDER_NAME ?? 'MedAdher',
+      recipientName: `${user.details.first_name} ${user.details.surname}`,
+      senderName: process.env.EMAIL_SENDER_NAME ?? 'NIS',
       type: type,
       token: loginToken.toString()
     })
 
     await sendSMS(
       [user.details.phone],
-      this.otpMsg(user.details.name, loginToken.toString())
+      this.otpMsg(`${user.details.first_name} ${user.details.surname}`, loginToken.toString())
     )
 
     const editedUser = await this.dbService.user.update({
@@ -89,7 +108,7 @@ MedAdher.`
   }
 
   @OnEvent('passwordReset.success', { async: true })
-  private async sendEmail(email: string, message: string, subject: string, type: EmailType): Promise<void> {
+  private async sendResetEmail(email: string, message: string, subject: string, type: EmailType): Promise<void> {
     const user = await this.dbService.user.findUnique({
       where: {
         email
@@ -99,12 +118,12 @@ MedAdher.`
       }
     })
     await sendEmail({
-      sender: process.env.EMAIL_SENDER_EMAIL ?? 'no-reply@medadher.com',
+      sender: process.env.EMAIL_SENDER_EMAIL ?? 'no-reply@nis.com',
       recipient: email,
       subject: subject,
       message: message,
-      recipientName: user.details.name,
-      senderName: process.env.EMAIL_SENDER_NAME ?? 'MedAdher',
+      recipientName: `${user.details.first_name} ${user.details.surname}`,
+      senderName: process.env.EMAIL_SENDER_NAME ?? 'NIS',
       type: type,
       token: ""
     })
@@ -129,13 +148,13 @@ MedAdher.`
 
     if (email && email !== "") {
       await sendEmail({
-        sender: process.env.EMAIL_SENDER_EMAIL ?? 'no-reply@medadher.com',
+        sender: process.env.EMAIL_SENDER_EMAIL ?? 'no-reply@nis.com',
         recipient: email,
-        subject: 'Change Password',  // 
+        subject: 'Password Reset',  // 
         // `${process.env.DAT_PASSWORD_RESET_URL}?${password_token}`,
-        message: `https://dat-auth.interranetworks.com/password-reset?${token}`,
-        recipientName: user.details.name,
-        senderName: process.env.EMAIL_SENDER_NAME ?? 'MedAdher',
+        message: `${token}`,
+        recipientName: `${user.details.first_name} ${user.details.surname}`,
+        senderName: process.env.EMAIL_SENDER_NAME ?? 'NIS',
         type: EmailType.change_password,
         token: token
       })
@@ -223,23 +242,14 @@ MedAdher.`
     jwtService: JwtService,
     ip?: any
   ): Promise<ServiceResponse> {
-    // IF THE OTP IS ATTCHED TO THIS REQUEST, IT MEANS THAT THE USER EXISTS/IS VALIDATED
-    const isExpired = differenceInMinutes(new Date().toISOString(), user.login_token_sentAt) > 30
+    try {
+      const isMatch = userToLogin.otp ? true : await bcrypt.compare(userToLogin.password, user.password);
+      console.log(userToLogin.password, user.password, isMatch)
 
-    if (userToLogin.otp && isExpired) {
-      this.eventEmitter.emit('loginToken.send', user.email, "", 'Login Token', EmailType.login_otp)
-      badRequest({ customMessage: "Expired OTP. A new one has been sent to your email" })
-    }
+      if (!isMatch) {
+        unauthorized({ customMessage: "Invalid Password" })
+      }
 
-    if (userToLogin.otp && userToLogin.otp !== user.login_token) {
-      badRequest({ customMessage: `Kindly verify your login using the OTP you recieved` })
-    }
-
-    const isMatch = userToLogin.otp ? true : await bcrypt.compare(userToLogin.password, user.password);
-    // console.log(userToLogin.password, user.password)
-
-    if (isMatch) {
-      // const res = await usersService.getSingleUserDetails(user.id);
       const res = await this.dbService.user.findUnique({
         where: {
           id: user.id
@@ -260,119 +270,53 @@ MedAdher.`
       }
 
       // CHECK IF THE USER REQUIRES AN OTP
-      if (!user.details.is_super_admin) {
-        const now = new Date()
-        const tokenSentAt = user.login_token_sentAt
-        const diff = differenceInMinutes(now, tokenSentAt)
-        // if (diff < 5) {
-        //   return badRequest("Too many requests", `Please wait for at least ${5 - diff} minute${5 - diff > 1 ? "s" : ""} before attempting to log in again`)
-        // }
+      // if (!user.details.is_super_admin) {    
+        const { id, user_id, phone, address, first_name, middle_name, surname, ...otherDetails } = userDetails;
 
-        // if (user.details.isOrgAdmin) {
-        //   // const tokenSentAt = user.login_token_sentAt
-        //   if (!userToLogin.otp) {
-        //     if (diff < 5) {
-        //       badRequest({
-        //         message: "Too many requests",
-        //         customMessage: `Please wait for at least ${5 - diff} minute${5 - diff > 1 ? "s" : ""} before attempting to log in again`
-        //       })
-        //     }
-        //     this.eventEmitter.emit('loginToken.send', userToLogin.email, "", 'Login Token', EmailType.login_otp)
-        //     return success("", "Login token sent successfully")
-        //   }
-        // } else if (!user.details.isOrgAdmin) {
-        //   if (user.login_token && !userToLogin.otp && !isExpired) {
-        //     return badRequest("Verify via OTP", `Kindly verify your login using the OTP you recieved`)
-        //   }
-        //   if (!user.login_token &&
-        //     !isSameDay(now, tokenSentAt) &&
-        //     !isSameDay(now, user.lastLogin)
-        //   ) {
-        //     this.eventEmitter.emit('loginToken.send', userToLogin.email, "", 'Login Token', EmailType.login_otp)
-        //     return success("", "Login token sent successfully")
-        //   }
-        // }
+        const jwtPayload = { sub: user.id, email: user.email, ...otherDetails };
+        const access_token = await jwtService.signAsync(jwtPayload);
+        const refresh_token = await this.generateRefreshToken(user.id)
+        const decodedToken = jwtService.decode(access_token) as any;
+        const expiresIn = decodedToken.exp;
+        let userType;
+        let userRole;
+        let role = {};
 
-      }
+        if (userDetails.role_id) {
+          role = await this.dbService.role.findUnique({
+            where: {
+              id: userDetails.role_id
+            }
+          })
+        }
 
-      // const { password, createdAt, updatedAt, id, activation_token, password_reset_token, passwordSalt, ...result } = user;
-      const { id, user_id, phone, address, name, ...otherDetails } = userDetails;
+        if (userDetails.is_super_admin) {
+          userType = 'SUPERADMIN';
+          userRole = 'admin';
+        } else if (userDetails.role) {
+          userType = 'PLEBIAN';
+          userRole = 'plebian';
+        }
 
-      const jwtPayload = { sub: user.id, email: user.email, ...otherDetails };
-      const access_token = await jwtService.signAsync(jwtPayload);
-      const refresh_token = await this.generateRefreshToken(user.id)
-      const decodedToken = jwtService.decode(access_token) as any;
-      const expiresIn = decodedToken.exp;
-      let userType;
-      let userRole;
-      let role = {};
-
-
-      if (userDetails.role_id) {
-        role = await this.dbService.role.findUnique({
+        const updatedUser = await this.dbService.user.update({
           where: {
-            id: userDetails.role_id
+            id: user_id
+          },
+          data: {
+            login_token: null,
+            last_login: new Date().toISOString()
           }
         })
-      }
 
-      if (userDetails.is_super_admin) {
-        userType = 'SUPERADMIN';
-        userRole = 'admin';
-      } else if (userDetails.role) {
-        //   if (userDetails.isOrgAdmin) {
-        //     userType = 'ORG';
-        //     userRole = 'admin';
-        //   } else if (userDetails.facilityId) {
-        //     userType = 'FACILITY';
-        //     userRole = 'user';
-        //   } else {
-        //     userType = 'ORG';
-        //     userRole = 'user';
-        //   }
-        // } else if (userDetails.role?.partnerId) {
-        //   userType = 'PARTNER';
-        //   userRole = 'user';
-        // } else if (userDetails.role?.donorId) {
-        //   userType = 'DONOR';
-        //   userRole = 'user';
-        // } else {
-        userType = 'PLEBIAN';
-        userRole = 'plebian';
-      }
-
-      const updatedUser = await this.dbService.user.update({
-        where: {
-          id: user_id
-        },
-        data: {
-          login_token: null,
-          last_login: new Date().toISOString()
-        }
-      })
-
-      // Log the Audit action
-      // await this.auditService.logAction({
-      //   actor: {
-      //     userId: userId,
-      //     ip
-      //   },
-      //   event: "LOGIN",
-      //   entity: {
-      //     id: userId,
-      //     name: "USER",
-      //     alias: `${name}`
-      //   },
-      //   time: updatedUser.lastLogin
-      // })
-
-      return success({
-        access_token, refresh_token, userType, userRole,
-        role, expiresIn,
-        lastLogin: updatedUser.last_login
-      });
+        return success({
+          access_token, refresh_token, userType, userRole,
+          role, expiresIn,
+          lastLogin: updatedUser.last_login
+        });
+      // }
+    } catch (e) {
+      exception({ customMessage: 'an error occured', message: e });
     }
-    badRequest({ customMessage: 'Invalid password' });
   }
 
   async login(userToLogin: LoginDto, ip?: any): Promise<ServiceResponse> {
@@ -427,6 +371,10 @@ MedAdher.`
       badRequest({ customMessage: "Expired OTP. A new one has been sent to your email" })
     }
 
+    if (userToLoginOtp.otp && userToLoginOtp.otp !== user.login_token) {
+      badRequest({ customMessage: `Kindly verify your login using the OTP you recieved` })
+    }
+
     return this.loginLogic(user, {
       email: existingUser.email,
       otp: userToLoginOtp.otp
@@ -448,7 +396,7 @@ MedAdher.`
   }
 
   async getPasswordResetToken(email: string): Promise<ServiceResponse> {
-    const existingUser = await this.dbService.user.findFirst({
+    const existingUser = await this.dbService.user.findUnique({
       where: {
         email
       }
@@ -469,7 +417,7 @@ MedAdher.`
   }
 
   async resetPassword(userToResetPassword: ResetPasswordDto): Promise<ServiceResponse> {
-    let user;
+    let user: User & { details?: UserDetail };
     let userId;
 
     const existingUser = await this.dbService.user.findUnique({
@@ -518,17 +466,16 @@ MedAdher.`
     }
 
     // compare password reset tokens
-    if (userToResetPassword.resetToken !== user.password_reset_token
-      && userToResetPassword.resetToken !== user.user?.password_reset_token
-    ) {
+    if (userToResetPassword.resetToken !== user.password_reset_token) {
       badRequest({ customMessage: "Invalid reset token" });
     }
 
     const hashed = await hashPassword(userToResetPassword.newPassword)
+
     try {
       const res = await this.dbService.user.update({
         where: {
-          id: userId,
+          id: user.id,
         },
         data: {
           password: hashed,
@@ -545,7 +492,7 @@ MedAdher.`
     }
   }
 
-  async sendPasswordResetToken(body: { email?: string, phone?: string }): Promise<ServiceResponse> {
+  async sendPasswordResetToken(body: ForgotPasswordDto): Promise<ServiceResponse> {
     const user = await this.dbService.user.findFirst({
       where: {
         OR: [
@@ -586,8 +533,8 @@ MedAdher.`
 
   }
 
-  async verifyUserByPasswordResetToken(body: { token: string }): Promise<ServiceResponse> {
-    const user = await this.dbService.user.findFirst({
+  async verifyUserByPasswordResetToken(body: { token: number }): Promise<ServiceResponse> {
+    const user = await this.dbService.user.findUnique({
       where: {
         password_reset_token: body.token
       }
@@ -637,7 +584,10 @@ MedAdher.`
         where: {
           id: userId
         },
-        include: {
+        select: {
+          id: true,
+          email: true,
+          last_login: true,
           details: true
         }
       })
@@ -649,111 +599,177 @@ MedAdher.`
 
 
   async register(createUserDto: CreateUserDto): Promise<ServiceResponse> {
-    const hashed = await hashPassword((await generateToken()).slice(0, 5))
+    const { email, phone, password, ...createUserObj } = createUserDto
+
+    let hashed: string;
+
+    if (password) {
+      hashed = await hashPassword(password)
+    } else {
+      hashed = await hashPassword((await generateToken()).slice(0, 5)) // Auto-generate password
+    }
+
     const resetToken = await generateResetToken();
     const activationToken = await generateActivationToken();
 
-    const { name, gender, phone, address, ...createUserObj } = createUserDto
-
-    // // Check the creator's organization/facility & restrict them to choose a role ONLY from roles in their org/facility
-    // const creator = await this.dbService.userDetail.findUnique({
-    //     where: {
-    //         userId: createdBy
-    //     }
-    // });
-
-    // if (!roleId) {
-    //     return badRequest("", "Role ID cannot be ull")
-    // }
-
-    // const roleDetails = await this.getRoleById(roleId)
-
-    // if (!creator.isSuperAdmin) {
-    //     if ((creator.facilityId !== roleDetails.facilityId)
-    //         && (creator.organizationId !== roleDetails.facilityId)
-    //         && (creator.partnerId !== roleDetails.partnerId)
-    //         && (creator.donorId !== roleDetails.donorId)) {
-    //         return badRequest(ForbiddenException, 'Cannot use a role from another organization')
-    //     }
-    // }
-
     // // CHECK IF USER ALREADY EXISTS
-    // const userExistsPhone = await this.findByPhone(phone)
-    // const userExistsEmail = await this.findByEmail(createUserObj.email)
-    // if (userExistsEmail) {
-    //     return badRequest("", "User with this email exists")
-    // }
-    // if (userExistsPhone) {
-    //     return badRequest("", "User with this phone exists")
-    // }
+    const userExistsEmail = await this.dbService.user.findUnique({
+      where: {
+        email
+      }
+    })
+    if (userExistsEmail) {
+      badRequest({ message: "", customMessage: "User with this email exists}" })
+    }
+    const userExistsPhone = await this.dbService.userDetail.findUnique({
+      where: {
+        phone
+      }
+    })
+    if (userExistsPhone) {
+      badRequest({ message: "", customMessage: "User with this phone exists" })
+    }
 
-    let createdUser: User;
-    let userDetails: UserDetail;
-
-    // try {
-    createdUser = await this.dbService.user.create({
+    const createdUser = await this.dbService.user.create({
       data: {
         password: hashed,
         password_reset_token: resetToken,
-        email: createUserObj.email,
-        activation_token: activationToken
+        email,
+        activation_token: activationToken,
+        details: {
+          create: {
+            is_super_admin: false,
+            phone,
+            ...createUserObj,
+          }
+        }
       },
     });
 
-    console.log("CREATEDD: ", createdUser)
+    console.log("CREATED: ", createdUser)
 
-
-    // data.isOrgAdmin = isOrgAdmin
-    // data.isFacilityAdmin = isFacilityAdmin
-    // data.creator = { connect: { userId: createdBy } }
-    // data.name = name
-    // data.phone = phone,
-    // data.address = createUserObj.address,
-    // data.gender = GENDER[genderId]
-    // data.user = { connect: { id: createdUser.id } }
-
-
-    // If the user was created successfuly, create an entry in the UserDetail table
+    // If the user was created successfuly, send activation email
     if (createdUser) {
-      let data: Prisma.UserDetailCreateInput = { user: { connect: { id: createdUser.id } }, is_super_admin: false, name, gender, phone, address };
-      userDetails = await this.dbService.userDetail.create({
-        data: data
-      })
+      const email = createdUser.email
+      console.log('Email sending initiated');
+      this.eventEmitter.emit('activationEmail.send', email, activationToken, 'Activation Token', EmailType.activate)
 
-      if (userDetails) {
-        const email = createdUser.email
-        console.log('Email sending initiated');
-        this.eventEmitter.emit('activationEmail.send', email, activationToken, 'Activation Token', EmailType.activate)
-
-      }
-      return success(await this.dbService.userDetail.findFirst({
+      return success(await this.dbService.userDetail.findUnique({
         where: {
-          id: userDetails.id
+          user_id: createdUser.id
         },
         include: {
-          role: true
+          role: true,
         }
       }), "Account created successfully. Please check your email for the activation link")
     }
+  }
 
-    // } catch (err) {
-    //   if (createdUser) {
-    //     // DELETE THE USER IF CREATED
-    //     if (userDetails) {
-    //       await this.dbService.UserDetail.delete({
-    //         where: {
-    //           user_id: userDetails.userId
-    //         }
-    //       })
-    //     }
-    //     await this.dbService.user.delete({
-    //       where: {
-    //         id: createdUser.id
-    //       }
-    //     })
-    //   }
-    //   exception({ message: err, customMessage: "An error occured while creating the user" })
-    // }
+
+  async activateAccount(data: ActivateAccountDto): Promise<ServiceResponse> {
+    const { userId, token } = data
+    // ID based activation
+    if (userId) {
+      const user = await this.dbService.user.findUnique({
+        where: {
+          id: userId
+        },
+        include: {
+          details: true
+        }
+      })
+      if (user) {
+        if (user.details.is_active) {
+          forbidden({ customMessage: "Account already active" })
+        }
+      }
+
+      const activatedUser = await this.dbService.userDetail.update({
+        where: {
+          user_id: user.id
+        },
+        data: {
+          is_active: true
+        }
+      })
+      if (activatedUser.is_active) {
+        await this.dbService.user.update({
+          where: {
+            id: user.id
+          },
+          data: {
+            activation_token: null,
+            activation_token_sentAt: null,
+            password_reset_token: await generateResetToken(),
+            password_reset_token_sentAt: new Date()
+          }
+        })
+        this.eventEmitter.emit('activationEmail.send', user.email, "", 'Activation Success', EmailType.activation_success)
+        return success("", "User activated successfully")
+      }
+      badRequest({ message: activatedUser, customMessage: "Unable to activate user" })
+    }
+
+    // Token based activation
+    const user = await this.dbService.user.findUnique({
+      where: {
+        activation_token: token
+      },
+      include: {
+        details: true
+      }
+    })
+    if (user) {
+      if (user.details.is_active) {
+        forbidden({ customMessage: "Account already active" })
+      }
+
+      // Check if token validity elapsed
+      const now = new Date()
+      const sentDateTime = user.activation_token_sentAt
+      const hourDiff = differenceInHours(now, sentDateTime ?? 0)
+
+      if (hourDiff && (hourDiff > 12)) {
+        await this.dbService.user.update({
+          where: {
+            id: user.id
+          },
+          data: {
+            activation_token: null,
+            activation_token_sentAt: null
+          }
+        })
+        forbidden({ customMessage: "Invalid/Expired token" })
+      }
+
+      const activatedUser = await this.dbService.userDetail.update({
+        where: {
+          user_id: user.id
+        },
+        data: {
+          is_active: true
+        }
+      })
+      // this.eventEmitter.emit('activationToken.send', user.id)
+      if (activatedUser) {
+        const updatedUser = await this.dbService.user.update({
+          where: {
+            id: user.id
+          },
+          data: {
+            activation_token: null,
+            activation_token_sentAt: null,
+            password_reset_token: await generateResetToken(),
+            password_reset_token_sentAt: new Date()
+          }
+        })
+        let body = { email: updatedUser.email, 'password_reset_token': updatedUser.password_reset_token }
+        this.eventEmitter.emit('activationEmail.send', updatedUser.email, "", 'Activation Success', EmailType.activation_success)
+
+        return success(body, 'Account activated sucessfully!')
+      }
+    }
+    unauthorized({ customMessage: 'Token expired or does not exist!' })
   }
 
 }

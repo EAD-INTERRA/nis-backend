@@ -11,6 +11,14 @@ import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 
 
+export interface IOPagination {
+    data: any;
+    page: number;
+    page_size: number;
+    totalCount: number
+}
+
+
 const prisma = new PrismaClient()
 
 export async function hashPassword(password: string, saltOrRounds: number = 10) {
@@ -30,9 +38,13 @@ export async function generateToken(prefix?: string, suffix?: string) {
     return token
 }
 
-export async function generateActivationToken(length: number = 6) {
-    const token = (await generateToken()).substring(0, length)
-    const existingUser = await prisma.user.findFirst({
+export async function generateNumericToken() {
+    return Math.floor(100000 + Math.random() * 900000)
+}
+
+export async function generateActivationToken() {
+    const token = await generateNumericToken()
+    const existingUser = await prisma.user.findUnique({
         where: {
             activation_token: token
         }
@@ -43,9 +55,9 @@ export async function generateActivationToken(length: number = 6) {
     return token
 }
 
-export async function generateResetToken(length: number = 6) {
-    const token = (await generateToken()).substring(0, length)
-    const existingUser = await prisma.user.findFirst({
+export async function generateResetToken() {
+    const token = await generateNumericToken()
+    const existingUser = await prisma.user.findUnique({
         where: {
             password_reset_token: token
         }
@@ -69,10 +81,20 @@ export async function generateLoginOtp() {
     return token
 }
 
-export async function paginate(page, size) {
-    const limit = size ? +size : 10;
-    const offset = page ? page * limit : 0;
-    return { limit, offset };
+export async function paginate(data: IOPagination) {
+    const currentPage = +data.page || 1;
+    const pageSize = +data.page_size || 20;
+    const totalPages = Math.ceil(data.totalCount / pageSize);
+
+    const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+    const previousPage = currentPage > 1 ? currentPage - 1 : null;
+
+    return { 
+        results: data.data, 
+        count: data.totalCount, 
+        nextPage, 
+        previousPage 
+    }
 }
 
 export async function pagingData(data, page, limit, records) {
