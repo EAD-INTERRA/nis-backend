@@ -13,7 +13,7 @@ import { ApiCustomResponse } from '@app/utils/decorators/swagger.decorator';
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
-    // @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     @ApiCustomResponse({
         summary: 'Get all audit logs',
         example: {
@@ -63,7 +63,7 @@ export class UsersController {
     }
 
 
-    // @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     @ApiBearerAuth()
     @Get(':userId')
     async getUserById(
