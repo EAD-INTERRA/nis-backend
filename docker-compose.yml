@@ -7,7 +7,7 @@ services:
   core-cs:
     container_name: nis_backend_core
     image: nis-backend
-    # image: eadinterra/nis-backend
+    #image: eadinterra/nis-backend
     build:
       context: .
       args:
@@ -27,7 +27,7 @@ services:
   auth-cs:
     container_name: nis_backend_auth
     image: nis-backend
-    # image: eadinterra/nis-backend
+    #image: eadinterra/nis-backend
     build:
       context: .
       args:
