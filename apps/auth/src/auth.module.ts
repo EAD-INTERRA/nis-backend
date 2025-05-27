@@ -4,6 +4,8 @@ import { AuthService } from './auth.service';
 import * as dotenv from 'dotenv';
 import { JwtModule } from '@nestjs/jwt';
 import { DbModule } from '@app/db';
+import { UsersController } from './users/users.controller';
+import { UsersService } from '@app/users';
 
 dotenv.config()
 
@@ -16,7 +18,7 @@ dotenv.config()
       signOptions: { expiresIn: '6000s' },
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService],
+  controllers: [AuthController, UsersController],
+  providers: [AuthService, UsersService],
 })
 export class AuthModule {}

@@ -108,7 +108,8 @@
       "^@app/utils(|/.*)$": "<rootDir>/libs/utils/src/$1",
       "^@app/audit(|/.*)$": "<rootDir>/libs/audit/src/$1",
       "^@app/e-visa(|/.*)$": "<rootDir>/libs/e-visa/src/$1",
-      "^@app/replica(|/.*)$": "<rootDir>/libs/replica/src/$1"
+      "^@app/replica(|/.*)$": "<rootDir>/libs/replica/src/$1",
+      "^@app/users(|/.*)$": "<rootDir>/libs/users/src/$1"
     }
   }
 }
