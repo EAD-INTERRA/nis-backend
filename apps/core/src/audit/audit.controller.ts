@@ -30,7 +30,18 @@ export class AuditController {
                     date: '2025-03-07T14:27:12.000Z'
                 }
             ]
-        }
+        },
+        queries: [
+            'user_id',
+            'org_id',
+            'ip',
+            'action',
+            'search_term',
+            'from_date',
+            'to_date',
+            'page',
+            'page_size'
+        ]
     })
     // @Permissions([Resource.AUDIT_MANAGEMENT, PermissionLevel.READ])
     @ApiBearerAuth()

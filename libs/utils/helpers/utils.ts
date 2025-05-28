@@ -89,6 +89,8 @@ export async function paginate(data: IOPagination) {
     const nextPage = currentPage < totalPages ? currentPage + 1 : null;
     const previousPage = currentPage > 1 ? currentPage - 1 : null;
 
+    console.log("DATA: ", data)
+    
     return { 
         results: data.data, 
         count: data.totalCount, 
