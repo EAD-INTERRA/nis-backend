@@ -34,13 +34,13 @@ WORKDIR /usr/src/app
 COPY package*.json ./ 
 
 # Install dependencies
-# RUN pnpm install 
+RUN pnpm install 
 
 # Copy the rest of the app
 COPY . . 
 
 # Ensure dependencies are installed correctly
-RUN pnpm install 
+# RUN pnpm install 
 
 # Generate Prisma client
 RUN pnpm i @prisma/client
