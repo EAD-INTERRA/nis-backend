@@ -76,7 +76,7 @@ export class UsersService {
                     orderBy: {
                         created_at: "desc"
                     },
-                    skip: (+data.page - 1) * +data.page_size || 1,
+                    skip: (+data.page - 1) * +data.page_size || 0,
                     take: +data.page_size || 20,
                 }),
                 this.dbService.user.count({
