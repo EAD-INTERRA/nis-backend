@@ -111,5 +111,12 @@
       "^@app/replica(|/.*)$": "<rootDir>/libs/replica/src/$1",
       "^@app/users(|/.*)$": "<rootDir>/libs/users/src/$1"
     }
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/core/client",
+      "@prisma/replica/client"
+    ]
   }
 }

@@ -26,10 +26,6 @@ ARG APP
 ARG NODE_ENV=development 
 ENV NODE_ENV=${NODE_ENV}
 
-# Set pnpm store inside the container to avoid conflicts
-# ENV PNPM_HOME=/app/.pnpm-store
-# RUN pnpm config set store-dir $PNPM_HOME
-
 WORKDIR /usr/src/app 
 COPY package*.json ./ 
 
@@ -44,8 +40,8 @@ COPY . .
 
 # Generate Prisma client
 RUN pnpm i @prisma/client
-RUN pnpm i @prisma/core/client
-RUN pnpm i @prisma/replica/client
+# RUN pnpm i @prisma/core/client
+# RUN pnpm i @prisma/replica/client
 # RUN pnpx prisma generate 
 RUN pnpx prisma generate --schema prisma/core/schema.prisma && pnpx prisma generate --schema prisma/replica/schema.prisma 
 
