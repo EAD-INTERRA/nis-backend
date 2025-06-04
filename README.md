@@ -140,3 +140,11 @@ The e-visa consumer now uses **BullMQ** for queue-based processing to ensure rel
 ### Swagger Documentation
 
 All endpoints are documented using Swagger. Access the documentation at `/docs`.
+
+
+### Known Bugs:
+- If you encounter an error while building the Docker image (along the lines of some node_modules folder not found), perform a clean install of all the dependencies by running:
+
+```bash
+./scripts/ci.sh
+```

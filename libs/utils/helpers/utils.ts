@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/core/client';
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcryptjs'
 import * as crypto from 'crypto'
 import { Parser } from 'json2csv';
 import * as fs from 'fs';
@@ -90,7 +90,7 @@ export async function paginate(data: IOPagination) {
     const previousPage = currentPage > 1 ? currentPage - 1 : null;
 
     console.log("DATA: ", data)
-    
+
     return { 
         results: data.data, 
         count: data.totalCount, 
