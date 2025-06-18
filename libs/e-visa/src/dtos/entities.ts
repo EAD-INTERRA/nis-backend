@@ -256,4 +256,12 @@ export class EVisaWebhookPayload {
     @ApiProperty({ required: false })
     @IsOptional()
     birth_certificate?: string;
+    
+    @ApiProperty({ required: false })
+    @IsOptional()
+    guardian_name?: string;
+
+    @ApiProperty({ required: false })
+    @IsOptional()
+    guardian_passport_number?: string;
 }
