@@ -16,6 +16,11 @@ export function generateToken(prefix?: string, suffix?: string) {
     return token
 }
 
+
+export function generateNumericToken() {
+    return Math.floor(100000 + Math.random() * 900000)
+}
+
 export async function createSuperAdmin(db: PrismaClient = new PrismaClient()) {
     const prisma = db;
     const saltOrRounds = 10;
@@ -26,7 +31,14 @@ export async function createSuperAdmin(db: PrismaClient = new PrismaClient()) {
             create: {
                 email: "superadmin@test.com",
                 password: hashed,
-                password_reset_token: generateToken(),
+                password_reset_token: generateNumericToken(),
+                details: {
+                    create: {
+                        first_name: "Super Admin",
+                        is_super_admin: true,
+                        is_active: true
+                    }
+                }
             },
             where: {
                 email: "superadmin@test.com"
@@ -34,16 +46,16 @@ export async function createSuperAdmin(db: PrismaClient = new PrismaClient()) {
             update: {}
         });
     
-        if (superAdmin) {
-            await prisma.userDetail.create({
-                data: {
-                    user_id: superAdmin.id,
-                    name: "Super Admin",
-                    is_super_admin: true,
-                    is_active: true
-                }
-            })
-        }
+        // if (superAdmin) {
+        //     await prisma.userDetail.create({
+        //         data: {
+        //             user_id: superAdmin.id,
+        //             name: "Super Admin",
+        //             is_super_admin: true,
+        //             is_active: true
+        //         }
+        //     })
+        // }
     } catch (error) {
         console.error('Error creating super admin:', error);
     }
