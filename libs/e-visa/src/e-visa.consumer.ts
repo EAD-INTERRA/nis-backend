@@ -31,7 +31,10 @@ const FILE_KEYS = [
     "onward_ticket",
     "visa_to_final_destination",
     "parental_consent",
-    "birth_certificate"
+    "birth_certificate",
+    "parent_letter_consent",
+    "birth_cert_minor",
+    "visa_final_destination"
 ];
 
 
