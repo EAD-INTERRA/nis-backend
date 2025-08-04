@@ -10,6 +10,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { EVisaWebhookPayload } from './dtos/entities';
 import { CrmDbService } from '@app/db/crm/crm.service';
 import { WatchlistDbService } from '@app/db/watchlist/watchlist.service';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class EVisaService {
@@ -17,9 +18,23 @@ export class EVisaService {
         private readonly dbService: CoreDbService,
         private readonly crmService: CrmDbService,
         private readonly watchlistService: WatchlistDbService,
+        private readonly eventEmitter: EventEmitter2,
         @InjectQueue('e-visa') private eVisaQueue: Queue,
         // private readonly logger = new Logger(EVisaService.name)
     ) { }
+
+    @OnEvent('watchlist.send', { async: true })
+    private async sendWatchlistNotification(passport_number: string): Promise<void> {
+        const data = await axios.post(process.env.CONTACT_MIDDLEWARE_URL, {
+            sender: process.env.WATCHLIST_SENDER_EMAIL,
+            messageType: "WATCHLIST",
+            message: passport_number,
+            origin: "immigration",
+            receiver: process.env.WATCHLIST_RECEIVER_EMAIL,
+            receiverCC: process.env.WATCHLIST_RECEIVER_CC_EMAIL
+
+        });
+    }
 
     async checkWatchlist(passport_number: string): Promise<ServiceResponse> {
         const ppNumber = passport_number.replace(/\s/g, '')
@@ -52,6 +67,7 @@ export class EVisaService {
             ;
 
         if (watchlistHit.HitTime) {
+            this.eventEmitter.emit('watchlist.send', rest.passport_number)
             return success(watchlistHit, "Security Investigation Required for this Passport Number");
         }
 
