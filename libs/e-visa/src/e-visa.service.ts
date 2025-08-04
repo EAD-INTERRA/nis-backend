@@ -37,7 +37,11 @@ export class EVisaService {
             // return success(existing_application, "Application already exists");
         }
 
-        const ppNumber = data.passport_number.replace(/\s/g, '')
+        if (!data.passport_number) {
+            throw badRequest({ message: "Passport number is missing or invalid", customMessage: "Missing passport_number" });
+        }
+
+        const ppNumber = (data.passport_number ||  '').replace(/\s/g, '');
         const [watchlistHit]: any[] = await this.watchlistService.$queryRaw
             `SET NOCOUNT ON; EXEC SelectAndUpdateDocumentHit @DocumentNumber = ${ppNumber}`
         ;

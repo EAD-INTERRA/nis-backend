@@ -30,8 +30,24 @@ const FILE_KEYS = [
     "invitation_letter_from_nigerian_company_with_letterhead",
     "onward_ticket",
     "visa_to_final_destination",
+    "visa_final_destination",
     "parental_consent",
-    "birth_certificate"
+    "birth_certificate",
+    "birth_cert_minor",
+    "application_letter_parent",
+    "parent_letter_consent",
+    "birth_cert_minor",
+    "visa_final_destination",
+    "sporting_fixtures_evidence",
+    "cultural_mou",
+    "ngo_employment",
+    "parent_datapage",
+    "passport_parent",
+    "proof_parentage",
+    "passport_minor",
+    "photo_parent",
+    "sports_commission_letter",
+    "parent_letter_consent"
 ];
 
 

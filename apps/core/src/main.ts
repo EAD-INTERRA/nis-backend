@@ -1,3 +1,4 @@
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -6,22 +7,28 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import * as compression from 'compression';
 import { auditLogger } from '@app/db/middleware/audit.middleware';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { json, urlencoded } from 'express';
 
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.use(auditLogger)
-  app.useBodyParser('json', { limit: '50mb' });
-  // app.use(json({ limit: '50mb' }));
-  // app.use(urlencoded({ extended: true, limit: '50mb' }));
+  // app.useBodyParser('json', { limit: '50mb' });
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   // Versioning and CORS
   app.enableVersioning({
     type: VersioningType.URI,
     prefix: 'api/v'
   });
-  app.enableCors();
+  app.enableCors({
+    origin: false, // disable Nest’s ACAO header
+    methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: false
+  });
 
   // Swagger config
   const config = new DocumentBuilder()
@@ -55,3 +62,4 @@ async function bootstrap() {
   await app.listen(process.env.BASE_PORT ?? 3001);
 }
 bootstrap();
+

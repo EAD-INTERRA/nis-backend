@@ -37,7 +37,7 @@ COPY . .
 
 # Ensure dependencies are installed correctly
 # RUN pnpm install 
-
+RUN pnpm install express
 # Generate Prisma client
 RUN pnpm i @prisma/client
 # RUN pnpm i @prisma/core/client

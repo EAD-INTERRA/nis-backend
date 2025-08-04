@@ -1,18 +1,18 @@
 export const VISA_TYPES = [
-    { id: "F3B", name: "Transit Visa"},
-    { id: "F4A", name: "Business Visa (Single Entry)"},
-    { id: "F4B", name: "Business Visa (Multiple Entry)"},
-    { id: "F4C", name: "Business Visa (Frequently Travelers)"},
-    { id: "F5A", name: "Tourism Visa"},
-    { id: "F6A", name: "Visiting Visa (Single Entry)"},
-    { id: "F7E", name: "Sports Visa"},
-    { id: "F7F", name: "Creative Arts Visa"},
-    { id: "F7G", name: "Study Tour Visa"},
-    { id: "F7H", name: "Academic Exchange isa"},
-    { id: "F7I", name: "International Cultural Exchange Visa"},
-    { id: "F7K", name: "Emergency/Relief Work Visa"},
-    { id: "F9A", name: "Returning Holders of Foreign Passports (Nigerians by Birth)"},
-    { id: "F9B", name: "Returning Holders of Foreign Passports (Nigerians by Birth) Accompanied Minors"}
+      { key: "F3B", name: "Transit Visa"},
+  { key: "F4A", name: "Business Visa (Single Entry)"},
+  { key: "F4B", name: "Business Visa (Multiple Entry)"},
+  { key: "F4C", name: "Business Visa (Frequently Travelers)"},
+  { key: "F5A", name: "Tourism Visa"},
+  { key: "F6A", name: "Visiting Visa (Single Entry)"},
+  { key: "F7E", name: "Sports Visa"},
+  { key: "F7F", name: "Creative Arts Visa"},
+  { key: "F7G", name: "Study Tour Visa"},
+  { key: "F7H", name: "Academic Exchange isa"},
+  { key: "F7I", name: "International Cultural Exchange Visa"},
+  { key: "F7K", name: "Emergency/Relief Work Visa"},
+  { key: "F9A", name: "Returning Holders of Foreign Passports (Nigerians by Birth)"},
+  { key: "F9B", name: "Returning Holders of Foreign Passports (Nigerians by Birth) Accompanied Minors"}
 ];
 
 export const PASSPORT_TYPES = [
