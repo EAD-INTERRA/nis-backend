@@ -21,6 +21,15 @@ export class EVisaService {
         // private readonly logger = new Logger(EVisaService.name)
     ) { }
 
+    async checkWatchlist(passport_number: string): Promise<ServiceResponse> {
+        const ppNumber = passport_number.replace(/\s/g, '')
+        const [watchlistHit]: any[] = await this.watchlistService.$queryRaw
+            `SET NOCOUNT ON; EXEC SelectAndUpdateDocumentHit @DocumentNumber = ${ppNumber}`
+            ;
+
+        return success(watchlistHit, "Watchlist check completed");
+    }
+
     // Add jobs to the queue
     async addToQueue(data: EVisaWebhookPayload): Promise<ServiceResponse> {
         const { hoh_address, sufficient_fund, ...rest } = data;
@@ -44,7 +53,7 @@ export class EVisaService {
         const ppNumber = (data.passport_number ||  '').replace(/\s/g, '');
         const [watchlistHit]: any[] = await this.watchlistService.$queryRaw
             `SET NOCOUNT ON; EXEC SelectAndUpdateDocumentHit @DocumentNumber = ${ppNumber}`
-        ;
+            ;
 
         if (watchlistHit.HitTime) {
             return success(watchlistHit, "Security Investigation Required for this Passport Number");

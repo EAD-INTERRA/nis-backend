@@ -179,6 +179,11 @@ export class EVisaController {
   //   return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypeById(id));
   // }
 
+  @Get('watchlist/:passport_no')
+  async checkWatchlist(@Param('passport_no') passport_no: string) {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.checkWatchlist(passport_no));
+  }
+  
   @Get('visa-types/:key')
   async getVisaTypeByKey(@Param('key') key: string) {
     return mapErrorCodeToHttpResponse(await this.eVisaService.getVisaTypeByKey(key));
