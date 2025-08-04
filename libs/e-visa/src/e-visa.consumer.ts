@@ -56,7 +56,8 @@ export class EVisaConsumer extends WorkerHost {
                     const { buffer, extension, mimeType } = this.decodeBase64(value);
 
                     // Convert Buffer to Blob
-                    const blob = new Blob([buffer], { type: mimeType });
+                    const arrayBuffer = Uint8Array.from(buffer).buffer as ArrayBuffer;
+                    const blob = new Blob([arrayBuffer], { type: mimeType });
 
                     // Append the Blob to FormData
                     formData.append(key, blob, `${key}.${extension}`);
