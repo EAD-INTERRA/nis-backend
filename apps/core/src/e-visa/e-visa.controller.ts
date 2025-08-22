@@ -6,6 +6,7 @@ import { mapErrorCodeToHttpResponse } from '@app/utils/response';
 import { FileInterceptor } from '@nestjs/platform-express';
 import axios from 'axios';
 import { SAMPLE_PAYLOAD } from '@app/e-visa/data';
+import { EVisaWebhookPayload } from '@app/e-visa/dtos/entities';
 
 @Controller({
   path: 'e-visa',
@@ -34,7 +35,7 @@ export class EVisaController {
   
   @Post('webhook')
   async triggerWebhookJob(
-    @Body() data: any
+    @Body() data: EVisaWebhookPayload
   ) {
     return mapErrorCodeToHttpResponse(
       await this.eVisaService.addToQueue(data)

@@ -47,7 +47,7 @@ export class EVisaService {
 
     // Add jobs to the queue
     async addToQueue(data: EVisaWebhookPayload): Promise<ServiceResponse> {
-        const { hoh_address, sufficient_fund, ...rest } = data;
+        const { hotel_or_home_address, sufficient_fund, ...rest } = data;
         // Validate the incoming data
         const existing_application: any[] = await this.crmService.$queryRaw`
             SELECT * FROM cases_cstm
@@ -78,8 +78,8 @@ export class EVisaService {
         // Swap hoh_address and sufficient_fund fields (for NewWorks mapping issues)
         const jobData = {
             ...rest,
-            hoh_address: sufficient_fund ?? null,
-            sufficient_fund: hoh_address ?? null,
+            hotel_or_home_address: sufficient_fund ?? null,
+            sufficient_fund: hotel_or_home_address ?? null,
         }
 
         const job = await this.eVisaQueue.add('e-visa-job', jobData, {
