@@ -1,7 +1,12 @@
 import { transformDate } from "@app/utils/helpers/utils";
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
-import { IsDate, IsEmail, IsOptional, IsString } from "class-validator";
+import { IsDate, IsEmail, IsEnum, IsOptional, IsString } from "class-validator";
+
+enum BiometricCapture {
+    YES = 'yes',
+    NO = 'no'
+}
 
 export class EVisaWebhookPayload {
     @ApiProperty({ required: true })
@@ -15,37 +20,41 @@ export class EVisaWebhookPayload {
     @ApiProperty({ required: true })
     @IsString()
     application_id: string;
+    
+    @ApiProperty({ required: true, examples: ['yes', 'no'] })
+    @IsEnum(BiometricCapture)
+    biometric_capture: BiometricCapture;
 
-    @ApiProperty({ required: true })
+    @ApiProperty({ required: true, maxLength: 250 })
     @IsString()
     salutation: string;
 
-    @ApiProperty({ required: true })
+    @ApiProperty({ required: true, maxLength: 250 })
     @IsString()
     first_name: string;
 
-    @ApiProperty({ required: false })
+    @ApiProperty({ required: false, maxLength: 250 })
     @IsOptional()
     middle_name?: string;
 
-    @ApiProperty({ required: true })
+    @ApiProperty({ required: true, maxLength: 250 })
     @IsString()
     surname: string;
 
-    @ApiProperty({ required: true })
+    @ApiProperty({ required: true, maxLength: 250 })
     @IsString()
     pob: string; // Place of birth
     
-    @ApiProperty({ required: true })
+    @ApiProperty({ required: true, maxLength: 250 })
     @Transform(({ value }) => transformDate(value))
-    @IsDate()
+    // @IsDate()
     dob: string; // Format: YYYY-MM-DD
 
-    @ApiProperty({ required: true })
+    @ApiProperty({ required: true, maxLength: 250 })
     @IsString()
     phone_number: string;
 
-    @ApiProperty({ required: true })
+    @ApiProperty({ required: true, maxLength: 250 })
     @IsEmail()
     email_address: string;
 
@@ -67,7 +76,7 @@ export class EVisaWebhookPayload {
 
     @ApiProperty({ required: true })
     @Transform(({ value }) => transformDate(value))
-    @IsDate()
+    // @IsDate()
     passport_expiration_date: string; // Format: YYYY-MM-DD
 
     @ApiProperty({ required: true })
@@ -88,23 +97,23 @@ export class EVisaWebhookPayload {
 
     @ApiProperty({ required: true })
     @Transform(({ value }) => transformDate(value))
-    @IsDate()
+    // @IsDate()
     date_of_departure: string; // Format: YYYY-MM-DD
 
     @ApiProperty({ required: true })
     @Transform(({ value }) => transformDate(value))
-    @IsDate()
+    // @IsDate()
     date_arrival: string; // Format: YYYY-MM-DD
 
     @ApiProperty({ required: false })
     @IsOptional()
     port_of_entry?: string;
 
-    @ApiProperty({ required: true })
+    @ApiProperty({ required: true, maxLength: 250 })
     @IsString()
     contact_or_hotel_name: string;
 
-    @ApiProperty({ required: true })
+    @ApiProperty({ required: true, maxLength: 250 })
     @IsString()
     contact_or_hotel_number: string;
 
@@ -116,17 +125,17 @@ export class EVisaWebhookPayload {
     @IsString()
     city_s_town: string;
 
-    @ApiProperty({ required: true })
+    @ApiProperty({ required: true, maxLength: 250 })
     @IsEmail()
     contact_or_hotel_email: string;
 
-    @ApiProperty({ required: true })
+    @ApiProperty({ required: true, maxLength: 250 })
     @IsString()
     contact_or_hotel_postal_code: string;
 
     @ApiProperty({ required: true })
     @Transform(({ value }) => transformDate(value))
-    @IsDate()
+    // @IsDate()
     issue_date: string; // Format: YYYY-MM-DD
 
     @ApiProperty({ required: true })
@@ -147,12 +156,12 @@ export class EVisaWebhookPayload {
 
     @ApiProperty({ required: true })
     @Transform(({ value }) => transformDate(value))
-    @IsDate()
+    // @IsDate()
     date_entered: string; // Format: YYYY-MM-DD
 
     @ApiProperty({ required: true })
     @Transform(({ value }) => transformDate(value))
-    @IsDate()
+    // @IsDate()
     date_modified: string; // Format: YYYY-MM-DD
 
     // New document fields (base64-encoded)
@@ -174,11 +183,18 @@ export class EVisaWebhookPayload {
 
     @ApiProperty({ required: false })
     @IsOptional()
-    hoh_address?: string;
+    hotel_or_home_address?: string;
+    
+    @ApiProperty({ required: true })
+    @IsOptional()
+    applicant_photo: string;
 
     @ApiProperty({ required: false })
     @IsOptional()
-    lfra?: string;
+    mou_or_letter_from_relevant_government_agency?: string;
+
+    @ApiProperty({ required: false })
+    @IsOptional()
     invitation_letter_from_nigeria_institution?: string;
 
     @ApiProperty({ required: false })
@@ -257,11 +273,11 @@ export class EVisaWebhookPayload {
     @IsOptional()
     birth_certificate?: string;
     
-    @ApiProperty({ required: false })
+    @ApiProperty({ required: false, maxLength: 250 })
     @IsOptional()
     guardian_name?: string;
 
-    @ApiProperty({ required: false })
+    @ApiProperty({ required: false, maxLength: 250 })
     @IsOptional()
     guardian_passport_number?: string;
 }
