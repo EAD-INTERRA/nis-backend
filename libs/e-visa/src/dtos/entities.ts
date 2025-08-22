@@ -1,7 +1,7 @@
 import { transformDate } from "@app/utils/helpers/utils";
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
-import { IsDate, IsEmail, IsEnum, IsOptional, IsString } from "class-validator";
+import { IsDate, IsEmail, IsEnum, IsOptional, IsString, MaxLength } from "class-validator";
 
 enum BiometricCapture {
     YES = 'yes',
@@ -25,37 +25,45 @@ export class EVisaWebhookPayload {
     @IsEnum(BiometricCapture)
     biometric_capture: BiometricCapture;
 
-    @ApiProperty({ required: true, maxLength: 250 })
+    @ApiProperty({ required: true })
     @IsString()
+    @MaxLength(250, { message: 'Salutation must not exceed 250 characters' })
     salutation: string;
 
-    @ApiProperty({ required: true, maxLength: 250 })
+    @ApiProperty({ required: true })
     @IsString()
+    @MaxLength(250, { message: 'First name must not exceed 250 characters' })
     first_name: string;
 
-    @ApiProperty({ required: false, maxLength: 250 })
+    @ApiProperty({ required: false })
     @IsOptional()
+    @MaxLength(250, { message: 'Middle name must not exceed 250 characters' })
     middle_name?: string;
 
-    @ApiProperty({ required: true, maxLength: 250 })
+    @ApiProperty({ required: true })
     @IsString()
+    @MaxLength(250, { message: 'Surname must not exceed 250 characters' })
     surname: string;
 
-    @ApiProperty({ required: true, maxLength: 250 })
+    @ApiProperty({ required: true })
     @IsString()
+    @MaxLength(250, { message: 'POB must not exceed 250 characters' })
     pob: string; // Place of birth
     
-    @ApiProperty({ required: true, maxLength: 250 })
-    @Transform(({ value }) => transformDate(value))
-    // @IsDate()
+    @ApiProperty({ required: true})
+    // @Transform(({ value }) => transformDate(value))
+    @IsString()
+    @MaxLength(250, { message: 'DOB must not exceed 250 characters' })
     dob: string; // Format: YYYY-MM-DD
 
-    @ApiProperty({ required: true, maxLength: 250 })
+    @ApiProperty({ required: true })
     @IsString()
+    @MaxLength(250, { message: 'Phone number must not exceed 250 characters' })
     phone_number: string;
 
-    @ApiProperty({ required: true, maxLength: 250 })
+    @ApiProperty({ required: true })
     @IsEmail()
+    @MaxLength(250, { message: 'Email must not exceed 250 characters' })
     email_address: string;
 
     @ApiProperty({ required: true })
@@ -75,8 +83,8 @@ export class EVisaWebhookPayload {
     passport_number: string;
 
     @ApiProperty({ required: true })
-    @Transform(({ value }) => transformDate(value))
-    // @IsDate()
+    // @Transform(({ value }) => transformDate(value))
+    @IsString()
     passport_expiration_date: string; // Format: YYYY-MM-DD
 
     @ApiProperty({ required: true })
@@ -96,25 +104,27 @@ export class EVisaWebhookPayload {
     country_of_departure: string;
 
     @ApiProperty({ required: true })
-    @Transform(({ value }) => transformDate(value))
-    // @IsDate()
+    // @Transform(({ value }) => transformDate(value))
+    @IsString()
     date_of_departure: string; // Format: YYYY-MM-DD
 
     @ApiProperty({ required: true })
-    @Transform(({ value }) => transformDate(value))
-    // @IsDate()
+    // @Transform(({ value }) => transformDate(value))
+    @IsString()
     date_arrival: string; // Format: YYYY-MM-DD
 
     @ApiProperty({ required: false })
     @IsOptional()
     port_of_entry?: string;
 
-    @ApiProperty({ required: true, maxLength: 250 })
+    @ApiProperty({ required: true })
     @IsString()
+    @MaxLength(250, { message: 'Hotel name must not exceed 250 characters' })
     contact_or_hotel_name: string;
 
-    @ApiProperty({ required: true, maxLength: 250 })
+    @ApiProperty({ required: true })
     @IsString()
+    @MaxLength(250, { message: 'Hotel contact number must not exceed 250 characters' })
     contact_or_hotel_number: string;
 
     @ApiProperty({ required: true })
@@ -125,17 +135,19 @@ export class EVisaWebhookPayload {
     @IsString()
     city_s_town: string;
 
-    @ApiProperty({ required: true, maxLength: 250 })
+    @ApiProperty({ required: true })
     @IsEmail()
+    @MaxLength(250, { message: 'Hotel Email must not exceed 250 characters' })
     contact_or_hotel_email: string;
 
-    @ApiProperty({ required: true, maxLength: 250 })
+    @ApiProperty({ required: true})
     @IsString()
+    @MaxLength(250, { message: 'Postal code must not exceed 250 characters' })
     contact_or_hotel_postal_code: string;
 
     @ApiProperty({ required: true })
-    @Transform(({ value }) => transformDate(value))
-    // @IsDate()
+    // @Transform(({ value }) => transformDate(value))
+    @IsString()
     issue_date: string; // Format: YYYY-MM-DD
 
     @ApiProperty({ required: true })
@@ -149,19 +161,24 @@ export class EVisaWebhookPayload {
     @ApiProperty({ required: true })
     @IsString()
     visa_type: string;
+    
+    @ApiProperty({ required: true })
+    @IsString()
+    @MaxLength(3, { message: 'Visa validity must not exceed 3 characters' })
+    visa_validity: string;
 
     @ApiProperty({ required: true })
     @IsString()
     entry_type: string;
 
     @ApiProperty({ required: true })
-    @Transform(({ value }) => transformDate(value))
-    // @IsDate()
+    // @Transform(({ value }) => transformDate(value))
+    @IsString()
     date_entered: string; // Format: YYYY-MM-DD
 
     @ApiProperty({ required: true })
-    @Transform(({ value }) => transformDate(value))
-    // @IsDate()
+    // @Transform(({ value }) => transformDate(value))
+    @IsString()
     date_modified: string; // Format: YYYY-MM-DD
 
     // New document fields (base64-encoded)
