@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/core/client";
 import { COMMON_UPLOADS, COUNTRIES, NATIONALITIES, PASSPORT_TYPES, PORTS_OF_ENTRY, STATES_IN_NIGERIA, VISA_SPECIFIC_UPLOADS_MAP, VISA_TYPES } from "../data/nationality";
+import { PERMISSION_SEED_DATA } from "../data/generated/permission.data";
 
 const providers = ["COURE", "AFRICASTALKING", "SENDGRID"]
 const channels = ["SMS", "EMAIL"]
@@ -294,4 +295,31 @@ export async function seedNationalities(db: PrismaClient = new PrismaClient()) {
             console.error('Error creating Nationality:', error);
         }
     }
+}
+
+export async function seedPermissions(db: PrismaClient = new PrismaClient()) {
+    const prisma = db;
+
+    for (const data of PERMISSION_SEED_DATA) {
+        const { resource, level } = data
+        try {
+            await prisma.permission.upsert({
+                create: {
+                    resource,
+                    level,
+                    resource_level: `${resource}:${level}`
+                },
+                update: {
+                    resource,
+                    level
+                },
+                where: {
+                    resource_level: `${resource}:${level}`
+                }
+            });
+        } catch (err) {
+            console.error('Error creating Permission:', err);
+        }
+    }
+    console.log("Permissions seeded")
 }
