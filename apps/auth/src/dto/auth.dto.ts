@@ -1,3 +1,4 @@
+import { PaginationFilter } from '@app/utils/types';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Gender } from '@prisma/core/client';
 import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from 'class-validator';  
@@ -108,4 +109,48 @@ export class CreateUserDto {
     @IsString()
     @IsOptional() 
     address?: string;
+}
+
+
+export class FilterUserInterface extends PaginationFilter {
+    @IsOptional()
+    search_term?: string
+
+    @IsOptional()
+    role_id?: string
+   
+    @IsOptional()
+    ip?: string
+    
+    @IsOptional()
+    from_date?: string | Date;
+    
+    @IsOptional()
+    to_date?: string | Date;
+}
+
+
+export class EditUserDto {
+    user_id: string;
+    @IsOptional()
+    is_active?: boolean;
+    
+    @IsOptional()
+    is_admin?: boolean;
+
+    @IsOptional()
+    first_name?: string;
+
+    @IsOptional()
+    middle_name?: string;
+
+    @IsOptional()
+    surname?: string;
+
+    @IsOptional()
+    phone?: string;
+
+    @IsOptional()
+    role_id?: string
+    
 }

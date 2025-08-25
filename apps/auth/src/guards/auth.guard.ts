@@ -1,114 +1,91 @@
 import {
-    CanActivate,
-    ExecutionContext,
-    Injectable,
-    UnauthorizedException,
-  } from '@nestjs/common';
-  import { JwtService } from '@nestjs/jwt';
-  import { Request } from 'express';
-  import { Reflector } from '@nestjs/core';
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
+import { Reflector } from '@nestjs/core';
 
-  import * as dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 import { CoreDbService } from '@app/db';
-import { Permission, PermissionLevel, UserDetail } from '@prisma/core/client';
-import { Permissions } from '../decorators/permissions.decorator';
-  
-  dotenv.config()
-  
-  @Injectable()
-  export class AuthGuard implements CanActivate {
-    constructor(private jwtService: JwtService, private reflector: Reflector, private readonly dbService: CoreDbService) { }
-  
-    async canActivate(context: ExecutionContext): Promise<boolean> {
-      const request: Request = context.switchToHttp().getRequest();
-      const token = this.extractTokenFromHeader(request);
-      if (!token) {
-        throw new UnauthorizedException();
-      }
-      try {
-        const payload = await this.jwtService.verifyAsync(
-          token,
-          {
-            secret: process.env.JWT_CONSTANT
-          }
-        );
-        // 💡 We're assigning the payload to the request object here
-        // so that we can access it in our route handlers
-        request['user'] = payload;
-      } catch {
-        throw new UnauthorizedException();
-      }
-  
-      // CHECK PERMISSIONS DECORATOR
-      const permissions = this.reflector.get(Permissions, context.getHandler());
-      if (!permissions) {
-        return true;
-      }
-      const user = await this.dbService.userDetail.findUnique({
-        where: {
-          user_id: request['user'].sub
-        },
-        include: {
-          role: {
-            include: {
-              permissions: true
-            }
-          }
-          // state: {
-          //   include: {
-          //     geoZone: true,
-          //   }
-          // },
-          // role: {
-          //   select: {
-          //     permissions: true
-          //   }
-          // },
-          // lga: true,
-          // facility: true,
-          // organization: true
+import { Permission, UserDetail } from '@prisma/core/client';
+import { PermissionDecoratorOptions, Permissions } from '../decorators/permissions.decorator';
+import { EncodedJWT } from '../dto/types';
+
+dotenv.config()
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+  constructor(private jwtService: JwtService, private reflector: Reflector, private readonly dbService: CoreDbService) { }
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request: Request & { user: EncodedJWT } = context.switchToHttp().getRequest();
+    const token = this.extractTokenFromHeader(request);
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+    try {
+      const payload: EncodedJWT = await this.jwtService.verifyAsync(
+        token,
+        {
+          secret: process.env.JWT_CONSTANT
         }
-      })
-      // RETURN TRUE FOR SUPERADMIN
-      if (user.is_super_admin) {
-        return true
-      }
-  
-      // const geoZoneId = request.query?.geoZoneId ?? request.params?.geoZoneId;
-      // const stateId = request.query?.stateId ?? request.params?.stateId;
-      // const lgaId = request.query?.lgaId ?? request.params?.lgaId;
-      // const wardId = request.query?.wardId ?? request.params?.wardId;
-      // const facilityId = request.query?.facilityId ?? request.params?.facilityId;
-      // const patientId = request.query?.patientId ?? request.params?.patientId;
-  
-      const res = this.matchPermissions(permissions, user, user.role?.permissions);
-      return res;
+      );
+      // 💡 We're assigning the payload to the request object here
+      // so that we can access it in our route handlers
+      request.user = payload;
+    } catch {
+      throw new UnauthorizedException();
+    }
+    // CHECK PERMISSIONS DECORATOR
+    const permissions = this.reflector.get(Permissions, context.getHandler());
+    if (!permissions) {
+      return true;
+    }
+    console.log("PERMISSIONS: ", permissions)
+    // RETURN TRUE FOR SUPERADMIN
+    if (request.user.is_super_admin || request.user.is_admin) {
+      return true
+    }
+    const res = this.matchPermissions(permissions, request.user.role?.permissions);
+    return res;
+  }
+
+
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    // console.log("TOKENN: ", token)
+    return type === 'Bearer' ? token : undefined;
+  }
+
+
+  private matchPermissions(
+    permissions: PermissionDecoratorOptions,
+    userPermissions?: Permission[],
+  ): boolean {
+    const { resource, permission } = permissions;
+    if (!resource || !permission) {
+      return false; // Invalid permission format
+    }
+    const hasPermission = (userPermissions ?? [])
+      .some((p) => p.resource === resource && p.level === permission);
+
+    // console.log("USER PERMISSIONS: ", userPermissions);
+    // console.log("HAS PERMISSION: ", hasPermission);
+
+    if (!hasPermission) {
+      throw new ForbiddenException({ 
+        message: "Forbidden Action", 
+        customMessage: `You do not have permission to access this resource: {${resource.toUpperCase()}} requiring permission level: {${permission.toUpperCase()}}`,
+        error: "Forbidden",
+        statusCode: 403
+      });
     }
 
-    private extractTokenFromHeader(request: Request): string | undefined {
-        const [type, token] = request.headers.authorization?.split(' ') ?? [];
-        return type === 'Bearer' ? token : undefined;
-      }
+    return hasPermission
+  }
 
-    private async matchPermissions(
-        permissions: string[],
-        user: any,
-        userPermissions?: Permission[],
-      ): Promise<boolean> {
-        const [resource, ...requiredPermissions] = permissions;
-    
-        // CHECK IF USER IS ORG ADMIN
-        if (user.isOrgAdmin) {
-          return true;
-        }
-    
-        const permissionLevels = userPermissions
-          .filter((p) => p.resource === resource)
-          .map((p) => p.level);
-
-          
-        // MORE PERMISSION LOGIC
-        return true
-    }
-    
 }
