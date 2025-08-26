@@ -99,23 +99,23 @@ export class EVisaWebhookPayload {
     @IsString()
     flight_number: string;
 
-    @ApiProperty({ required: false })
-    @IsOptional()
-    country_of_departure?: string;
+    // @ApiProperty({ required: false })
+    // @IsOptional()
+    // country_of_departure?: string;
 
-    @ApiProperty({ required: false })
-    // @Transform(({ value }) => transformDate(value))
-    @IsOptional()
-    date_of_departure?: string; // Format: YYYY-MM-DD
+    // @ApiProperty({ required: false })
+    // // @Transform(({ value }) => transformDate(value))
+    // @IsOptional()
+    // date_of_departure?: string; // Format: YYYY-MM-DD
 
-    @ApiProperty({ required: true })
-    // @Transform(({ value }) => transformDate(value))
-    @IsString()
-    date_arrival: string; // Format: YYYY-MM-DD
+    // @ApiProperty({ required: true })
+    // // @Transform(({ value }) => transformDate(value))
+    // @IsString()
+    // date_arrival: string; // Format: YYYY-MM-DD
 
-    @ApiProperty({ required: false })
-    @IsOptional()
-    port_of_entry?: string;
+    // @ApiProperty({ required: false })
+    // @IsOptional()
+    // port_of_entry?: string;
 
     @ApiProperty({ required: true })
     @IsString()
@@ -162,24 +162,24 @@ export class EVisaWebhookPayload {
     @IsString()
     visa_type: string;
     
-    @ApiProperty({ required: false })
-    @IsOptional()
-    @MaxLength(3, { message: 'Visa validity must not exceed 3 characters' })
-    visa_validity?: string;
+    // @ApiProperty({ required: false })
+    // @IsOptional()
+    // @MaxLength(3, { message: 'Visa validity must not exceed 3 characters' })
+    // visa_validity?: string;
 
     @ApiProperty({ required: true })
     @IsString()
     entry_type: string;
 
-    @ApiProperty({ required: true })
-    // @Transform(({ value }) => transformDate(value))
-    @IsString()
-    date_entered: string; // Format: YYYY-MM-DD
+    // @ApiProperty({ required: true })
+    // // @Transform(({ value }) => transformDate(value))
+    // @IsString()
+    // date_entered: string; // Format: YYYY-MM-DD
 
-    @ApiProperty({ required: true })
-    // @Transform(({ value }) => transformDate(value))
-    @IsString()
-    date_modified: string; // Format: YYYY-MM-DD
+    // @ApiProperty({ required: true })
+    // // @Transform(({ value }) => transformDate(value))
+    // @IsString()
+    // date_modified: string; // Format: YYYY-MM-DD
 
     // New document fields (base64-encoded)
     @ApiProperty({ required: false })
@@ -205,6 +205,54 @@ export class EVisaWebhookPayload {
     @ApiProperty({ required: true })
     @IsOptional()
     applicant_photo: string;
+    
+    @ApiProperty({ required: false })
+    @IsOptional()
+    application_letter_parent?: string;
+    
+    @ApiProperty({ required: false })
+    @IsOptional()
+    birth_cert_minor?: string;
+   
+    @ApiProperty({ required: false })
+    @IsOptional()
+    sporting_fixtures_evidence?: string;
+    
+    @ApiProperty({ required: false })
+    @IsOptional()
+    cultural_mou?: string;
+   
+    @ApiProperty({ required: false })
+    @IsOptional()
+    ngo_employment?: string;
+    
+    @ApiProperty({ required: false })
+    @IsOptional()
+    parent_datapage?: string;
+  
+    @ApiProperty({ required: false })
+    @IsOptional()
+    passport_parent?: string;
+
+    @ApiProperty({ required: false })
+    @IsOptional()
+    proof_parentage?: string;
+    
+    @ApiProperty({ required: false })
+    @IsOptional()
+    passport_minor?: string;
+    
+    @ApiProperty({ required: false })
+    @IsOptional()
+    photo_parent?: string;
+    
+    @ApiProperty({ required: false })
+    @IsOptional()
+    sports_commission_letter?: string;
+    
+    @ApiProperty({ required: false })
+    @IsOptional()
+    parent_letter_consent?: string;
 
     @ApiProperty({ required: false })
     @IsOptional()
