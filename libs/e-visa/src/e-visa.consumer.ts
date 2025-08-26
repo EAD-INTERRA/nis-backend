@@ -2,6 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
 import { SAMPLE_PAYLOAD } from './data';
+import { EVisaWebhookPayload } from './dtos/entities';
 
 
 const FILE_KEYS = [
@@ -51,7 +52,7 @@ const FILE_KEYS = [
 @Processor('e-visa')
 export class EVisaConsumer extends WorkerHost {
     async process(job: any): Promise<any> {
-        const data = job.data;
+        const data: EVisaWebhookPayload = job.data;
         // const data = SAMPLE_PAYLOAD
 
         const formData = new FormData();
@@ -73,6 +74,11 @@ export class EVisaConsumer extends WorkerHost {
                     formData.append(key, blob, `${key}.${extension}`);
                 } else {
                     // Append other data as plain fields
+                    // let val = value;
+                    if (value === null || value === undefined || value === 'null' || value === '') {
+                        // val = '';
+                        continue; // Skip null/undefined/empty values
+                    }
                     formData.append(key, value);
                 }
             }
@@ -81,6 +87,7 @@ export class EVisaConsumer extends WorkerHost {
         // Make the HTTP request
         try {
             console.log('Data sent to external API:', formData);
+            // return
             const response = await axios.post(
                 process.env.WEBHOOK_URL,
                 formData,
@@ -100,7 +107,7 @@ export class EVisaConsumer extends WorkerHost {
 
     private isBase64(str: string): boolean {
         try {
-            return (FILE_KEYS.includes(str))
+            return (str.trim().length && str.trim() !== "null" && FILE_KEYS.includes(str))
         } catch (err) {
             return false;
         }
