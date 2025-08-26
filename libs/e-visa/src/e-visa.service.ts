@@ -10,6 +10,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { EVisaWebhookPayload } from './dtos/entities';
 import { CrmDbService } from '@app/db/crm/crm.service';
 import { WatchlistDbService } from '@app/db/watchlist/watchlist.service';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class EVisaService {
@@ -17,40 +18,64 @@ export class EVisaService {
         private readonly dbService: CoreDbService,
         private readonly crmService: CrmDbService,
         private readonly watchlistService: WatchlistDbService,
+        private readonly eventEmitter: EventEmitter2,
         @InjectQueue('e-visa') private eVisaQueue: Queue,
         // private readonly logger = new Logger(EVisaService.name)
     ) { }
 
-    // Add jobs to the queue
-    async addToQueue(data: EVisaWebhookPayload): Promise<ServiceResponse> {
-        const { hoh_address, sufficient_fund, ...rest } = data;
-        // Validate the incoming data
-        const existing_application: any[] = await this.crmService.$queryRaw`
-            SELECT * FROM cases_cstm
-            WHERE reference_no_c = ${data.application_id}
-            AND active_status_c IN ('Active', 'New');
-        `;
+    @OnEvent('watchlist.send', { async: true })
+    private async sendWatchlistNotification(passport_number: string): Promise<void> {
+        const data = await axios.post(process.env.CONTACT_MIDDLEWARE_URL, {
+            sender: process.env.WATCHLIST_SENDER_EMAIL,
+            messageType: "WATCHLIST",
+            message: passport_number,
+            origin: "immigration",
+            receiver: process.env.WATCHLIST_RECEIVER_EMAIL,
+            receiverCC: process.env.WATCHLIST_RECEIVER_CC_EMAIL
 
-        console.log("EXISTING APPLICATION: ", existing_application)
-        if (existing_application.length > 0) {
-            badRequest({ message: "Visa Application with this <application_id> already exists", customMessage: "Visa Application already exists" });
-            // return success(existing_application, "Application already exists");
-        }
+        });
+    }
 
-        const ppNumber = data.passport_number.replace(/\s/g, '')
+    async checkWatchlist(passport_number: string): Promise<ServiceResponse> {
+        const ppNumber = passport_number.replace(/\s/g, '')
         const [watchlistHit]: any[] = await this.watchlistService.$queryRaw
             `SET NOCOUNT ON; EXEC SelectAndUpdateDocumentHit @DocumentNumber = ${ppNumber}`
-        ;
+            ;
 
-        if (watchlistHit.HitTime) {
-            return success(watchlistHit, "Security Investigation Required for this Passport Number");
-        }
+        return success(watchlistHit, "Watchlist check completed");
+    }
+
+    // Add jobs to the queue
+    async addToQueue(data: EVisaWebhookPayload): Promise<ServiceResponse> {
+        const { hotel_or_home_address, sufficient_fund, ...rest } = data;
+        // Validate the incoming data
+        // const active_application: any[] = await this.crmService.$queryRaw`
+        //     SELECT * FROM cases_cstm
+        //     WHERE reference_no_c = ${data.application_id}
+        //     AND active_status_c IN ('Active', 'New');
+        // `;
+
+        // console.log("ACTIVE APPLICATION: ", active_application)
+        // if (active_application.length > 0) {
+        //     badRequest({ message: "Visa Application with this <application_id> already exists", customMessage: "Visa Application already exists" });
+        //     // return success(existing_application, "Application already exists");
+        // }
+
+        const ppNumber = data.passport_number.replace(/\s/g, '')
+        // const [watchlistHit]: any[] = await this.watchlistService.$queryRaw
+        //     `SET NOCOUNT ON; EXEC SelectAndUpdateDocumentHit @DocumentNumber = ${ppNumber}`
+        //     ;
+
+        // if (watchlistHit.HitTime) {
+        //     this.eventEmitter.emit('watchlist.send', rest.passport_number)
+        //     return success(watchlistHit, "Security Investigation Required for this Passport Number");
+        // }
 
         // Swap hoh_address and sufficient_fund fields (for NewWorks mapping issues)
         const jobData = {
             ...rest,
-            hoh_address: sufficient_fund ?? null,
-            sufficient_fund: hoh_address ?? null,
+            hotel_or_home_address: sufficient_fund ?? null,
+            sufficient_fund: hotel_or_home_address ?? null,
         }
 
         const job = await this.eVisaQueue.add('e-visa-job', jobData, {

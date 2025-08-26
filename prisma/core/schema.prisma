@@ -76,12 +76,16 @@ model User {
 
 model UserDetail {
   id          String  @id @default(uuid())
+
   first_name  String  @default("")
   middle_name String?
   surname     String  @default("")
 
   user_id String @unique
   user    User?  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  state_id String?
+  state    State?  @relation("StateToUserDetail", fields: [state_id], references: [id])
 
   role_id String?
   role    Role?   @relation("RoleToUser", fields: [role_id], references: [id])
@@ -114,6 +118,7 @@ model UserDetail {
   @@map("user_detail")
 }
 
+
 model Role {
   id          String       @id @default(uuid())
   name        String
@@ -128,18 +133,19 @@ model Role {
   updater    UserDetail? @relation("RoleToUpdater", fields: [updated_by], references: [user_id])
   updated_at DateTime?   @updatedAt
 
-  @@index([name])
-  @@map("role")
+  @@index([id, created_by])
+  @@map("roles")
 }
 
 model Permission {
-  id       String          @id @default(uuid())
-  resource Resource
-  level    PermissionLevel
-  roles    Role[]          @relation()
+  id             String          @id @default(uuid())
+  resource       String // Resource
+  level          String // PermissionLevel
+  resource_level String?         @unique
+  roles          Role[]          @relation()
 
   @@index([resource, level])
-  @@map("permission")
+  @@map("permissions")
 }
 
 model NotificationChannel {
@@ -247,6 +253,7 @@ model Country {
 model State {
   id              String          @id @default(uuid())
   name            String          @unique
+  users              UserDetail[]       @relation("StateToUserDetail")
   contact_details ContactDetail[]
 
   created_at DateTime @default(now())

@@ -38,6 +38,7 @@ export function auditLogger(req: Request & { user: any }, res: Response, next: N
     // Log the response status code instead of calling res.json()
     res.on('finish', async () => {
         console.log('Response Status: ', res.statusCode);
+        console.log('Request BODY: ', req.body);
 
         // Create a new audit record
         await prisma.audit.create({

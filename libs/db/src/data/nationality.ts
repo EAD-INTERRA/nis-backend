@@ -1,17 +1,18 @@
 export const VISA_TYPES = [
-    { key: "F3B", name: "Transit Visa" },
-    { key: "F4A", name: "Business (Single Entry)" },
-    { key: "F4B", name: "Business (Multiple Entry)" },
-    { key: "F4C", name: "Business (Frequent Travelers)" },
-    { key: "F5A", name: "Tourism Visa" },
-    { key: "F6A", name: "Visiting Visa (Single Entry)" },
-    { key: "F7E", name: "Sports Visa" },
-    { key: "F7F", name: "Creative Arts Visa" },
-    { key: "F7G", name: "Study Tour Visa" },
-    { key: "F7H", name: "Academic Exchange Visa" },
-    { key: "F71", name: "International Cultural Exchange Visa" },
-    { key: "F7K", name: "Emergency/Relief Work Visa" },
-    { key: "F9A", name: "Returning Nigerians by Birth" },
+      { key: "F3B", name: "Transit Visa"},
+  { key: "F4A", name: "Business Visa (Single Entry)"},
+  { key: "F4B", name: "Business Visa (Multiple Entry)"},
+  { key: "F4C", name: "Business Visa (Frequently Travelers)"},
+  { key: "F5A", name: "Tourism Visa"},
+  { key: "F6A", name: "Visiting Visa (Single Entry)"},
+  { key: "F7E", name: "Sports Visa"},
+  { key: "F7F", name: "Creative Arts Visa"},
+  { key: "F7G", name: "Study Tour Visa"},
+  { key: "F7H", name: "Academic Exchange isa"},
+  { key: "F7I", name: "International Cultural Exchange Visa"},
+  { key: "F7K", name: "Emergency/Relief Work Visa"},
+  { key: "F9A", name: "Returning Holders of Foreign Passports (Nigerians by Birth)"},
+  { key: "F9B", name: "Returning Holders of Foreign Passports (Nigerians by Birth) Accompanied Minors"}
 ];
 
 export const PASSPORT_TYPES = [
@@ -36,68 +37,120 @@ export const PORTS_OF_ENTRY = [
     { name: "Akanu Ibiam International Airport, Enugu" },
 ];
 
-export const COMMON_UPLOADS = [
-    { field: "passport", label: "Passport Copy (Valid for at least 6 months)", required: true },
-    { field: "return_ticket", label: "Return Ticket", required: true },
-    { field: "hotel_reservation", label: "Hotel Reservation or Host Address in Nigeria", required: true },
-    { field: "bank_statement", label: "Evidence of Sufficient Funds (Bank Statement)", required: true },
-];
 
 export const VISA_SPECIFIC_UPLOADS_MAP = {
     F3B: [
         { field: "onward_ticket", label: "Onward Ticket", required: true },
-        { field: "visa_final_destination", label: "Visa to Final Destination (if applicable)", required: false },
-        { field: "birth_certificate", label: "Birth Certificate (For Minors)", required: false },
-        { field: "parental_consent", label: "Parental Consent Letter (For Minors)", required: false },
-    ],
-    F4A: [
-        { field: "cac_certificate", label: "CAC Certificate", required: true },
-        { field: "invitation_letter", label: "Invitation Letter (On Company Letterhead)", required: true },
-    ],
-    F4B: [
-        { field: "cac_certificate", label: "CAC Certificate", required: true },
-        { field: "invitation_letter", label: "Invitation Letter (On Company Letterhead)", required: true },
-    ],
-    F4C: [
-        { field: "cac_certificate", label: "CAC Certificate", required: true },
-        { field: "invitation_letter", label: "Invitation Letter (On Company Letterhead)", required: true },
-        { field: "investment_confirmation", label: "Investment Confirmation Letter (from NIPC)", required: true },
-    ],
-    F5A: [
-        { field: "bank_statement_180", label: "180-Day Bank Statement", required: true },
-    ],
-    F6A: [
-        { field: "invitation_letter", label: "Invitation Letter from Nigerian Host", required: true },
-        { field: "host_passport", label: "Copy of Nigerian Passport/Residency Permit of Host", required: true },
-    ],
-    F7E: [
-        { field: "invitation_letter", label: "Invitation Letter from Tournament Organizer", required: true },
-        { field: "athlete_credentials", label: "Athlete’s Credentials", required: true },
-        { field: "sports_commission_letter", label: "Letter from Federal/State Sports Commission", required: true },
-    ],
-    F7F: [
-        { field: "invitation_letter", label: "Invitation Letter from Event Organizer", required: true },
-        { field: "cultural_endorsement", label: "Federal/State Arts or Cultural Endorsement", required: true },
-    ],
-    F7G: [
-        { field: "academic_credentials", label: "Academic Credentials", required: true },
-        { field: "invitation_letter", label: "Invitation Letter from Nigerian Institution", required: true },
-    ],
-    F7H: [
-        { field: "academic_credentials", label: "Academic Credentials", required: true },
-        { field: "invitation_letter", label: "Invitation Letter from Nigerian Institution", required: true },
-        { field: "acceptance_letter", label: "Acceptance Letter from Home Institution (or MOU)", required: true },
-    ],
-    F71: [
-        { field: "govt_letter", label: "Letter from Relevant Government Agency", required: true },
+        { field: "visa_final_destination", label: "Visa to Final Destination", required: false },
+        { field: "hoh_address", label: "Evidence of Hotel Reservations", required: true },
+        { field: "birth_cert_minor", label: "Birth Certificate (For Minors)", required: false },
+        { field: "parent_letter_consent", label: "Parental / Legal Guardians’ Letter of consent of the accompanying Guardian.", required: false }
+      ],
+      F4A: [
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "hoh_address", label: "Evidence of Hotel Reservations (Verifiable Address) or host address in Nigeria", required: true },
+        { field: "cac_certificate", label: "CAC Certificate of inviting company", required: true },
+        { field: "invitation_letter_from_nigerian_company_with_letterhead", label: "Invitation Letter (On Company Letterhead)", required: true }
+      ],
+      F4B: [
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "hoh_address", label: "Evidence of Hotel Reservations (Verifiable Address) or host address in Nigeria", required: true },
+        { field: "cac_certificate", label: "CAC Certificate of inviting company", required: true },
+        { field: "invitation_letter_from_nigerian_company_with_letterhead", label: "Invitation Letter (On Company Letterhead)", required: true }
+      ],
+      F4C: [
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "hoh_address", label: "Evidence of Hotel Reservations (Verifiable Address) or host address in Nigeria", required: true },
+        { field: "cac_certificate", label: "CAC Certificate of inviting company", required: true },
+        { field: "invitation_letter_from_nigerian_company_with_letterhead", label: "Invitation Letter (On Company Letterhead)", required: true },
+        { field: "investment_confirmation", label: "Letter of verification or confirmation of investment from Government Agency from NIPC", required: true }
+      ],
+      F5A: [
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "hoh_address", label: "Evidence of Hotel Reservations or host address in Nigeria", required: true },
+        { field: "sufficient_fund", label: "180 Days Bank Statement", required: true },
+        { field: "birth_cert_minor", label: "Birth Certificate (For Minors)", required: false },
+        { field: "parent_letter_consent", label: "Parental / Legal Guardians’ Letter of consent of the accompanying Guardian.", required: false }
+      ],
+      F6A: [
+        { field: "invitation_letter_from_nigerian_host", label: "Invitation letter from family/friend in Nigeria ", required: true },
+        { field: "copy_of_nigerian_passport_strok_residency_permit_of_host", label: "Copy of Nigerian Passport of the Host or Residency Permit (Non-Nigerian)", required: true },
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "hoh_address", label: "Evidence of Hotel Reservations or host address in Nigeria", required: true },
+        { field: "sufficient_fund", label: "180 Days Bank Statement", required: true },
+        { field: "birth_cert_minor", label: "Birth Certificate (For Minors)", required: false },
+        { field: "parent_letter_consent", label: "Parental / Legal Guardians’ Letter of consent of the accompanying Guardian.", required: false }
+      ],
+      F7E: [
+         { field: "hoh_address", label: "Evidence of Hotel Reservations or host address in Nigeria", required: true },
+        { field: "tournament_event_invitation", label: "Letter of invitation indicating Tournament or sporting Event", required: true },
+        { field: "athlete_credentials", label: "Athlete’s Credentials (CV)", required: true },
+        { field: "sports_commission_letter", label: "Letter from Federal/State organizer or Private organiser (with endorsement by Federal or State sports commissions or agency in charge)", required: true },
+        { field: "sufficient_fund", label: "6 Months Bank Statement", required: true },
+        { field: "sporting_fixtures_evidence", label: "Evidence of sporting fixtures towards the sporting event", required: true },
+      ],
+      F7F: [
+        { field: "invitation_letter_from_event_organizer", label: "Invitation Letter from Event Organizer", required: true },
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "hoh_address", label: "Evidence of Hotel Reservations or host address in Nigeria", required: true },
+        { field: "endorsement_for_cultural_activities", label: "Federal/State Arts or Cultural Endorsement", required: true },
+        { field: "sufficient_fund", label: "6 Months Bank Statement from applicant or host", required: true },
+        { field: "birth_cert_minor", label: "Birth Certificate (For Minors)", required: false },
+        { field: "parent_letter_consent", label: "Parental / Legal Guardians’ Letter of consent of the accompanying Guardian.", required: false }
+      ],
+      F7G: [
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "hoh_address", label: "Evidence of Hotel Reservations or host address in Nigeria", required: true },
+        { field: "sufficient_fund", label: "6 Months Bank Statement", required: true },
+        { field: "academic_credential", label: "Academic Credentials", required: true },
+        { field: "invitation_letter_from_nigeria_institution", label: "Letter from approved institution in Nigeria", required: true }
+      ],
+      F7H: [
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "hoh_address", label: "Evidence of Hotel Reservations or host address in Nigeria", required: true },
+        { field: "sufficient_fund", label: "Evidence of sufficient funds from applicant", required: true },
+        { field: "academic_credential", label: "Academic Credentials", required: true },
+        { field: "invitation_letter_from_nigeria_institution", label: "Letter from approved institution in Nigeria", required: true },
+        { field: "acceptance_letter_from_home_institution", label: "Acceptance letter from institution’s on exchange program (e.g. MOU where applicable)", required: true }
+      ],
+      F71: [
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "hoh_address", label: "Evidence of Hotel Reservations or host address in Nigeria", required: true },
+        { field: "sufficient_fund", label: "Evidence of sufficient funds Bank statement to be provided", required: true },
+        { field: "lfra", label: "MOU or Letter from relevant Government agency", required: true },
         { field: "cultural_mou", label: "Cultural Exchange MoU", required: true },
-    ],
-    F7K: [
-        { field: "govt_letter", label: "Letter from Relevant Government Agency", required: true },
-        { field: "ngo_employment", label: "Employment/Affiliation Letter from NGO", required: true },
-    ],
+        { field: "birth_cert_minor", label: "Birth Certificate (For Minors)", required: false },
+        { field: "parent_letter_consent", label: "Parental / Legal Guardians’ Letter of consent of the accompanying Guardian.", required: false }
+      ],
+      F7K: [
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "hoh_address", label: "Evidence of Hotel Reservations or host address in Nigeria", required: true },
+        { field: "lfra", label: "Letter from Relevant Government Agency", required: true },
+        { field: "ngo_employment", label: "Letter of employment and or affiliation to NGO providing relief or emergency services", required: true }
+      ],
+      F9A: [
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "proof_parentage", label: "Proof of Nigerian Parentage (birth certificate with Nigerian parents, old Nigerian passport, etc.).", required: true },
+        { field: "parent_datapage", label: "Parents data pages.", required: false },
+        { field: "nigerian_passport", label: "Valid Nigerian passport (where applicable)", required: false }
+      ],
+      F9B: [
+        { field: "passport_minor", label: "Valid Foreign Passport of Minor", required: true },
+        { field: "return_ticket", label: "Evidence of return ticket", required: true },
+        { field: "proof_parentage", label: "Proof of Nigerian Parentage (birth certificate with Nigerian parents, old Nigerian passport, etc.).", required: true },
+        { field: "parent_datapage", label: "Parents data pages.", required: false },
+        { field: "passport_parent", label: "Valid Passport of Nigerian Parent", required: false },
+        { field: "photo_parent", label: "Passport Size photo of the accompanying Parental/Legal Guardian", required: false },
+        { field: "birth_cert_minor", label: "Birth Certificate (For Minors)", required: false },
+        { field: "parent_letter_consent", label: "Parental / Legal Guardians’ Letter of consent of the accompanying Guardian.", required: false },
+        { field: "application_letter_parent", label: "Application Letter from Parent/Guardian requesting visa.", required: false }
+      ]
 };
 
+export const COMMON_UPLOADS = [
+    { field: "profile_picture", label: "Passport size photo", required: true },
+    { field: "passport", label: "Valid Passport (Valid for at least 6 months)", required: VISA_SPECIFIC_UPLOADS_MAP.F9B ? false : true }
+];
 export const STATES_IN_NIGERIA = [
     { name: "Abia" },
     { name: "Adamawa" },

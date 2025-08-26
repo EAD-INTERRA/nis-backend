@@ -7,11 +7,11 @@ import { SAMPLE_PAYLOAD } from './data';
 const FILE_KEYS = [
     "passport",
     "profile_picture",
-    "photo",
+    "applicant_photo",
     "return_ticket",
     "sufficient_fund",
-    "hoh_address",
-    "lfra",
+    "hotel_or_home_address",
+    "mou_or_letter_from_relevant_government_agency",
     "invitation_letter_from_nigeria_institution",
     "academic_credential",
     "acceptance_letter_from_home_institution",
@@ -31,7 +31,20 @@ const FILE_KEYS = [
     "onward_ticket",
     "visa_to_final_destination",
     "parental_consent",
-    "birth_certificate"
+    "birth_certificate",
+    "birth_cert_minor",
+    "application_letter_parent",
+    "parent_letter_consent",
+    "sporting_fixtures_evidence",
+    "cultural_mou",
+    "ngo_employment",
+    "parent_datapage",
+    "passport_parent",
+    "proof_parentage",
+    "passport_minor",
+    "photo_parent",
+    "sports_commission_letter",
+    "parent_letter_consent"
 ];
 
 
@@ -53,7 +66,8 @@ export class EVisaConsumer extends WorkerHost {
                     const { buffer, extension, mimeType } = this.decodeBase64(value);
 
                     // Convert Buffer to Blob
-                    const blob = new Blob([buffer], { type: mimeType });
+                    const arrayBuffer = Uint8Array.from(buffer).buffer as ArrayBuffer;
+                    const blob = new Blob([arrayBuffer], { type: mimeType });
 
                     // Append the Blob to FormData
                     formData.append(key, blob, `${key}.${extension}`);

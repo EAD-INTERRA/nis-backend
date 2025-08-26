@@ -11,11 +11,37 @@ import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 
 
-export interface IOPagination {
-    data: any;
-    page: number;
-    page_size: number;
-    totalCount: number
+export interface IOPagination<T> {
+  data: T[];
+  page: number;
+  page_size: number;
+  total_count: number;
+}
+
+
+export interface PaginatedData<T> {
+  results: T[];
+  count: number;
+  next: number | null;
+  previous: number | null;
+  total_pages: number | null;
+}
+
+export function paginate<T>(data: IOPagination<T>): PaginatedData<T> {
+  const currentPage = +data.page || 1;
+  const pageSize = +data.page_size || 10;
+  const total_pages = Math.ceil(data.total_count / pageSize);
+
+  const next = currentPage < total_pages ? currentPage + 1 : null;
+  const previous = currentPage > 1 ? currentPage - 1 : null;
+
+  return {
+    results: data.data,
+    count: data.total_count,
+    next,
+    previous,
+    total_pages
+  };
 }
 
 
@@ -79,24 +105,6 @@ export async function generateLoginOtp() {
         generateLoginOtp()
     }
     return token
-}
-
-export async function paginate(data: IOPagination) {
-    const currentPage = +data.page || 1;
-    const pageSize = +data.page_size || 20;
-    const totalPages = Math.ceil(data.totalCount / pageSize);
-
-    const nextPage = currentPage < totalPages ? currentPage + 1 : null;
-    const previousPage = currentPage > 1 ? currentPage - 1 : null;
-
-    console.log("DATA: ", data)
-
-    return { 
-        results: data.data, 
-        count: data.totalCount, 
-        nextPage, 
-        previousPage 
-    }
 }
 
 export async function pagingData(data, page, limit, records) {
@@ -201,3 +209,22 @@ export const transformDate = (value: any): string | null => {
 
     return isValid(parsed) ? parsed.toISOString() : null;
 }
+
+
+export const EXAMPLE_RESPONSE = {
+  statusCode: 200,
+  message: 'SUCCESSFUL',
+  body: {},
+  customMessage: 'Action Successful',
+};
+
+export const EXAMPLE_PAGINATED_RESPONSE = {
+  ...EXAMPLE_RESPONSE,
+  body: {
+    count: 100,
+    next: 3,
+    previous: 1,
+    total_pages: 1,
+    results: [],
+  },
+};

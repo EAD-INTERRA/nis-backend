@@ -1,3 +1,9 @@
+import { PERMISSION, RESOURCE } from '@app/db/data/generated/resource.enum';
 import { Reflector } from '@nestjs/core';
 
-export const Permissions = Reflector.createDecorator<string[]>();
+export interface PermissionDecoratorOptions {
+    resource: RESOURCE;
+    permission: PERMISSION;
+}
+
+export const Permissions = Reflector.createDecorator<PermissionDecoratorOptions>();

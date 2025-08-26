@@ -16,7 +16,12 @@ async function bootstrap() {
     type: VersioningType.URI,
     prefix: 'api/v'
   });
-  app.enableCors();
+  app.enableCors({
+    origin: false, // disable Nest’s ACAO header
+    methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: false
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Template Auth Service')
