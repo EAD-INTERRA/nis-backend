@@ -54,22 +54,28 @@ export class EVisaService {
         //     WHERE reference_no_c = ${data.application_id}
         //     AND active_status_c IN ('Active', 'New');
         // `;
+        const active_application: any[] = await this.crmService.$queryRaw`
+            SELECT c.*, cc.* FROM cases c 
+            JOIN cases_cstm cc ON c.id=cc.id_c 
+            WHERE ticket_num_c=${data.application_id} 
+            AND c.deleted=0;
+        `;
 
-        // console.log("ACTIVE APPLICATION: ", active_application)
-        // if (active_application.length > 0) {
-        //     badRequest({ message: "Visa Application with this <application_id> already exists", customMessage: "Visa Application already exists" });
-        //     // return success(existing_application, "Application already exists");
-        // }
+        console.log("ACTIVE APPLICATION: ", active_application)
+        if (active_application.length > 0) {
+            badRequest({ message: "Visa Application with this <application_id> already exists", customMessage: "Visa Application already exists" });
+            // return success(existing_application, "Application already exists");
+        }
 
         const ppNumber = data.passport_number.replace(/\s/g, '')
-        // const [watchlistHit]: any[] = await this.watchlistService.$queryRaw
-        //     `SET NOCOUNT ON; EXEC SelectAndUpdateDocumentHit @DocumentNumber = ${ppNumber}`
-        //     ;
+        const [watchlistHit]: any[] = await this.watchlistService.$queryRaw
+            `SET NOCOUNT ON; EXEC SelectAndUpdateDocumentHit @DocumentNumber = ${ppNumber}`
+            ;
 
-        // if (watchlistHit.HitTime) {
-        //     this.eventEmitter.emit('watchlist.send', rest.passport_number)
-        //     return success(watchlistHit, "Security Investigation Required for this Passport Number");
-        // }
+        if (watchlistHit.HitTime) {
+            this.eventEmitter.emit('watchlist.send', rest.passport_number)
+            return success(watchlistHit, "Security Investigation Required for this Passport Number");
+        }
 
         // Swap hoh_address and sufficient_fund fields (for NewWorks mapping issues)
         const jobData = {

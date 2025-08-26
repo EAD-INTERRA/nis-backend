@@ -203,7 +203,7 @@ export class EVisaWebhookPayload {
     hotel_or_home_address?: string;
     
     @ApiProperty({ required: true })
-    @IsOptional()
+    @IsString()
     applicant_photo: string;
     
     @ApiProperty({ required: false })
