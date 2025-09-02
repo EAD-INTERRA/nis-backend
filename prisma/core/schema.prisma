@@ -87,6 +87,9 @@ model UserDetail {
   state_id String?
   state    State?  @relation("StateToUserDetail", fields: [state_id], references: [id])
 
+  country_id String?
+  country    Country?  @relation("CountryToUserDetail", fields: [country_id], references: [id])
+
   role_id String?
   role    Role?   @relation("RoleToUser", fields: [role_id], references: [id])
 
@@ -242,6 +245,7 @@ model Country {
   name        String              @unique
   code        String?             @unique
   travel_info TravelInformation[]
+  users       UserDetail[]  @relation("CountryToUserDetail")
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

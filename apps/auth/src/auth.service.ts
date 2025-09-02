@@ -787,6 +787,41 @@ MedAdher.`;
 
     const { email, phone, password, ...createUserObj } = createUserDto;
 
+    if (createUserDto.role_id) {
+      const existingRole = await this.dbService.role.findUnique({
+        where: {
+          id: createUserDto.role_id,
+        },
+      });
+
+      if (!existingRole) {
+        badRequest({ message: 'Invalid Role ID', customMessage: 'Role does not exist' });
+      }
+    }
+    
+    if (createUserDto.country_id) {
+      const existingCountry = await this.dbService.country.findUnique({
+        where: {
+          id: createUserDto.country_id,
+        },
+      });
+
+      if (!existingCountry) {
+        badRequest({ message: 'Invalid Country ID', customMessage: 'Country does not exist' });
+      }
+    }
+    
+    if (createUserDto.state_id) {
+      const existingState = await this.dbService.state.findUnique({
+        where: {
+          id: createUserDto.state_id,
+        },
+      });
+
+      if (!existingState) {
+        badRequest({ message: 'Invalid State ID', customMessage: 'State does not exist' });
+      }
+    }
     // // Check the creator's organization/facility & restrict them to choose a role ONLY from roles in their org/facility
     // const creator = await this.dbService.userDetail.findUnique({
     //     where: {
@@ -796,17 +831,6 @@ MedAdher.`;
 
     // if (!roleId) {
     //     return badRequest("", "Role ID cannot be ull")
-    // }
-
-    // const roleDetails = await this.getRoleById(roleId)
-
-    // if (!creator.isSuperAdmin) {
-    //     if ((creator.facilityId !== roleDetails.facilityId)
-    //         && (creator.organizationId !== roleDetails.facilityId)
-    //         && (creator.partnerId !== roleDetails.partnerId)
-    //         && (creator.donorId !== roleDetails.donorId)) {
-    //         return badRequest(ForbiddenException, 'Cannot use a role from another organization')
-    //     }
     // }
 
     // // CHECK IF USER ALREADY EXISTS
@@ -866,6 +890,7 @@ MedAdher.`;
           include: {
             role: true,
             state: true,
+            country: true,
           },
         }),
         'Account created successfully. Please check your email for the activation link',

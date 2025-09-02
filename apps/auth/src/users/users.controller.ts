@@ -15,10 +15,10 @@ export class UsersController {
 
     @UseGuards(AuthGuard)
     @ApiCustomResponse({
-        summary: 'Get all audit logs',
+        summary: 'Get all users',
         example: {
             statusCode: 200,
-            message: 'Audit logs retrieved successfully',
+            message: 'Users retrieved successfully',
         },
         queries: [
             'search_term',

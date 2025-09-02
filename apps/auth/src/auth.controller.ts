@@ -4,7 +4,8 @@ import { CustomHttpResponse, mapErrorCodeToHttpResponse } from '@app/utils/respo
 import { JwtService } from '@nestjs/jwt';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from './guards/auth.guard';
-import { ActivateAccountDto, ChangePasswordDto, CreateUserDto, ForgotPasswordDto, LoginDto, OtpLoginDto, ResetPasswordDto } from './dto/auth.dto';
+import { ActivateAccountDto, ChangePasswordDto, CreateUserDto, FilterRoleInterface, ForgotPasswordDto, LoginDto, OtpLoginDto, ResetPasswordDto, UpsertRoleDto } from './dto/auth.dto';
+import { UsersService } from '@app/users';
 
 @Controller({
   path: 'auth',
@@ -14,7 +15,7 @@ import { ActivateAccountDto, ChangePasswordDto, CreateUserDto, ForgotPasswordDto
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    // private readonly userService: UsersService,
+    private readonly userService: UsersService,
     // private readonly auditService: AuditService,
     private readonly jwtService: JwtService,
   ) { }
@@ -26,7 +27,32 @@ export class AuthController {
   //   const res = this.authService.getHello(+id);
   //   return mapErrorCodeToHttpResponse(res)
   // }
-  
+
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @Post("roles")
+  async upsertRole(
+    @Request() req,
+    @Body() roleData: UpsertRoleDto
+  ) {
+    const res = await this.userService.upsertRole({ 
+      created_by: roleData.id ? undefined : req.user.sub, 
+      updated_by: roleData.id ? req.user.sub : undefined,
+      ...roleData 
+    });
+    return mapErrorCodeToHttpResponse(res)
+  }
+
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @Get("roles")
+  async getRoles(
+    @Query() filter: FilterRoleInterface
+  ) {
+    const res = await this.userService.getRoles(filter);
+    return mapErrorCodeToHttpResponse(res)
+  }
+
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @Post("register")
@@ -46,12 +72,12 @@ export class AuthController {
     const jwtPayload = { sub: userId };
     const newAccessToken = await this.jwtService.signAsync(jwtPayload);
 
-    return mapErrorCodeToHttpResponse({code: 0, body: { access_token: newAccessToken, refresh_token }});
+    return mapErrorCodeToHttpResponse({ code: 0, body: { access_token: newAccessToken, refresh_token } });
   }
 
-   @Post('activate')
+  @Post('activate')
   async activateAccount(@Body() body: ActivateAccountDto): Promise<CustomHttpResponse> {
-    const res = await this.authService.activateAccount({token: +body.token})
+    const res = await this.authService.activateAccount({ token: +body.token })
     return mapErrorCodeToHttpResponse(res)
   }
 
