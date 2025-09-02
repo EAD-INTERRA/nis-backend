@@ -49,20 +49,26 @@ export class EVisaService {
     async addToQueue(data: EVisaWebhookPayload): Promise<ServiceResponse> {
         const { hotel_or_home_address, sufficient_fund, ...rest } = data;
         // Validate the incoming data
-        // const active_application: any[] = await this.crmService.$queryRaw`
-        //     SELECT * FROM cases_cstm
-        //     WHERE reference_no_c = ${data.application_id}
-        //     AND active_status_c IN ('Active', 'New');
-        // `;
         const active_application: any[] = await this.crmService.$queryRaw`
+            SELECT * FROM cases_cstm
+            WHERE reference_no_c = ${data.application_id}
+            AND active_status_c IN ('Active', 'New', 'Pending');
+        `;
+
+        console.log("ACTIVE APPLICATION: ", active_application)
+        if (active_application.length > 0) {
+            badRequest({ message: "Visa Application for this <passport_number> already exists", customMessage: "There's an active application already tied to this passport number" });
+        }
+
+        const existing_application: any[] = await this.crmService.$queryRaw`
             SELECT c.*, cc.* FROM cases c 
             JOIN cases_cstm cc ON c.id=cc.id_c 
             WHERE ticket_num_c=${data.application_id} 
             AND c.deleted=0;
         `;
 
-        console.log("ACTIVE APPLICATION: ", active_application)
-        if (active_application.length > 0) {
+        console.log("EXISTING APPLICATION: ", existing_application)
+        if (existing_application.length > 0) {
             badRequest({ message: "Visa Application with this <application_id> already exists", customMessage: "Visa Application already exists" });
             // return success(existing_application, "Application already exists");
         }

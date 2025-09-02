@@ -149,6 +149,7 @@ export const VISA_SPECIFIC_UPLOADS_MAP = {
 
 export const COMMON_UPLOADS = [
     { field: "profile_picture", label: "Passport size photo", required: true },
+    { field: "applicant_photo", label: "Applicant Passport size photo", required: true },
     { field: "passport", label: "Valid Passport (Valid for at least 6 months)", required: VISA_SPECIFIC_UPLOADS_MAP.F9B ? false : true }
 ];
 export const STATES_IN_NIGERIA = [

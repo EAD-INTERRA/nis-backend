@@ -1,7 +1,7 @@
 import { PaginationFilter } from '@app/utils/types';
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty, PartialType } from '@nestjs/swagger';
 import { Gender } from '@prisma/core/client';
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from 'class-validator';  
+import { IsArray, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from 'class-validator';  
 
 export class LoginDto {
     @IsEmail()
@@ -62,6 +62,25 @@ export class ResetPasswordDto {
 }
 
 
+export class UpsertRoleDto {
+    @IsString()
+    name: string;
+   
+    @IsString()
+    @IsOptional()
+    id?: string;
+    
+    @IsArray()
+    @IsOptional()
+    permission_ids?: string[];
+
+    @ApiHideProperty()
+    created_by?: string;
+
+    @ApiHideProperty()
+    updated_by?: string;
+}
+
 export class CreateUserDto {
 
     // @IsString()
@@ -80,9 +99,17 @@ export class CreateUserDto {
     @IsNotEmpty() 
     surname: string;
     
-    // @IsString()
-    // @IsNotEmpty() 
-    // state_id: string;
+    @IsString()
+    @IsOptional() 
+    role_id?: string;
+    
+    @IsString()
+    @IsOptional() 
+    state_id?: string;
+    
+    @IsString()
+    @IsOptional() 
+    country_id?: string;
 
     @IsString()
     // @IsEmail() 
@@ -127,6 +154,17 @@ export class FilterUserInterface extends PaginationFilter {
     
     @IsOptional()
     to_date?: string | Date;
+}
+
+export class FilterRoleInterface extends PaginationFilter {
+    @IsOptional()
+    search_term?: string
+    
+    @IsOptional()
+    from_date?: string;
+    
+    @IsOptional()
+    to_date?: string;
 }
 
 
