@@ -102,6 +102,7 @@ model UserDetail {
   phone   String? @unique
   gender  Gender?
   address String?
+  visa_center String?
 
   is_active      Boolean @default(false)
   is_admin       Boolean @default(false)
