@@ -5,6 +5,6 @@ export const AUDIT_SELECT = {
     action: true,
     path: true,
     description: true,
-    created_at: true,
+    date: true,
     user: true
 };
