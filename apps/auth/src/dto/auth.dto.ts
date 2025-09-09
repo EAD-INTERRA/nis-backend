@@ -136,6 +136,10 @@ export class CreateUserDto {
     @IsString()
     @IsOptional() 
     address?: string;
+    
+    @IsString()
+    @IsOptional() 
+    visa_center?: string;
 }
 
 

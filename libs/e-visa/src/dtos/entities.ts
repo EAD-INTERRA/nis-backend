@@ -345,4 +345,8 @@ export class EVisaWebhookPayload {
     @ApiProperty({ required: false, maxLength: 250 })
     @IsOptional()
     guardian_passport_number?: string;
+    
+    @ApiProperty({ required: false, maxLength: 250 })
+    @IsOptional()
+    payment_ref_id?: string;
 }

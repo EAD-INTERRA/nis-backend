@@ -48,7 +48,13 @@ export class AuditService {
             const paginatedAudits =
                 await paginateQuery<Prisma.AuditWhereInput>({
                     model: this.dbService.audit,
-                    findArgs: { where: filters, select: AUDIT_SELECT },
+                    findArgs: {
+                        where: {
+                            ...filters,
+                        },
+                        orderBy: { date: 'desc' },
+                        select: AUDIT_SELECT
+                    },
                     page: +data.page,
                     page_size: +data.page_size,
                 });
