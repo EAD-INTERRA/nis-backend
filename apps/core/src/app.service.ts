@@ -1,14 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Queue } from 'bullmq';
-import { InjectQueue } from '@nestjs/bullmq';
 import { exception, ServiceResponse, success } from '@app/utils/response';
 import { CoreDbService } from '@app/db';
+
 
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
 
-  constructor(private readonly dbService: CoreDbService) { }
+  constructor(
+    private readonly dbService: CoreDbService,
+  ) { }
 
   getHello(): string {
     return 'Hello World!';

@@ -49,10 +49,33 @@ export class EVisaService {
     async addToQueue(data: EVisaWebhookPayload): Promise<ServiceResponse> {
         const { hotel_or_home_address, sufficient_fund, ...rest } = data;
         // Validate the incoming data
+        // const active_application: any[] = await this.crmService.$queryRaw`
+        //     SELECT * FROM cases_cstm
+        //     WHERE reference_no_c = ${data.passport_number}
+        //     AND active_status_c IN ('Active', 'New', 'Pending');
+        // `;
+        
         const active_application: any[] = await this.crmService.$queryRaw`
-            SELECT * FROM cases_cstm
-            WHERE reference_no_c = ${data.application_id}
-            AND active_status_c IN ('Active', 'New', 'Pending');
+            SELECT 
+                a.id AS account_id,
+                a.name AS account_name,
+                c.id AS case_id,
+                c.name AS case_name,
+                c.status AS case_status,
+                cc.active_status_c AS case_active_status,
+                ac.passport_number_c AS passport_number
+            FROM 
+                accounts a
+            INNER JOIN 
+                accounts_cstm ac ON ac.id_c = a.id
+            INNER JOIN 
+                cases c ON c.account_id = a.id AND c.deleted = 0
+            INNER JOIN 
+                cases_cstm cc ON cc.id_c = c.id
+            WHERE 
+                cc.active_status_c IN ('New', 'Active', 'Pending')
+                AND a.id = c.account_id
+                AND ac.passport_number_c = ${data.passport_number}
         `;
 
         console.log("ACTIVE APPLICATION: ", active_application)
