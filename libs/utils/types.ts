@@ -51,6 +51,7 @@ export const USER_SELECT = {
       middle_name: true,
       surname: true,
       is_active: true,
+      passport_records: true,
       phone: true,
       creator: {
         select: {

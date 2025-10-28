@@ -34,7 +34,7 @@ import {
   EditUserDto,
 } from './dto/auth.dto';
 import { differenceInHours, differenceInMinutes } from 'date-fns';
-import { Prisma, Role, User, UserDetail } from '@prisma/core/client';
+import { Prisma, Role, User, UserDetail, UserType } from '@prisma/core/client';
 import { buildObject, paginateQuery } from '@app/utils/helpers/prisma-utils';
 import { USER_SELECT } from '@app/utils/types';
 
@@ -771,7 +771,13 @@ MedAdher.`;
           id: true,
           email: true,
           last_login: true,
-          details: true,
+          details: {
+            include: {
+              role: true,
+              country: true,
+              passport_records: true,
+            },
+          },
         },
       });
       return success(user);
@@ -785,7 +791,7 @@ MedAdher.`;
     const resetToken = await generateResetToken();
     const activationToken = await generateActivationToken();
 
-    const { email, phone, password, ...createUserObj } = createUserDto;
+    const { email, phone, password, passport_no, passport_expiry_at, passport_issued_at, ...createUserObj } = createUserDto;
 
     if (createUserDto.role_id) {
       const existingRole = await this.dbService.role.findUnique({
@@ -798,7 +804,7 @@ MedAdher.`;
         badRequest({ message: 'Invalid Role ID', customMessage: 'Role does not exist' });
       }
     }
-    
+
     if (createUserDto.country_id) {
       const existingCountry = await this.dbService.country.findUnique({
         where: {
@@ -810,7 +816,7 @@ MedAdher.`;
         badRequest({ message: 'Invalid Country ID', customMessage: 'Country does not exist' });
       }
     }
-    
+
     if (createUserDto.state_id) {
       const existingState = await this.dbService.state.findUnique({
         where: {
@@ -822,6 +828,14 @@ MedAdher.`;
         badRequest({ message: 'Invalid State ID', customMessage: 'State does not exist' });
       }
     }
+
+    console.log('Passport debugging:', {
+  passport_no,
+  passport_issued_at,
+  passport_expiry_at,
+  hasPassportNo: !!passport_no,
+  passportNoType: typeof passport_no
+});
     // // Check the creator's organization/facility & restrict them to choose a role ONLY from roles in their org/facility
     // const creator = await this.dbService.userDetail.findUnique({
     //     where: {
@@ -845,6 +859,7 @@ MedAdher.`;
         customMessage: 'User with this email exists}',
       });
     }
+
     const userExistsPhone = await this.dbService.userDetail.findUnique({
       where: {
         phone,
@@ -854,20 +869,48 @@ MedAdher.`;
       badRequest({ message: '', customMessage: 'User with this phone exists' });
     }
 
-    const createdUser = await this.dbService.user.create({
-      data: {
-        password: hashed,
-        password_reset_token: resetToken,
-        email: email.toLowerCase(),
-        activation_token: activationToken,
-        details: {
-          create: {
-            is_super_admin: false,
-            phone,
-            ...createUserObj,
-          },
+    if (passport_no) {
+      const applicantExistsPassport = await this.dbService.passportRecord.findUnique({
+        where: {
+          passport_no,
+        },
+      });
+      if (applicantExistsPassport) {
+        badRequest({ message: '', customMessage: 'User with this passport number exists' });
+      }
+    }
+
+    let userCreateObject: Prisma.UserCreateInput = {
+      password: hashed,
+      password_reset_token: resetToken,
+      email: email.toLowerCase(),
+      activation_token: activationToken,
+      details: {
+        create: {
+          is_super_admin: false,
+          phone,
+          ...createUserObj,
         },
       },
+    };
+
+    if (passport_no) {
+      userCreateObject.details.create = {
+        ...userCreateObject.details.create,
+        user_type: UserType.APPLICANT,
+        passport_records: {
+          create: {
+            passport_no,
+            issued_at: passport_issued_at,
+            expiry_at: passport_expiry_at,
+          },
+        },
+      };
+    }
+
+    console.log("USEROBJ: ", userCreateObject);
+    const createdUser = await this.dbService.user.create({
+      data: userCreateObject
     });
 
     // If the user was created successfuly, send activation email
@@ -891,6 +934,7 @@ MedAdher.`;
             role: true,
             state: true,
             country: true,
+            passport_records: true,
           },
         }),
         'Account created successfully. Please check your email for the activation link',

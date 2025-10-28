@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../../node_modules/@prisma/core/client"
+  provider      = "prisma-client-js"
+  output        = "../../node_modules/@prisma/core/client"
   binaryTargets = ["native"]
   engineType    = "binary"
 }
@@ -43,6 +43,25 @@ enum MaritalStatus {
   Divorced
 }
 
+enum UserType {
+  ADMIN
+  USER
+  GUEST
+  APPLICANT
+}
+
+model PassportRecord {
+  id          String      @id @default(uuid())
+  passport_no String      @unique
+  user_id     String      @unique
+  user        UserDetail? @relation(references: [user_id], fields: [user_id], onDelete: Cascade)
+  issued_at   DateTime?
+  expiry_at   DateTime?
+  active      Boolean     @default(true)
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+}
+
 model User {
   // id  String @id @unique @default(uuid())
   id    String @unique @default(uuid())
@@ -75,11 +94,14 @@ model User {
 }
 
 model UserDetail {
-  id          String  @id @default(uuid())
+  id String @id @default(uuid())
 
   first_name  String  @default("")
   middle_name String?
   surname     String  @default("")
+
+  user_type  UserType?      @default(USER)
+  passport_records PassportRecord[] @relation()
 
   user_id String @unique
   user    User?  @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -88,7 +110,7 @@ model UserDetail {
   state    State?  @relation("StateToUserDetail", fields: [state_id], references: [id])
 
   country_id String?
-  country    Country?  @relation("CountryToUserDetail", fields: [country_id], references: [id])
+  country    Country? @relation("CountryToUserDetail", fields: [country_id], references: [id])
 
   role_id String?
   role    Role?   @relation("RoleToUser", fields: [role_id], references: [id])
@@ -99,9 +121,9 @@ model UserDetail {
   notification_channels_created  NotificationChannel[]  @relation()
   notification_providers_created NotificationProvider[] @relation()
 
-  phone   String? @unique
-  gender  Gender?
-  address String?
+  phone       String? @unique
+  gender      Gender?
+  address     String?
   visa_center String?
 
   is_active      Boolean @default(false)
@@ -122,7 +144,6 @@ model UserDetail {
   @@map("user_detail")
 }
 
-
 model Role {
   id          String       @id @default(uuid())
   name        String
@@ -142,11 +163,11 @@ model Role {
 }
 
 model Permission {
-  id             String          @id @default(uuid())
+  id             String  @id @default(uuid())
   resource       String // Resource
   level          String // PermissionLevel
-  resource_level String?         @unique
-  roles          Role[]          @relation()
+  resource_level String? @unique
+  roles          Role[]  @relation()
 
   @@index([resource, level])
   @@map("permissions")
@@ -245,8 +266,10 @@ model Country {
   id          String              @id @default(uuid())
   name        String              @unique
   code        String?             @unique
+  iso_code    String?             @unique
+  is_exempt   Boolean             @default(false)
   travel_info TravelInformation[]
-  users       UserDetail[]  @relation("CountryToUserDetail")
+  users       UserDetail[]        @relation("CountryToUserDetail")
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -258,7 +281,7 @@ model Country {
 model State {
   id              String          @id @default(uuid())
   name            String          @unique
-  users              UserDetail[]       @relation("StateToUserDetail")
+  users           UserDetail[]    @relation("StateToUserDetail")
   contact_details ContactDetail[]
 
   created_at DateTime @default(now())

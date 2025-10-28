@@ -8,6 +8,6 @@ import { WatchlistDbService } from './watchlist/watchlist.service';
 @Module({
   imports: [EventEmitterModule.forRoot()],
   providers: [CoreDbService, ReplicaDbService, CrmDbService, WatchlistDbService],
-  exports: [CoreDbService],
+  exports: [CoreDbService, CrmDbService, ReplicaDbService, WatchlistDbService],
 })
 export class DbModule {}

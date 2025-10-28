@@ -1,9 +1,10 @@
 import { UsersService } from '@app/users';
-import { Controller, Get, Param, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { CustomHttpResponse, mapErrorCodeToHttpResponse } from '@app/utils/response';
 import { ApiCustomResponse } from '@app/utils/decorators/swagger.decorator';
+import { UpdatePassportRecordDto, UpdateUserDetailsDto } from '@app/users/users.dto';
 
 @Controller({
     path: 'users',
@@ -58,18 +59,60 @@ export class UsersController {
     ): Promise<CustomHttpResponse> {
         const authenticatedUser = req.user;
 
-        const res = await this.usersService.getUserById(authenticatedUser.id)
+        const res = await this.usersService.getUserById(authenticatedUser.sub)
         return mapErrorCodeToHttpResponse(res)
     }
 
 
     @UseGuards(AuthGuard)
     @ApiBearerAuth()
-    @Get(':userId')
-    async getUserById(
-        @Param('userId') userId: string
+    @Get('me/applications')
+    async getUserApplications(
+        @Request() req
     ): Promise<CustomHttpResponse> {
-        const res = await this.usersService.getUserById(userId)
+        const authenticatedUser = req.user;
+        console.log('Authenticated User: ', authenticatedUser);
+
+        const res = await this.usersService.getApplicationsByUserId(authenticatedUser.sub)
+        return mapErrorCodeToHttpResponse(res)
+    }
+
+
+    @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    @Post('me/passport-records')
+    async upsertPassportRecord(
+        @Body() data: UpdatePassportRecordDto,
+        @Request() req
+    ): Promise<CustomHttpResponse> {
+        const authenticatedUser = req.user;
+
+        const res = await this.usersService.upsertPassportRecord({ user_id: authenticatedUser.sub, ...data })
+        return mapErrorCodeToHttpResponse(res)
+    }
+   
+   
+    @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    @Patch('me')
+    async updateUserDetails(
+        @Body() data: UpdateUserDetailsDto,
+        @Request() req
+    ): Promise<CustomHttpResponse> {
+        const authenticatedUser = req.user;
+
+        const res = await this.usersService.updateUserDetails({ user_id: authenticatedUser.sub, ...data })
+        return mapErrorCodeToHttpResponse(res)
+    }
+
+
+    @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    @Get(':user_id')
+    async getUserById(
+        @Param('user_id') user_id: string
+    ): Promise<CustomHttpResponse> {
+        const res = await this.usersService.getUserById(user_id)
         return mapErrorCodeToHttpResponse(res)
     }
 }
