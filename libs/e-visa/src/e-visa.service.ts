@@ -242,9 +242,18 @@ export class EVisaService {
         }
     }
 
-    async getCountries(): Promise<ServiceResponse> {
+    async getCountries(exempt?: boolean): Promise<ServiceResponse> {
         try {
-            const countries = await this.dbService.country.findMany();
+            let countries: Country[];
+            if (exempt === undefined) {
+                countries = await this.dbService.country.findMany();
+            } else {
+                countries = await this.dbService.country.findMany({
+                    where: {
+                        is_exempt: exempt
+                    }
+                });
+            }
             return success(countries, "Countries loaded successfully");
         } catch (e) {
             console.error(e);

@@ -63,11 +63,18 @@ export async function seedCountries(db: PrismaClient = new PrismaClient()) {
                 create: {
                     name: country.name,
                     code: country.code,
+                    iso_code: country.iso_code,
+                    is_exempt: country.is_exempt || false,
                 },
                 where: {
                     code: country.code,
                 },
-                update: {},
+                update: {
+                    name: country.name,
+                    code: country.code,
+                    iso_code: country.iso_code,
+                    is_exempt: country.is_exempt || false,
+                },
             });
 
             if (result) {

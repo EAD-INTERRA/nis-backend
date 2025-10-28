@@ -62,6 +62,16 @@ export class AuthController {
     const res = await this.authService.register(userToRegister);
     return mapErrorCodeToHttpResponse(res)
   }
+ 
+  // @UseGuards(AuthGuard)
+  // @ApiBearerAuth()
+  @Post("register/applicant")
+  async registerApplicant(
+    @Body() userToRegister: CreateUserDto
+  ) {
+    const res = await this.authService.register(userToRegister);
+    return mapErrorCodeToHttpResponse(res)
+  }
 
 
   @Post('refresh-token')

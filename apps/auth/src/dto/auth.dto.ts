@@ -1,7 +1,7 @@
 import { PaginationFilter } from '@app/utils/types';
-import { ApiHideProperty, ApiProperty, PartialType } from '@nestjs/swagger';
-import { Gender } from '@prisma/core/client';
-import { IsArray, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from 'class-validator';  
+import { ApiHideProperty, ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Gender, UserType } from '@prisma/core/client';
+import { IsArray, IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 
 export class LoginDto {
     @IsEmail()
@@ -41,35 +41,35 @@ export class ActivateAccountDto {
     token?: number;
 }
 
-export class ResetPasswordDto { 
+export class ResetPasswordDto {
     @IsString()
     @IsOptional()
     // @IsEmail() 
     email?: string;
-    
-    @IsString()
-    @IsOptional() 
-    // @IsPhoneNumber("NG")
-    phone?: string; 
 
     @IsString()
-    @IsNotEmpty() 
+    @IsOptional()
+    // @IsPhoneNumber("NG")
+    phone?: string;
+
+    @IsString()
+    @IsNotEmpty()
     newPassword: string;
-    
+
     @IsNumber()
-    @IsNotEmpty() 
-    resetToken: number 
+    @IsNotEmpty()
+    resetToken: number
 }
 
 
 export class UpsertRoleDto {
     @IsString()
     name: string;
-   
+
     @IsString()
     @IsOptional()
     id?: string;
-    
+
     @IsArray()
     @IsOptional()
     permission_ids?: string[];
@@ -88,27 +88,27 @@ export class CreateUserDto {
     // id?: string;
 
     @IsString()
-    @IsNotEmpty()    
+    @IsNotEmpty()
     first_name: string;
 
     @IsString()
-    @IsOptional() 
+    @IsOptional()
     middle_name?: string;
 
     @IsString()
-    @IsNotEmpty() 
+    @IsNotEmpty()
     surname: string;
-    
+
     @IsString()
-    @IsOptional() 
+    @IsOptional()
     role_id?: string;
-    
+
     @IsString()
-    @IsOptional() 
+    @IsOptional()
     state_id?: string;
-    
+
     @IsString()
-    @IsOptional() 
+    @IsOptional()
     country_id?: string;
 
     @IsString()
@@ -116,7 +116,7 @@ export class CreateUserDto {
     email: string;
 
     @IsString()
-    @IsOptional() 
+    @IsOptional()
     password?: string;
 
     @IsString()
@@ -130,17 +130,44 @@ export class CreateUserDto {
     @ApiProperty({
         description: `The user's gender`,
         example: Gender,
-      })
+        enum: Gender
+    })
     gender?: Gender;
 
     @IsString()
-    @IsOptional() 
+    @IsOptional()
     address?: string;
     
     @IsString()
-    @IsOptional() 
+    @IsOptional()
     visa_center?: string;
+    
+    @ApiPropertyOptional({
+        description: `The user's type`,
+        example: UserType,
+        enum: UserType
+    })
+    @IsOptional()
+    user_type?: UserType;
+    
+    @ApiPropertyOptional({
+        description: `The applicant's passport number`,
+        example: 'A12345678',
+    })
+    @IsOptional()
+    passport_no?: string;
+    
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsDateString()
+    passport_issued_at?: string;
+    
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsDateString()
+    passport_expiry_at?: string;
 }
+
 
 
 export class FilterUserInterface extends PaginationFilter {
@@ -149,13 +176,13 @@ export class FilterUserInterface extends PaginationFilter {
 
     @IsOptional()
     role_id?: string
-   
+
     @IsOptional()
     ip?: string
-    
+
     @IsOptional()
     from_date?: string | Date;
-    
+
     @IsOptional()
     to_date?: string | Date;
 }
@@ -163,10 +190,10 @@ export class FilterUserInterface extends PaginationFilter {
 export class FilterRoleInterface extends PaginationFilter {
     @IsOptional()
     search_term?: string
-    
+
     @IsOptional()
     from_date?: string;
-    
+
     @IsOptional()
     to_date?: string;
 }
@@ -176,7 +203,7 @@ export class EditUserDto {
     user_id: string;
     @IsOptional()
     is_active?: boolean;
-    
+
     @IsOptional()
     is_admin?: boolean;
 
@@ -194,5 +221,5 @@ export class EditUserDto {
 
     @IsOptional()
     role_id?: string
-    
+
 }

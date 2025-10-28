@@ -144,6 +144,11 @@ export class EVisaController {
   async getCountries() {
     return mapErrorCodeToHttpResponse(await this.eVisaService.getCountries());
   }
+  
+  @Get('exempt-countries')
+  async getExemptCountries() {
+    return mapErrorCodeToHttpResponse(await this.eVisaService.getCountries(true));
+  }
 
   //   @Post('state')
   //   async saveState(@Body() createOrUpdateStateDto: CreateOrUpdateStateDto) {
